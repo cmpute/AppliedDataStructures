@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class SplayTreeNode<TKey> : BinaryTreeNode, ISearchTreeNode<TKey>
+    public class SplayTreeNode<TKey> : BalancedBinaryTreeNode, ISearchTreeNode<TKey>
     {
         TKey _key;
 

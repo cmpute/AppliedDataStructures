@@ -8,6 +8,19 @@ namespace System.Collections.Advanced
 {
     public class SplayTree<TNode, TKey> : BinaryTree<TNode>, ISearchTree<TNode, TKey> where TNode : SplayTreeNode<TKey>
     {
+        IComparer<TKey> _comparer;
+
+        public SplayTree()
+        {
+            _comparer = Comparer<TKey>.Default;
+        }
+        public SplayTree(IComparer<TKey> comparer)
+        {
+            _comparer = comparer;
+        }
+
+        #region Interface boilerplates
+
         public TNode this[TKey key]
         {
             get
@@ -21,27 +34,45 @@ namespace System.Collections.Advanced
             }
         }
 
-        public bool IsReadOnly
+        public bool IsReadOnly { get { return false; } }
+
+        /// <summary>
+        /// Get the collection of Keys
+        /// 获取关键字的集合
+        /// </summary>
+        /// <remarks>
+        /// Actually this getter consumes considerable time, avoid using this or optimize this through override getter in derived classes
+        /// 实际上获取树的该属性非常耗时，应避免使用或考虑在派生类中进行优化
+        /// </remarks>
+        public virtual ICollection<TKey> Keys
         {
             get
             {
-                throw new NotImplementedException();
+                var keys = new List<TKey>();
+                using (var iter = GetEnumerator())
+                    while (iter.MoveNext())
+                        keys.Add(iter.Current.Key);
+                return keys;
             }
         }
 
-        public ICollection<TKey> Keys
+        /// <summary>
+        /// Get the collection of nodes (thus get all the values)
+        /// 获取结点的集合（即获得了全部的值信息)
+        /// </summary>
+        /// <remarks>
+        /// Actually this getter consumes considerable time, avoid using this or optimize this through override getter in derived classes
+        /// 实际上获取树的该属性非常耗时，应避免使用或考虑在派生类中进行优化
+        /// </remarks>
+        public virtual ICollection<TNode> Values
         {
             get
             {
-                throw new NotImplementedException();
-            }
-        }
-
-        public ICollection<TNode> Values
-        {
-            get
-            {
-                throw new NotImplementedException();
+                var values = new List<TNode>();
+                using (var iter = GetEnumerator())
+                    while (iter.MoveNext())
+                        values.Add(iter.Current);
+                return values;
             }
         }
 
@@ -94,5 +125,7 @@ namespace System.Collections.Advanced
         {
             throw new NotImplementedException();
         }
+
+        #endregion
     }
 }

@@ -12,7 +12,7 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <typeparam name="TNode">结点类型</typeparam>
     /// <typeparam name="TKey">关键字类型</typeparam>
-    public interface ISearchTree<TNode, TKey> :IDictionary<TKey, TNode> where TNode : ISearchTreeNode<TKey>
+    public interface ISearchTree<TNode, TKey> : IDictionary<TKey, TNode> where TNode : ISearchTreeNode<TKey>
     {
     }
 }

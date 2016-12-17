@@ -24,6 +24,10 @@ namespace System.Collections.Advanced
         /// Invoke when travel down from root through the tree
         /// 在搜索下行时调用方法
         /// </summary>
+        /// <remarks>
+        /// If there are some lazy operations which need being performed on child nodes, the performation should be implemented here.
+        /// 如果有延迟操作的标记需要应用到子节点上，应在此方法中实现
+        /// </remarks>
         protected virtual void OnSearchDown()
         {
 
@@ -32,6 +36,10 @@ namespace System.Collections.Advanced
         /// Invoke when travel back from the leaves through the tree
         /// 在搜索上行时调用方法
         /// </summary>
+        /// <remarks>
+        /// If there exist information which need being updated from child nodes, the update should be implemented here.
+        /// 如果有信息需要从子节点更新，应在次方法中实现
+        /// </remarks>
         protected virtual void OnSearchUp()
         {
             if (LeftChild != null && LeftChild._version > _version)
