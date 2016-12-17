@@ -10,7 +10,8 @@ Basic dynamic data structures implemented by the .NET framework will not be cons
 #### Implemeted:
 
 #### In Plan:
-
+- Splay Tree
+- van Emde Boas Tree
 
 ## Reference
 
