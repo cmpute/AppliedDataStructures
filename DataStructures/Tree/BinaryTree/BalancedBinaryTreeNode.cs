@@ -12,8 +12,6 @@ namespace System.Collections.Advanced
     /// </summary>
     public class BalancedBinaryTreeNode : BinaryTreeNode
     {
-        public virtual BalancedBinaryTreeNode Parent { get; set; }
-
         /// <summary>
         /// Zig - Right Rotation at the node
         /// 平衡二叉树的右旋操作
@@ -39,8 +37,6 @@ namespace System.Collections.Advanced
             lnode.RightChild = this;
             this.OnSearchUp();
             lnode.OnSearchUp();
-            _version++;
-            lnode._version++;
         }
         /// <summary>
         /// Zag - Left Rotation at the node
@@ -67,8 +63,6 @@ namespace System.Collections.Advanced
             rnode.LeftChild = this;
             this.OnSearchUp();
             rnode.OnSearchUp();
-            _version++;
-            rnode._version++;
         }
     }
 }

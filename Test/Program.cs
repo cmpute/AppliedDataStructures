@@ -11,30 +11,29 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            //var tree = new BinaryTree<ValueNode>();
-            //tree.Root = new ValueNode() { Value = 1 };
-            //tree.Root.LeftChild = new ValueNode() { Value = 2 };
-            //tree.Root.LeftChild.LeftChild = new ValueNode { Value = 4 };
-            //tree.Root.LeftChild.LeftChild.LeftChild = new ValueNode { Value = 7 };
-            //tree.Root.LeftChild.RightChild = new ValueNode { Value = 5 };
-            //tree.Root.LeftChild.RightChild.LeftChild = new ValueNode { Value = 8 };
-            //tree.Root.LeftChild.RightChild.RightChild = new ValueNode { Value = 9 };
-            //tree.Root.RightChild = new ValueNode { Value = 3 };
-            //tree.Root.RightChild.RightChild = new ValueNode { Value = 6 };
-            //tree.Root.RightChild.RightChild.LeftChild = new ValueNode { Value = 10 };
-            //tree.Root.RightChild.RightChild.LeftChild.LeftChild = new ValueNode { Value = 12 };
-            //tree.Root.RightChild.RightChild.RightChild = new ValueNode { Value = 11 };
-            //var iter = tree.GetEnumerator(TraversalOrder.LevelOrder);
-            //while(iter.MoveNext())
-            //{
-            //    Console.WriteLine(iter.Current.Value);
-            //}
+            var tree = new BinarySearchTree<ValueNode, int>();
+            tree.Insert(new ValueNode(4));
+            tree.Insert(new ValueNode(6));
+            tree.Insert(new ValueNode(8));
+            tree.Insert(new ValueNode(3));
+            tree.Insert(new ValueNode(2));
+            tree.Insert(new ValueNode(9));
+            tree.Insert(new ValueNode(7));
+            tree.Insert(new ValueNode(4));
+            foreach (var t in tree)
+                Console.WriteLine(t.Key);
+            tree.Delete(7);
+            tree.Delete(4);
+            tree.Delete(2);
+            foreach (var t in tree)
+                Console.WriteLine(t.Key);
             Console.ReadKey();
         }
     }
 
-    class ValueNode : BinaryTreeNode
+    class ValueNode : BinaryTreeNode, IComparableNode<int>
     {
-        public int Value { get; set; }
+        public ValueNode(int key) { Key = key; }
+        public int Key { get; set; }
     }
 }

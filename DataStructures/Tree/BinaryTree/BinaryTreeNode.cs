@@ -18,6 +18,7 @@ namespace System.Collections.Advanced
     {
         internal int _version = 0; // 作为持久数据结构版本记录的标记
 
+        public virtual BinaryTreeNode Parent { get; set; }
         public virtual BinaryTreeNode LeftChild { get; set; }
         public virtual BinaryTreeNode RightChild { get; set; }
         /// <summary>
@@ -28,7 +29,7 @@ namespace System.Collections.Advanced
         /// If there are some lazy operations which need being performed on child nodes, the performation should be implemented here.
         /// 如果有延迟操作的标记需要应用到子节点上，应在此方法中实现
         /// </remarks>
-        protected virtual void OnSearchDown()
+        public virtual void OnSearchDown()
         {
 
         }
@@ -40,12 +41,85 @@ namespace System.Collections.Advanced
         /// If there exist information which need being updated from child nodes, the update should be implemented here.
         /// 如果有信息需要从子节点更新，应在次方法中实现
         /// </remarks>
-        protected virtual void OnSearchUp()
+        public virtual void OnSearchUp()
         {
+            _version++;
             if (LeftChild != null && LeftChild._version > _version)
                 _version = LeftChild._version;
             if (RightChild != null && RightChild._version > _version)
                 _version = RightChild._version;
+            BinaryTreeNode current = this;
+            while (current.Parent != null)
+            {
+                if (current.LeftChild != null && current.LeftChild._version > _version)
+                    _version = LeftChild._version;
+                if (current.RightChild != null && current.RightChild._version > _version)
+                    _version = RightChild._version;
+                current = current.Parent;
+            }
+        }
+        /// <summary>
+        /// 寻找当前结点在二叉树中序遍历中的后继
+        /// </summary>
+        public virtual BinaryTreeNode Successor()
+        {
+            BinaryTreeNode current = this;
+            if(current.RightChild !=null)
+            {
+                current = current.RightChild;
+                while (current.LeftChild != null)
+                    current = current.LeftChild;
+            }
+            else
+            {
+                while (current.Parent?.RightChild == current)
+                    current = current.Parent;
+                current = current.Parent;
+            }
+            return current;
+        }
+        /// <summary>
+        /// 寻找当前结点在二叉树中序遍历中的前驱
+        /// </summary>
+        public virtual BinaryTreeNode Predecessor()
+        {
+            BinaryTreeNode current = this;
+            if (current.LeftChild != null)
+            {
+                current = current.LeftChild;
+                while (current.RightChild != null)
+                    current = current.RightChild;
+            }
+            else
+            {
+                while (current.Parent?.LeftChild == current)
+                    current = current.Parent;
+                current = current.Parent;
+            }
+            return current;
+        }
+        /// <summary>
+        /// Swap with certain node
+        /// 与指定结点交换
+        /// </summary>
+        /// <param name="target">需要交换的结点</param>
+        public virtual void SwapWith(BinaryTreeNode target)
+        {
+            OnSearchDown();
+            target.OnSearchDown();
+            BinaryTreeNode temp = Parent;
+            Parent = target.Parent;
+            target.Parent = temp;
+            temp = LeftChild;
+            LeftChild = target.LeftChild;
+            target.LeftChild = temp;
+            temp = RightChild;
+            RightChild = target.RightChild;
+            target.RightChild = temp;
+            OnSearchUp();
+            Parent?.OnSearchUp();
+            target.OnSearchUp();
+            target.Parent?.OnSearchUp();
         }
     }
 }

@@ -95,6 +95,9 @@ namespace System.Collections.Advanced
             protected abstract bool MoveNextInternal();
         }
 
+        /// <remarks>
+        /// 中序遍历器采用栈的方式进行遍历，而不要求结点支持Successor操作
+        /// </remarks>
         public class InOrderEnumerator : RecursiveEnumerator
         {
             public InOrderEnumerator(BinaryTree<TNode> tree) : base(tree) { }

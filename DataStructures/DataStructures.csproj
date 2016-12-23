@@ -40,14 +40,20 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tree\BinaryTree.cs" />
-    <Compile Include="Tree\BinaryTreeNode.cs" />
+    <Compile Include="Tree\BinaryTree\BalancedBinaryTreeNode.cs" />
+    <Compile Include="Tree\BinaryTree\BinarySearchTree.cs" />
+    <Compile Include="Tree\Splay\SplayTreeNode.cs" />
+    <Compile Include="Tree\Splay\SplayTree.cs" />
+    <Compile Include="Tree\BinaryTree\BinaryTree.cs" />
+    <Compile Include="Tree\BinaryTree\BinaryTreeNode.cs" />
     <Compile Include="IHeap.cs" />
     <Compile Include="INode.cs" />
     <Compile Include="IRangeEnumerable.cs" />
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Tree\TraversalOrder.cs" />
+    <Compile Include="Tree\ISearchTree.cs" />
+    <Compile Include="IComparableNode.cs" />
+    <Compile Include="Tree\BinaryTree\TraversalOrder.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
