@@ -6,8 +6,8 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public interface ISearchTreeNode<TKey> : INode
+    public class SplayTree<TNode, TKey> : BinarySearchTree<TNode,TKey> where TNode : BinaryTreeNode, IComparableNode<TKey>
     {
-        TKey Key { get; }
+        
     }
 }
