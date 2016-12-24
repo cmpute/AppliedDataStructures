@@ -9,7 +9,7 @@ namespace System.Collections.Advanced
     /// <summary>
     /// 不允许允许重复TKey的二叉搜索树
     /// </summary>
-    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTree<TNode, TKey> where TNode : BinaryTreeNode, IComparableNode<TKey>
+    public class BinarySearchTree<TNode, TKey, TData> : BinaryTree<TNode>, ISearchTree<TNode, TKey> where TNode : BinarySearchTreeNode<TKey,TData>
     {
         protected IComparer<TKey> _comparer;
 
@@ -43,6 +43,7 @@ namespace System.Collections.Advanced
             if (Root == null)
             {
                 Root = node;
+                Count++;
                 return node;
             }
             TNode current = Root;
@@ -59,6 +60,7 @@ namespace System.Collections.Advanced
                         current.RightChild = node;
                         node.Parent = current;
                         current.OnSearchUp();
+                        Count++;
                         break;
                     }
                     current = current.RightChild as TNode;
@@ -70,6 +72,7 @@ namespace System.Collections.Advanced
                         current.LeftChild = node;
                         node.Parent = current;
                         current.OnSearchUp();
+                        Count++;
                         break;
                     }
                     current = current.LeftChild as TNode;
@@ -87,23 +90,32 @@ namespace System.Collections.Advanced
                 if (result == 0)
                 {
                     TNode replace = null;
-                    if (current.LeftChild == null) replace = current.LeftChild as TNode;
-                    else if (current.RightChild == null) replace = current.RightChild as TNode;
+                    if (current.LeftChild == null) replace = current.RightChild as TNode;
+                    else if (current.RightChild == null) replace = current.LeftChild as TNode;
                     else
                     {
-                        var succ = current.Successor();
+                        var succ = current.Successor() as BinarySearchTreeNode<TKey, TData>;
                         succ.SwapWith(current);
+                        while (Root.Parent != null) Root = Root.Parent as TNode;
                         //current.onSearchDown();
-                        if (current.Parent == succ)
-                            current.Parent.RightChild = current.RightChild;
+                        replace = current.RightChild as TNode;
+                        if (succ.Parent == current)
+                            succ.Parent.RightChild = succ.RightChild;
                         else
-                            current.Parent.LeftChild = current.RightChild;
-                        current.RightChild.Parent = current.Parent;
-                        current.Parent.OnSearchUp();
+                            succ.Parent.LeftChild = succ.RightChild;
+                        if (succ.RightChild != null)
+                            succ.RightChild.Parent = succ.Parent;
+                        succ.Parent?.OnSearchUp();
                     }
-                    if (current.Parent.LeftChild == current) current.Parent.LeftChild = replace;
-                    else current.Parent.RightChild = replace;
-                    //current.Parent = null;
+                    if (current.Parent != null)
+                    {
+                        if (current.Parent.LeftChild == current) current.Parent.LeftChild = replace;
+                        else current.Parent.RightChild = replace;
+                    }
+                    if (replace != null) replace.Parent = current.Parent;
+                    //remove(current);
+                    Count--;
+                    if (Count == 0) Root = null;
                     return current;
                 }
                 if (result < 0)

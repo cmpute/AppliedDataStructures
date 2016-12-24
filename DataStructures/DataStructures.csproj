@@ -41,7 +41,8 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Tree\BinaryTree\BalancedBinaryTreeNode.cs" />
-    <Compile Include="Tree\BinaryTree\BinarySearchTree.cs" />
+    <Compile Include="Tree\BinarySearchTree\BinarySearchTree.cs" />
+    <Compile Include="Tree\BinarySearchTree\BinarySearchTreeNode.cs" />
     <Compile Include="Tree\Splay\SplayTreeNode.cs" />
     <Compile Include="Tree\Splay\SplayTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTree.cs" />

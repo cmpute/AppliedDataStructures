@@ -12,6 +12,7 @@ namespace System.Collections.Advanced
     /// </summary>
     public interface IRootedTree<out TNode> : IEnumerable<TNode> where TNode : INode
     {
+        int Count { get; }
         /// <summary>
         /// Get the root of the tree
         /// 获取有根树的根

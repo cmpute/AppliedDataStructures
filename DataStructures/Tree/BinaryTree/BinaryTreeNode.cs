@@ -98,28 +98,5 @@ namespace System.Collections.Advanced
             }
             return current;
         }
-        /// <summary>
-        /// Swap with certain node
-        /// 与指定结点交换
-        /// </summary>
-        /// <param name="target">需要交换的结点</param>
-        public virtual void SwapWith(BinaryTreeNode target)
-        {
-            OnSearchDown();
-            target.OnSearchDown();
-            BinaryTreeNode temp = Parent;
-            Parent = target.Parent;
-            target.Parent = temp;
-            temp = LeftChild;
-            LeftChild = target.LeftChild;
-            target.LeftChild = temp;
-            temp = RightChild;
-            RightChild = target.RightChild;
-            target.RightChild = temp;
-            OnSearchUp();
-            Parent?.OnSearchUp();
-            target.OnSearchUp();
-            target.Parent?.OnSearchUp();
-        }
     }
 }

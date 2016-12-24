@@ -61,12 +61,17 @@ namespace System.Collections.Advanced
             protected Stack<TNode> _stack;
             protected TNode _current;
             protected int _version;
+            bool _null = false;
 
             internal RecursiveEnumerator(BinaryTree<TNode> tree)
             {
-                _tree = tree;
-                _version = tree.Root._version;
-                _stack = new Stack<TNode>();
+                if (tree.Root != null)
+                {
+                    _tree = tree;
+                    _version = tree.Root._version;
+                    _stack = new Stack<TNode>();
+                }
+                else _null = true;
             }
 
             public void Dispose() { }
@@ -74,6 +79,7 @@ namespace System.Collections.Advanced
             object IEnumerator.Current { get { return _current; } }
             public bool MoveNext()
             {
+                if (_null) return false;
                 if (_version != _tree.Root._version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_current == null)
