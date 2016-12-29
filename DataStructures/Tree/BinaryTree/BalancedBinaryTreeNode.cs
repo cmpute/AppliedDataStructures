@@ -23,8 +23,8 @@ namespace System.Collections.Advanced
         {
             var lnode = LeftChild as BalancedBinaryTreeNode;
             if (lnode == null) throw new InvalidOperationException("左孩子为空时无法进行Zig操作");
-            this.OnSearchDown();
-            lnode.OnSearchDown();
+            this.SearchDown();
+            lnode.SearchDown();
             LeftChild = lnode.LeftChild;
             ((BalancedBinaryTreeNode)LeftChild).Parent = this;
             lnode.Parent = Parent;
@@ -35,8 +35,8 @@ namespace System.Collections.Advanced
                     Parent.RightChild = lnode;
             Parent = lnode;
             lnode.RightChild = this;
-            this.OnSearchUp();
-            lnode.OnSearchUp();
+            this.SearchUp();
+            lnode.SearchUp();
         }
         /// <summary>
         /// Zag - Left Rotation at the node
@@ -49,8 +49,8 @@ namespace System.Collections.Advanced
         {
             var rnode = RightChild as BalancedBinaryTreeNode;
             if (rnode == null) throw new InvalidOperationException("左孩子为空时无法进行Zig操作");
-            this.OnSearchDown();
-            rnode.OnSearchDown();
+            this.SearchDown();
+            rnode.SearchDown();
             RightChild = rnode.RightChild;
             ((BalancedBinaryTreeNode)RightChild).Parent = this;
             rnode.Parent = Parent;
@@ -61,8 +61,8 @@ namespace System.Collections.Advanced
                     Parent.LeftChild = rnode;
             Parent = rnode;
             rnode.LeftChild = this;
-            this.OnSearchUp();
-            rnode.OnSearchUp();
+            this.SearchUp();
+            rnode.SearchUp();
         }
     }
 }

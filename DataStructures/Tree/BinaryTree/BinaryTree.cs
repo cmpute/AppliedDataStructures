@@ -19,35 +19,14 @@ namespace System.Collections.Advanced
         public TNode Root { get; set; }
         public int Count { get; protected set; }
 
-        public IEnumerator<TNode> GetEnumerator(TraversalOrder order)
-        {
-            switch (order)
-            {
-                case TraversalOrder.InOrder:
-                    return new InOrderEnumerator(this);
-                case TraversalOrder.PreOrder:
-                    return new PreOrderEnumerator(this);
-                case TraversalOrder.PostOrder:
-                    return new PostOrderEnumerator(this);
-                case TraversalOrder.LevelOrder:
-                    return new LevelOrderEnumerator(this);
-                default:
-                    return null;
-            }
-        }
+        
+        public IEnumerator<TNode> GetEnumerator(TraversalOrder order) => Root.GetSubtreeEnumerator(order);
         /// <summary>
         /// Return InOrder Enumerator by default
         /// 默认返回中序遍历器
         /// </summary>
-        /// <returns></returns>
-        public IEnumerator<TNode> GetEnumerator()
-        {
-            return new InOrderEnumerator(this);
-        }
-        IEnumerator IEnumerable.GetEnumerator()
-        {
-            return new InOrderEnumerator(this);
-        }
+        public IEnumerator<TNode> GetEnumerator() => new InOrderEnumerator(Root);
+        IEnumerator IEnumerable.GetEnumerator() => new InOrderEnumerator(Root);
 
         #region Traverse Enumerators
 
@@ -55,20 +34,20 @@ namespace System.Collections.Advanced
         /// Enumerator for preorder, inorder and postorder traversing
         /// 递归遍历的迭代器
         /// </summary>
-        public abstract class RecursiveEnumerator : IEnumerator<TNode>, IEnumerator
+        internal abstract class RecursiveEnumerator : IEnumerator<TNode>, IEnumerator
         {
-            protected BinaryTree<TNode> _tree;
+            protected TNode _root;
             protected Stack<TNode> _stack;
             protected TNode _current;
             protected int _version;
             bool _null = false;
 
-            internal RecursiveEnumerator(BinaryTree<TNode> tree)
+            internal RecursiveEnumerator(TNode root)
             {
-                if (tree.Root != null)
+                if (root != null)
                 {
-                    _tree = tree;
-                    _version = tree.Root._version;
+                    _root = root;
+                    _version = root._version;
                     _stack = new Stack<TNode>();
                 }
                 else _null = true;
@@ -80,11 +59,11 @@ namespace System.Collections.Advanced
             public bool MoveNext()
             {
                 if (_null) return false;
-                if (_version != _tree.Root._version)
+                if (_version != _root._version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_current == null)
                 {
-                    if (_tree.Root == null) return false;
+                    if (_root == null) return false;
                     InitPosition();
                     return true;
                 }
@@ -92,7 +71,7 @@ namespace System.Collections.Advanced
             }
             public void Reset()
             {
-                if (_version != _tree.Root._version)
+                if (_version != _root._version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _stack.Clear();
@@ -104,12 +83,12 @@ namespace System.Collections.Advanced
         /// <remarks>
         /// 中序遍历器采用栈的方式进行遍历，而不要求结点支持Successor操作
         /// </remarks>
-        public class InOrderEnumerator : RecursiveEnumerator
+        internal class InOrderEnumerator : RecursiveEnumerator
         {
-            public InOrderEnumerator(BinaryTree<TNode> tree) : base(tree) { }
+            public InOrderEnumerator(TNode root) : base(root) { }
             protected override void InitPosition()
             {
-                _current = _tree.Root;
+                _current = _root;
                 while (_current.LeftChild != null)
                 {
                     _stack.Push(_current);
@@ -140,13 +119,13 @@ namespace System.Collections.Advanced
                 }
             }
         }
-        public class PreOrderEnumerator : RecursiveEnumerator
+        internal class PreOrderEnumerator : RecursiveEnumerator
         {
-            public PreOrderEnumerator(BinaryTree<TNode> tree) : base(tree) { }
+            public PreOrderEnumerator(TNode root) : base(root) { }
 
             protected override void InitPosition()
             {
-                _current = _tree.Root;
+                _current = _root;
             }
             protected override bool MoveNextInternal()
             {
@@ -163,14 +142,14 @@ namespace System.Collections.Advanced
                 return true;
             }
         }
-        public class PostOrderEnumerator : RecursiveEnumerator
+        internal class PostOrderEnumerator : RecursiveEnumerator
         {
-            public PostOrderEnumerator(BinaryTree<TNode> tree) : base(tree) { }
+            public PostOrderEnumerator(TNode root) : base(root) { }
 
             protected override void InitPosition()
             {
-                _stack.Push(_tree.Root as TNode);
-                _current = _tree.Root;
+                _stack.Push(_root as TNode);
+                _current = _root;
             }
 
             protected override bool MoveNextInternal()
@@ -202,26 +181,26 @@ namespace System.Collections.Advanced
             }
         }
 
-        public class LevelOrderEnumerator : IEnumerator<TNode>, IEnumerator
+        internal class LevelOrderEnumerator : IEnumerator<TNode>, IEnumerator
         {
-            protected BinaryTree<TNode> _tree;
+            protected TNode _root;
             protected Queue<TNode> _queue;
             protected TNode _current;
             protected int _version;
 
-            internal LevelOrderEnumerator(BinaryTree<TNode> tree)
+            internal LevelOrderEnumerator(TNode root)
             {
-                _tree = tree;
-                _version = tree.Root._version;
+                _root = root;
+                _version = root._version;
                 _queue = new Queue<TNode>();
-                if (_tree.Root != null) _queue.Enqueue(_tree.Root);
+                if (root != null) _queue.Enqueue(root);
             }
             public TNode Current { get { return _current; } }
             object IEnumerator.Current { get { return _current; } }
-            public void Dispose(){}
+            public void Dispose() { }
             public bool MoveNext()
             {
-                if (_version != _tree.Root._version)
+                if (_version != _root._version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_queue.Count == 0) return false;
                 _current = _queue.Dequeue();
@@ -231,7 +210,7 @@ namespace System.Collections.Advanced
             }
             public void Reset()
             {
-                if (_version != _tree.Root._version)
+                if (_version != _root._version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _queue.Clear();
@@ -239,5 +218,32 @@ namespace System.Collections.Advanced
         }
 
         #endregion
+    }
+
+    public static class BinaryTreeEx
+    {
+        /// <summary>
+        /// Get the enumerator of subtree, root of which is <paramref name="partialroot"/>
+        /// 获取以<paramref name="partialroot"/>为根的子树的遍历器
+        /// </summary>
+        /// <param name="order">二叉树遍历方式</param>
+        /// <param name="partialroot">需要遍历的子树的根</param>
+        /// <returns></returns>
+        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraversalOrder order) where TNode : BinaryTreeNode
+        {
+            switch (order)
+            {
+                case TraversalOrder.InOrder:
+                    return new BinaryTree<TNode>.InOrderEnumerator(partialroot);
+                case TraversalOrder.PreOrder:
+                    return new BinaryTree<TNode>.PreOrderEnumerator(partialroot);
+                case TraversalOrder.PostOrder:
+                    return new BinaryTree<TNode>.PostOrderEnumerator(partialroot);
+                case TraversalOrder.LevelOrder:
+                    return new BinaryTree<TNode>.LevelOrderEnumerator(partialroot);
+                default:
+                    return null;
+            }
+        }
     }
 }

@@ -6,27 +6,21 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class BinarySearchTreeNode<TKey, TData> : BinaryTreeNode, IComparableNode<TKey>
+    /// <summary>
+    /// node of Binary Search Tree, the data should be stored in a class of TData in order to make swap operation faster.
+    /// 二叉搜索树结点，为便于结点交换操作，因此节点数据需要专门的类型来存储
+    /// </summary>
+    /// <typeparam name="TKey">用于比较的关键字类型</typeparam>
+    /// <typeparam name="TData">节点存储的数据类型</typeparam>
+    public class BinarySearchTreeNode<TKey> : BinaryTreeNode, IComparableNode<TKey>
     {
+        internal bool _flip = false; // 在搜索下行时的方向记录
+
         public virtual TKey Key { get; set; }
-        public virtual TData Data { get; set; }
-        /// <summary>
-        /// Swap key and data with certain node
-        /// 与指定结点交换节点数据
-        /// </summary>
-        /// <param name="target">需要交换的结点</param>
-        public void SwapWith(BinarySearchTreeNode<TKey, TData> target)
+
+        public override string ToString()
         {
-            OnSearchDown();
-            target.OnSearchDown();
-            var tkey = Key;
-            Key = target.Key;
-            target.Key = tkey;
-            var tdata = Data;
-            Data = target.Data;
-            target.Data = tdata;
-            Parent?.OnSearchUp();
-            target.Parent?.OnSearchUp();
+            return "BST node with Key = " + Key.ToString();
         }
     }
 }
