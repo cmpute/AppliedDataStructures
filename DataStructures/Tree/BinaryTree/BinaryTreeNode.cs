@@ -22,6 +22,8 @@ namespace System.Collections.Advanced
         public virtual BinaryTreeNode LeftChild { get; set; }
         public virtual BinaryTreeNode RightChild { get; set; }
 
+        #region Update Operations
+
         internal void SearchDown()
         {
 
@@ -90,6 +92,8 @@ namespace System.Collections.Advanced
             return false;
         }
 
+        #endregion
+
         /// <summary>
         /// 寻找当前结点在二叉树中序遍历中的后继
         /// </summary>
@@ -130,5 +134,63 @@ namespace System.Collections.Advanced
             }
             return current;
         }
+
+        #region Balance Operations
+        // Operations for Balanced Binary Tree (BBT), specifically for Balanced Binary Search Tree (BBST)
+
+        /// <summary>
+        /// Zig - Right Rotation at the node
+        /// 平衡二叉树的右旋操作
+        /// </summary>
+        /// <remarks>
+        /// 在旋转之后需要考虑更新树根
+        /// </remarks>
+        public void Zig()
+        {
+            var lnode = LeftChild;
+            if (lnode == null) throw new InvalidOperationException("左孩子为空时无法进行Zig操作");
+            this.SearchDown();
+            lnode.SearchDown();
+            LeftChild = lnode.LeftChild;
+            LeftChild.Parent = this;
+            lnode.Parent = Parent;
+            if (Parent != null)
+                if (Parent.LeftChild == this)
+                    Parent.LeftChild = lnode;
+                else
+                    Parent.RightChild = lnode;
+            Parent = lnode;
+            lnode.RightChild = this;
+            this.SearchUp();
+            lnode.SearchUp();
+        }
+        /// <summary>
+        /// Zag - Left Rotation at the node
+        /// 平衡二叉树的左旋操作
+        /// </summary>
+        /// <remarks>
+        /// 在旋转之后需要考虑更新树根
+        /// </remarks>
+        public void Zag()
+        {
+            var rnode = RightChild;
+            if (rnode == null) throw new InvalidOperationException("左孩子为空时无法进行Zig操作");
+            this.SearchDown();
+            rnode.SearchDown();
+            RightChild = rnode.RightChild;
+            RightChild.Parent = this;
+            rnode.Parent = Parent;
+            if (Parent != null)
+                if (Parent.RightChild == this)
+                    Parent.RightChild = rnode;
+                else
+                    Parent.LeftChild = rnode;
+            Parent = rnode;
+            rnode.LeftChild = this;
+            this.SearchUp();
+            rnode.SearchUp();
+        }
+
+        #endregion
     }
 }

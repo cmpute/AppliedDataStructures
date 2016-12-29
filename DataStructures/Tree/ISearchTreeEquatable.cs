@@ -23,6 +23,15 @@ namespace System.Collections.Advanced
         /// <returns>与关键字<paramref name="key"/>相等的所有元素</returns>
         IEnumerable<TNode> SearchAll(TKey key);
 
+        /// <summary>
+        /// 表示树是否支持<see cref="ISearchTreeEquatable{TNode, TKey}"/>接口包含的操作
+        /// </summary>
+        /// <remarks>
+        /// 由于<see cref="ISearchTreeEquatable{TNode, TKey}"/>继承了<see cref="ISearchTree{TNode, TKey}"/>，该属性用于转换支持和不支持相同元素的模式
+        /// 不支持相同元素的操作时可以用作集合(Set)
+        /// </remarks>
+        bool SupportEquatable { set; }
+
         //new void Insert(TNode node);
     }
 }

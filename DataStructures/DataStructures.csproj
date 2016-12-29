@@ -40,15 +40,14 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tree\BinaryTree\BalancedBinaryTreeNode.cs" />
+    <Compile Include="Tree\BinarySearchTree\AVLTree.cs" />
     <Compile Include="Tree\BinarySearchTree\BinarySearchTree.cs" />
-    <Compile Include="Tree\BinarySearchTree\BinarySearchTreeNode.cs" />
+    <Compile Include="Tree\Heap\BinaryHeap.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />
-    <Compile Include="Tree\Splay\SplayTreeNode.cs" />
-    <Compile Include="Tree\Splay\SplayTree.cs" />
+    <Compile Include="Tree\BinarySearchTree\SplayTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTreeNode.cs" />
-    <Compile Include="IHeap.cs" />
+    <Compile Include="IPriorityQueue.cs" />
     <Compile Include="INode.cs" />
     <Compile Include="IRangeEnumerable.cs" />
     <Compile Include="Tree\IRootedTree.cs" />
@@ -56,7 +55,11 @@
     <Compile Include="Tree\ISearchTree.cs" />
     <Compile Include="IComparableNode.cs" />
     <Compile Include="Tree\BinaryTree\TraversalOrder.cs" />
+    <Compile Include="Tree\IStaticSearchTree.cs" />
+    <Compile Include="Tree\vanEmdeBoas\vEBTreeNode.cs" />
+    <Compile Include="Tree\vanEmdeBoas\vEBTree.cs" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

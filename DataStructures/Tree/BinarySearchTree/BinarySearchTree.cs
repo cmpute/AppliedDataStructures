@@ -7,11 +7,13 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     /// <summary>
+    /// Binary Search Tree (BST)
     /// 二叉搜索树
     /// </summary>
-    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinarySearchTreeNode<TKey>
+    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IComparableNode<TKey>
     {
         protected IComparer<TKey> _comparer;
+        Random _rand = new Random();
 
         public BinarySearchTree() : this(Comparer<TKey>.Default) { }
         public BinarySearchTree(IComparer<TKey> comparer)
@@ -107,7 +109,9 @@ namespace System.Collections.Advanced
                 current.SearchDown();
 
                 if (result < 0 || (result == 0 && (KeepInsertOrder  // keep right first when it keeps insert order
-                    || (current._flip = !current._flip)))) // alternatively down when it doesn't keep insert order
+                    || (_rand.Next() % 2 == 0)))) // randomly down when it doesn't keep insert order
+                                                  // another way to do this is to take a log of direction, and whenever need to select the direction, reverse it.(like following:)
+                                                  // (KeepInsertOrder || (current._flip = !current._flip))     //_flip is the field to log the direction
                 {
                     if (current.RightChild == null)
                     {
