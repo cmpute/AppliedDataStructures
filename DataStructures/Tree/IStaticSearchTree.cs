@@ -10,7 +10,7 @@ namespace System.Collections.Advanced
     /// Static Search Tree / Offline Search Tree
     /// 静态搜索树（离线数据结构）的抽象接口
     /// </summary>
-    public interface IStaticSearchTree<TNode, TKey> where TNode : IComparableNode<TKey>
+    public interface IStaticSearchTree<TNode, TKey> where TNode : IKeyedNode<TKey>
     {
         /// <summary>
         /// 在搜索树中根据关键字搜索结点

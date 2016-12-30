@@ -12,7 +12,7 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <typeparam name="TNode">结点上存储的数据类型</typeparam>
     /// <typeparam name="TPrior">优先级关键字的类型</typeparam>
-    public class BinaryHeap<TNode, TPrior> : DenseBinaryTree<TNode>, IPriorityQueue<TNode, TPrior> where TNode : IComparableNode<TPrior>
+    public class BinaryHeap<TNode, TPrior> : DenseBinaryTree<TNode>, IPriorityQueue<TNode, TPrior> where TNode : IKeyedNode<TPrior>
     {
 
     }

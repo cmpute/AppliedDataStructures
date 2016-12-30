@@ -5,12 +5,33 @@ This repository is originally a playground for learning *Data Structure* class o
 
 ## Implemtation Roadmap
 
-Basic dynamic data structures implemented by the .NET framework will not be considered.(like [*Vector*](https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs), [*Queue*](https://referencesource.microsoft.com/#System/compmod/system/collections/generic/queue.cs), [*Stack*](https://referencesource.microsoft.com/#System/compmod/system/collections/generic/stack.cs), [*Dictionary*](https://referencesource.microsoft.com/#mscorlib/system/collections/generic/dictionary.cs), [*Hash Table*](https://referencesource.microsoft.com/#mscorlib/system/collections/hashtable.cs))
+**The final goal of this project is to implement data structures listed in the [*List of Data Structures* in wiki](https://en.wikipedia.org/wiki/List_of_data_structures).**
 
-#### Implemeted:
+Basic dynamic data structures implemented by the .NET framework will not be considered.(like [*ArrayList*](https://referencesource.microsoft.com/#mscorlib/system/collections/arraylist.cs), [*Vector/List*](https://referencesource.microsoft.com/#mscorlib/system/collections/generic/list.cs), [*Queue*](https://referencesource.microsoft.com/#System/compmod/system/collections/generic/queue.cs), [*Stack*](https://referencesource.microsoft.com/#System/compmod/system/collections/generic/stack.cs), [*Hash Table*](https://referencesource.microsoft.com/#mscorlib/system/collections/hashtable.cs), [*Linked List*](https://referencesource.microsoft.com/#System/compmod/system/collections/generic/linkedlist.cs), [*Bit Array*](https://referencesource.microsoft.com/#mscorlib/system/collections/bitarray.cs))
 
-#### In Plan:
-- Splay Tree
+Simple data structure based on these structure will not be implemented here as well.(like [Two-way Linked List](https://en.wikipedia.org/wiki/Doubly_linked_list), [Double-ended Queue](https://en.wikipedia.org/wiki/Double-ended_queue), [Matrix](https://en.wikipedia.org/w/index.php?title=Matrix_(computer_science)&redirect=no))
+
+Algorithms implementations are not the goal of this project, but some of them will obviously be implemented when implementing data structures. And algorithm associated will implemented as much as possible.
+
+### Implemeted:
+
+#### Tree:
+- Binary Search Tree - 二叉搜索树
+- Binary Tree - 二叉树
+- Complete Binary Tree - 完全二叉树
+
+### In Plan:
+- AVL Tree
+- B Trees (AA tree, B*, B+, 2-3 tree, 2-3-4 tree, (a,b)-tree)
+- Binary Heap - 二叉堆
+- Fenwick Tree - 树状数组
+- KD Tree
+- Interval Tree - 区间树
+- Quadtree
+- Range Tree - 范围树
+- Red Black Tree - 红黑树
+- Segment Tree - 线段树
+- Splay Tree - 伸展树
 - van Emde Boas Tree
 
 ## Reference

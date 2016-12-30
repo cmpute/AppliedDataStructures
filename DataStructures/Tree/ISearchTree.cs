@@ -16,7 +16,7 @@ namespace System.Collections.Advanced
     /// ISearchTree interface does not derive from IDictionary because the TNode doesn't fit for the concept TValue, IDictionary can be easily implemented by a wrapper of a Search Tree
     /// ISearchTree接口没有继承IDictionary接口，因为TNode作为TValue并不是很合适，IDictionay可以通过对搜索树进行封装而非常容易地实现
     /// </remarks>
-    public interface ISearchTree<TNode, TKey> where TNode : IComparableNode<TKey>
+    public interface ISearchTree<TNode, TKey> where TNode : IKeyedNode<TKey>
     {
         /// <summary>
         /// 在搜索树中根据关键字搜索结点

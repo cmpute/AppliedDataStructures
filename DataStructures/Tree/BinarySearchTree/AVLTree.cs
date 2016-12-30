@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class AVLTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IComparableNode<TKey>
+    public class AVLTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
     }
 }

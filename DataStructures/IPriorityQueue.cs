@@ -21,7 +21,7 @@ namespace System.Collections.Advanced
     /// MaxHeap can be turned into MinHeap by changing IComparer
     /// 最大堆可以通过改变比较方式变成最小堆
     /// </remarks>
-    public interface IPriorityQueue<TValue, TPrior> where TValue : IComparableNode<TPrior>
+    public interface IPriorityQueue<TValue, TPrior> where TValue : IKeyedNode<TPrior>
     {
         /// <summary>
         /// The same as<see cref="Queue{T}.Peek"/>. Return the minimum in the queue

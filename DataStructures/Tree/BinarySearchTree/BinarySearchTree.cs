@@ -10,7 +10,7 @@ namespace System.Collections.Advanced
     /// Binary Search Tree (BST)
     /// 二叉搜索树
     /// </summary>
-    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IComparableNode<TKey>
+    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
         protected IComparer<TKey> _comparer;
         Random _rand = new Random();

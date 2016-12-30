@@ -14,7 +14,7 @@ namespace System.Collections.Advanced
     /// 此时<see cref="ISearchTree{TNode, TKey}.Search(TKey)"/>的返回值为第一个匹配的结点，
     /// <see cref="ISearchTree{TNode, TKey}.Insert(TNode)"/>返回值为插入的结点
     /// </remarks>
-    public interface ISearchTreeEquatable<TNode, TKey> : ISearchTree<TNode, TKey> where TNode : IComparableNode<TKey>
+    public interface ISearchTreeEquatable<TNode, TKey> : ISearchTree<TNode, TKey> where TNode : IKeyedNode<TKey>
     {
         /// <summary>
         /// 在搜索树中根据关键字搜索所有匹配结点
