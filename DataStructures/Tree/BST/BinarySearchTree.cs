@@ -32,6 +32,8 @@ namespace System.Collections.Advanced
         /// </summary>
         public bool KeepInsertOrder { get; set; } = true;
 
+        public IComparer<TKey> Comparer => _comparer;
+
         /// <summary>
         /// 用replace子树替换u结点
         /// </summary>
@@ -83,10 +85,7 @@ namespace System.Collections.Advanced
             return ret;
         }
 
-        public virtual TNode Search(TKey key)
-        {
-            return Search(key, false);
-        }
+        public virtual TNode Search(TKey key) => Search(key, false);
 
         public virtual TNode Insert(TNode node)
         {
@@ -143,11 +142,10 @@ namespace System.Collections.Advanced
         }
 
         /// <summary>
-        /// Delete certain node
-        /// 删除指定结点
+        /// 删除指定结点，由内部调用，确保删除的结点在内部
         /// </summary>
         /// <param name="node">需要删除的结点</param>
-        public virtual void Delete(TNode node)
+        protected virtual void DeleteInternal(TNode node)
         {
             if (node == null) return;
             if (node.LeftChild == null)
@@ -181,10 +179,23 @@ namespace System.Collections.Advanced
             Count--;
         }
 
-        public virtual TNode Delete(TKey key)
+        /// <summary>
+        /// Delete certain node
+        /// 删除指定结点
+        /// </summary>
+        /// <param name="node">需要删除的结点</param>
+        /// <return>结点在树中并且删除成功则返回true，否则返回false</return>
+        public bool Delete(TNode node)
+        {
+            if (!SearchAll(node.Key).Contains(node)) return false;
+            DeleteInternal(node);
+            return true;
+        }
+
+        public TNode Delete(TKey key)
         {
             TNode current = Search(key, true);
-            Delete(current);
+            DeleteInternal(current);
             return current;
         }
 
@@ -218,10 +229,11 @@ namespace System.Collections.Advanced
 
         public virtual IEnumerable<TNode> SearchAll(TKey key)
         {
-            if (!SupportEquatable)
-                throw new NotSupportedException("SupportEquatable设为了false，如果需要进行Search操作请使用Search函数");
-
             TNode current = Search(key);
+
+            if (!SupportEquatable)
+                yield return current;
+                //throw new NotSupportedException("SupportEquatable设为了false，如果需要进行Search操作请使用Search函数");
 
             if (KeepInsertOrder)
             {
@@ -248,6 +260,12 @@ namespace System.Collections.Advanced
                     part = part.Predecessor() as TNode;
                 }
             }
+        }
+
+        public virtual void Clear()
+        {
+            Root = null;
+            Count = 0;
         }
     }
 }

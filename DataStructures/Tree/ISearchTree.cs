@@ -22,18 +22,19 @@ namespace System.Collections.Advanced
         /// 在搜索树中根据关键字搜索结点
         /// </summary>
         /// <param name="key">关键字</param>
-        /// <returns>搜索到的结点</returns>
+        /// <returns>搜索到的结点，结点不在树中则返回<c>null</c></returns>
         TNode Search(TKey key);
         /// <summary>
         /// 在搜索树中根据关键字删除结点
         /// </summary>
         /// <param name="key">关键字</param>
-        /// <returns>删除掉的结点</returns>
+        /// <returns>删除掉的结点，结点不在树中则返回<c>null</c></returns>
         TNode Delete(TKey key);
         /// <summary>
         /// 在搜索树中插入结点，如果已存在同样Key值的结点则返回该结点
         /// </summary>
-        /// <param name="node">需要插入的结点</param>
+        /// <param name="node">需要插入的结点，结点已存在于树中则返回该结点</param>
         TNode Insert(TNode node);
+        IComparer<TKey> Comparer { get; }
     }
 }

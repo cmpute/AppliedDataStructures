@@ -40,11 +40,15 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Tree\BinarySearchTree\AVLTree.cs" />
-    <Compile Include="Tree\BinarySearchTree\BinarySearchTree.cs" />
+    <Compile Include="IKeyedNode.cs" />
+    <Compile Include="Tree\BST\AVLTree.cs" />
+    <Compile Include="Tree\BST\BinarySearchTree.cs" />
+    <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
+    <Compile Include="Tree\TreeEx.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
+    <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />
-    <Compile Include="Tree\BinarySearchTree\SplayTree.cs" />
+    <Compile Include="Tree\BST\SplayTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTreeNode.cs" />
     <Compile Include="IPriorityQueue.cs" />
@@ -53,11 +57,10 @@
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ISearchTree.cs" />
-    <Compile Include="IComparableNode.cs" />
     <Compile Include="Tree\BinaryTree\TraversalOrder.cs" />
     <Compile Include="Tree\IStaticSearchTree.cs" />
-    <Compile Include="Tree\vanEmdeBoas\vEBTreeNode.cs" />
-    <Compile Include="Tree\vanEmdeBoas\vEBTree.cs" />
+    <Compile Include="Tree\vEB\vanEmdeBoasTreeNode.cs" />
+    <Compile Include="Tree\vEB\vanEmdeBoasTree.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

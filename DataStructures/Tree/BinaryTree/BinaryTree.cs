@@ -16,7 +16,7 @@ namespace System.Collections.Advanced
     /// </remarks>
     public abstract class BinaryTree<TNode> : IRootedTree<TNode> where TNode : BinaryTreeNode
     {
-        public TNode Root { get; set; }
+        public TNode Root { get; protected set; }
         public int Count { get; protected set; }
 
         
@@ -218,32 +218,5 @@ namespace System.Collections.Advanced
         }
 
         #endregion
-    }
-
-    public static class BinaryTreeEx
-    {
-        /// <summary>
-        /// Get the enumerator of subtree, root of which is <paramref name="partialroot"/>
-        /// 获取以<paramref name="partialroot"/>为根的子树的遍历器
-        /// </summary>
-        /// <param name="order">二叉树遍历方式</param>
-        /// <param name="partialroot">需要遍历的子树的根</param>
-        /// <returns></returns>
-        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraversalOrder order) where TNode : BinaryTreeNode
-        {
-            switch (order)
-            {
-                case TraversalOrder.InOrder:
-                    return new BinaryTree<TNode>.InOrderEnumerator(partialroot);
-                case TraversalOrder.PreOrder:
-                    return new BinaryTree<TNode>.PreOrderEnumerator(partialroot);
-                case TraversalOrder.PostOrder:
-                    return new BinaryTree<TNode>.PostOrderEnumerator(partialroot);
-                case TraversalOrder.LevelOrder:
-                    return new BinaryTree<TNode>.LevelOrderEnumerator(partialroot);
-                default:
-                    return null;
-            }
-        }
     }
 }

@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class vEBTreeNode
+    public class vanEmdeBoasTreeNode
     {
     }
 }

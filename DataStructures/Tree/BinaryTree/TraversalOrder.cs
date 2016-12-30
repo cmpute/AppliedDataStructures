@@ -6,9 +6,12 @@
     /// </summary>
     public enum TraversalOrder
     {
+        /********** Depth First (DFS) **********/
+
         /// <summary>
         /// 前序遍历
         /// </summary>
+        /// <remarks>Binary Tree only.</remarks>
         PreOrder,
         /// <summary>
         /// 中序遍历
@@ -17,7 +20,11 @@
         /// <summary>
         /// 后序遍历
         /// </summary>
+        /// <remarks>Binary Tree only.</remarks>
         PostOrder,
+
+        /********** Breadth First (BFS) **********/
+
         /// <summary>
         /// 层次遍历
         /// </summary>

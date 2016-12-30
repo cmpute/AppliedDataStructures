@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class vEBTree<TNode, TKey> where TNode : vEBTreeNode
+    public class vanEmdeBoasTree<TNode, TKey> where TNode : vanEmdeBoasTreeNode
     {
     }
 }
