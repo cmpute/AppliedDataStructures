@@ -16,7 +16,20 @@ namespace System.Collections.Advanced
     /// </remarks>
     public abstract class BinaryTree<TNode> : IRootedTree<TNode> where TNode : BinaryTreeNode
     {
-        public TNode Root { get; protected set; }
+        /// <summary>
+        /// 根节点的哨兵，在中序遍历中位于所有结点的最前面
+        /// </summary>
+        protected readonly BinaryTreeNode _rootTrailer = new BinaryTreeNode();
+        public TNode Root
+        {
+            get { return _rootTrailer.RightChild as TNode; }
+            protected set
+            {
+                _rootTrailer.RightChild = value;
+                if (value != null)
+                    value.Parent = _rootTrailer;
+            }
+        }
         public int Count { get; protected set; }
 
         

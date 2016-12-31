@@ -10,6 +10,9 @@ namespace System.Collections.Advanced
     /// Binary Search Tree (BST)
     /// 二叉搜索树
     /// </summary>
+    /// <remarks>
+    /// Insert and Delete implementations are naive ones
+    /// </remarks>
     public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
         protected IComparer<TKey> _comparer;
@@ -41,7 +44,7 @@ namespace System.Collections.Advanced
         /// <param name="replace">替换的结点</param>
         private void Transplant(BinaryTreeNode target, BinaryTreeNode replace)
         {
-            if (target.Parent == null)
+            if (target.Parent == _rootTrailer)
                 Root = replace as TNode;
             else
             {
@@ -63,7 +66,7 @@ namespace System.Collections.Advanced
         /// 内部调用的Search函数
         /// </summary>
         /// <param name="modify">是否在下行过程中调用OnSearchDown</param>
-        private TNode Search(TKey key, bool modify)
+        protected virtual TNode Search(TKey key, bool modify)
         {
             TNode current = Root, ret = null;
             while (current != null)
@@ -85,7 +88,7 @@ namespace System.Collections.Advanced
             return ret;
         }
 
-        public virtual TNode Search(TKey key) => Search(key, false);
+        public TNode Search(TKey key) => Search(key, false);
 
         public virtual TNode Insert(TNode node)
         {
@@ -224,6 +227,7 @@ namespace System.Collections.Advanced
             if (SupportEquatable)
                 while (ret != null && _comparer.Compare(ret.Key, key) == 0)
                     ret = ret.Predecessor() as TNode;
+            if (ret == _rootTrailer) ret = null;//当访问到哨兵时返回空
             return ret as TNode;
         }
 

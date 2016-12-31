@@ -42,6 +42,7 @@
   <ItemGroup>
     <Compile Include="IKeyedNode.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
+    <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
     <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
     <Compile Include="Tree\TreeEx.cs" />

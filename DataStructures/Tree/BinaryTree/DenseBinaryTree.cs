@@ -13,7 +13,7 @@ namespace System.Collections.Advanced
     /// <typeparam name="TNode"></typeparam>
     public abstract class DenseBinaryTree<TNode> : IRootedTree<TNode> where TNode : INode
     {
-        protected List<TNode> _nodes;
+        protected IList<TNode> _nodes;
 
         /// <inheritdoc/>
         public int Count => _nodes.Count;

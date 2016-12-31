@@ -37,20 +37,24 @@ namespace System.Collections.Advanced
             if (RightChild != null && RightChild._version > _version)
                 _version = RightChild._version;
             OnSearchUp();
+            OnSearchUpRecursive();
 
-            BinaryTreeNode current = this;
-            while (current.Parent != null)
+            if (Parent != null)
             {
-                var temp = _version;
+                BinaryTreeNode current = Parent;
+                while (current != null)
+                {
+                    var temp = _version;
 
-                if (current.LeftChild != null && current.LeftChild._version > _version)
-                    _version = LeftChild._version;
-                if (current.RightChild != null && current.RightChild._version > _version)
-                    _version = RightChild._version;
-                var searchup = !current.OnSearchUpRecursive();
+                    var nsearchup = !current.OnSearchUpRecursive();
+                    if (current.LeftChild != null && current.LeftChild._version > _version)
+                        _version = current.LeftChild._version;
+                    if (current.RightChild != null && current.RightChild._version > _version)
+                        _version = current.RightChild._version;
 
-                if (temp == _version || searchup) break; // No updating any more
-                current = current.Parent;
+                    if (temp == _version && nsearchup) break; // No updating any more
+                    current = current.Parent;
+                }
             }
         }
 
