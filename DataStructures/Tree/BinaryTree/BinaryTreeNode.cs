@@ -14,7 +14,7 @@ namespace System.Collections.Advanced
     /// 继承结点可以在结点上维护额外信息减小操作的时间复杂度
     /// 结点没有保留双亲指针，因为部分树不需要向上回溯的过程
     /// </remarks>
-    public class BinaryTreeNode : INode
+    public class BinaryTreeNode
     {
         internal int _version = 0; // 作为持久数据结构版本记录的标记
 

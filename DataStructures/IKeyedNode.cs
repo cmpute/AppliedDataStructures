@@ -15,7 +15,7 @@ namespace System.Collections.Advanced
     /// It's recommended that <typeparamref name="TKey"/> implements <see cref="IComparable{T}"/> interface, if not, the <see cref="Comparer{T}.Default"/> will be used.
     /// <typeparamref name="TKey"/>应实现<see cref="IComparable{T}"/>接口，否则会使用<see cref="Comparer{T}.Default"/>比较器。
     /// </remarks>
-    public interface IKeyedNode<TKey> : INode
+    public interface IKeyedNode<TKey>
     {
         /// <summary>
         /// Key for comparing

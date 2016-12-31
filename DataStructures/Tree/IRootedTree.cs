@@ -10,7 +10,7 @@ namespace System.Collections.Advanced
     /// Abstract Interface for rooted-tree
     /// 有根树的抽象接口
     /// </summary>
-    public interface IRootedTree<out TNode> : IEnumerable<TNode> where TNode : INode
+    public interface IRootedTree<out TNode> : IEnumerable<TNode>
     {
         int Count { get; }
         /// <summary>

@@ -13,15 +13,11 @@ namespace System.Collections.Advanced
     /// <typeparam name="TValue">
     /// Type of values stored in PQ
     /// 堆上存储的数据类型</typeparam>
-    /// <typeparam name="TPrior">
-    /// Type standing for priority
-    /// 表示优先级的类型
-    /// </typeparam>
     /// <remarks>
     /// MaxHeap can be turned into MinHeap by changing IComparer
     /// 最大堆可以通过改变比较方式变成最小堆
     /// </remarks>
-    public interface IPriorityQueue<TValue, TPrior> where TValue : IKeyedNode<TPrior>
+    public interface IPriorityQueue<TValue>
     {
         /// <summary>
         /// The same as<see cref="Queue{T}.Peek"/>. Return the minimum in the queue
@@ -53,6 +49,6 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="another">另一个优先级队列</param>
         /// <returns>合并后的队</returns>
-        IPriorityQueue<TValue, TPrior> Merge(IPriorityQueue<TValue, TPrior> another);
+        IPriorityQueue<TValue> Merge(IPriorityQueue<TValue> another);
     }
 }

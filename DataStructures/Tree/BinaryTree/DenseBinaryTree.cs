@@ -11,7 +11,7 @@ namespace System.Collections.Advanced
     /// 稠密存储的二叉树（常用来表示完全二叉树）
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
-    public abstract class DenseBinaryTree<TNode> : IRootedTree<TNode> where TNode : INode
+    public abstract class DenseBinaryTree<TNode> : IRootedTree<TNode>
     {
         protected IList<TNode> _nodes;
 
@@ -26,5 +26,13 @@ namespace System.Collections.Advanced
 
         /// <inheritdoc/>
         IEnumerator IEnumerable.GetEnumerator() => _nodes.GetEnumerator();
+
+        /// <summary>
+        /// 如果是用<see cref="List{T}"/>存储的结点数据，那么该方法将会调用<see cref="List{T}.TrimExcess"/>方法。
+        /// </summary>
+        public void TrimExcess()
+        {
+            (_nodes as List<TNode>)?.TrimExcess();
+        }
     }
 }

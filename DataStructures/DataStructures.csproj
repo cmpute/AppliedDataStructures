@@ -40,12 +40,13 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IKeyedNode.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
     <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
-    <Compile Include="Tree\TreeEx.cs" />
+    <Compile Include="ExampleUsages\TreeEx.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />
@@ -53,7 +54,6 @@
     <Compile Include="Tree\BinaryTree\BinaryTree.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTreeNode.cs" />
     <Compile Include="IPriorityQueue.cs" />
-    <Compile Include="INode.cs" />
     <Compile Include="IRangeEnumerable.cs" />
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

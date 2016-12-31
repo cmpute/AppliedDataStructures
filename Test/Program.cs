@@ -10,8 +10,9 @@ namespace Test
     {
         static void Main(string[] args)
         {
-            BinarySearchTreeTest.Test();
-            AVLTreeTest.Test();
+            //BinarySearchTreeTest.Test();
+            //AVLTreeTest.Test();
+            BinaryHeapTest.Test();
 
             Console.ReadKey();
         }

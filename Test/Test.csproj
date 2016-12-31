@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="AVLTreeTest.cs" />
+    <Compile Include="BinaryHeapTest.cs" />
     <Compile Include="BinarySearchTreeTest.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
