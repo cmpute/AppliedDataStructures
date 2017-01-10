@@ -34,5 +34,7 @@ namespace System.Collections.Advanced
         {
             (_nodes as List<TNode>)?.TrimExcess();
         }
+
+        public void Clear() => _nodes.Clear();
     }
 }

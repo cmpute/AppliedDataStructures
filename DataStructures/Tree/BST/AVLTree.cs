@@ -16,5 +16,11 @@ namespace System.Collections.Advanced
     {
         // There is no more edit in BinarySearchTree Members, All modifications are in the AVLTreeNode class
         // 在BinarySearchTree类型中没有修改，AVL相比二叉搜索树所有的修改均在AVLTreeNode的类型中
+
+        /// <summary>
+        /// The height of AVL tree.
+        /// AVL树的树高
+        /// </summary>
+        public int Height => Root.Height;
     }
 }
