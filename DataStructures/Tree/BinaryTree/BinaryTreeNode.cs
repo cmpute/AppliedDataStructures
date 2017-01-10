@@ -34,6 +34,12 @@ namespace System.Collections.Advanced
             return false;
         }
         public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b)=>!(a==b);
+
+        public override string ToString()
+        {
+            if (Equals(_nil)) return "Nil Leaf";
+            return base.ToString();
+        }
         #endregion
 
         internal int _version = 0; // 作为持久数据结构版本记录的标记

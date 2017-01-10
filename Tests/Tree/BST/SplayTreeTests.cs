@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced.Tests
 {
     [TestClass()]
-    public class BinarySearchTreeTests
+    public class SplayTreeTests
     {
-        BinarySearchTree<BSTValueNode, int> tree = new BinarySearchTree<BSTValueNode, int>() { SupportEquatable = true, KeepInsertOrder = true };
+        SplayTree<BSTValueNode, int> tree = new SplayTree<BSTValueNode, int>() { SupportEquatable = true, KeepInsertOrder = true };
         List<BSTValueNode> nodes = new List<BSTValueNode>();
 
         void NewNode(int value)
@@ -64,20 +64,6 @@ namespace System.Collections.Advanced.Tests
                 Assert.IsTrue(tree.SearchAll(4).SequenceEqual(nodes.Where(val => val.Key == 4)));
             else
                 Assert.AreEqual(0, tree.SearchAll(4).Except(nodes.Where(val => val.Key == 4)).Count());
-        }
-    }
-
-
-    class BSTValueNode : BinaryTreeNode, IKeyedNode<int>
-    {
-        static int order = 1;
-        public int Order { get; set; }
-        public int Key { get; set; }
-        public BSTValueNode(int key) { Key = key; Order = order++; }
-
-        public override string ToString()
-        {
-            return "BSTNode, Key=" + Key;
         }
     }
 }
