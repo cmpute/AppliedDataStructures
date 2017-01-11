@@ -31,7 +31,7 @@ namespace System.Collections.Advanced
         public BinaryHeap(IEnumerable<TValue> data) : this(data, Comparer<TValue>.Default) { }
         public BinaryHeap(IEnumerable<TValue> data, IComparer<TValue> comparer)
         {
-            _nodes = data.ToArray();
+            _nodes = data.ToList();
             _comparer = comparer ?? Comparer<TValue>.Default;
             Heapify();
         }
@@ -62,9 +62,12 @@ namespace System.Collections.Advanced
 
         public TValue ExtractMin()
         {
+            if (Count == 0) throw new InvalidOperationException("堆为空");
+
             var min = Root;
             _nodes[0] = _nodes[Count - 1];
             _nodes.RemoveAt(Count - 1);
+
             if (Count == 0) return min;
             UpdateIndex(0);
             PercolateDown(0);
