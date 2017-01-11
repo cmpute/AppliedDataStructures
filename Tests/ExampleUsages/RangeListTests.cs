@@ -188,7 +188,7 @@ namespace System.Collections.Generic.Tests
         public void RemoveRangeTest()
         {
             int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start + 1);
+            int count = r.Next(list.Count - start);
             list.RemoveRange(start, count);
             compare.RemoveRange(start, count);
 
@@ -199,7 +199,7 @@ namespace System.Collections.Generic.Tests
         public void OperateRangeTest()
         {
             int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start + 1);
+            int count = r.Next(list.Count - start);
             int add = r.Next(100);
 
             list.OperateRange(start, count, (ref int target) => target += add);
@@ -218,7 +218,7 @@ namespace System.Collections.Generic.Tests
             Assert.IsTrue(compare.SequenceEqual(list));
 
             int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start + 1);
+            int count = r.Next(list.Count - start);
             list.Reverse(start, count);
             compare.Reverse(start, count);
 

@@ -35,6 +35,6 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="node">需要插入的结点，结点已存在于树中则返回该结点</param>
         TNode Insert(TNode node);
-        IComparer<TKey> Comparer { get; }
+        IComparer<TKey> KeyComparer { get; }
     }
 }

@@ -8,5 +8,6 @@ namespace System.Collections.Advanced
 {
     public class vanEmdeBoasTreeNode
     {
+
     }
 }

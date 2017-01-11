@@ -53,22 +53,21 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected static AVLTreeNode<TKey> Connect34(AVLTreeNode<TKey> a, AVLTreeNode<TKey> b, AVLTreeNode<TKey> c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
         {
-            var parent = b.Parent = top.Parent;
-            if (parent != null)
-                if (parent.LeftChild == top)
-                    parent.LeftChild = b;
-                else parent.RightChild = b;
+            var parent = top.Parent;
+            if (parent.LeftChild == top)
+                parent.LeftChild = b;
+            else parent.RightChild = b;
 
-            a.LeftChild = t0; if (t0 != null) t0.Parent = a;
-            a.RightChild = t1; if (t1 != null) t1.Parent = a;
+            a.LeftChild = t0;
+            a.RightChild = t1;
             a.OnSearchUpRecursive(false);
 
-            c.LeftChild = t2; if (t2 != null) t2.Parent = c;
-            c.RightChild = t3; if (t3 != null) t3.Parent = c;
+            c.LeftChild = t2;
+            c.RightChild = t3;
             c.OnSearchUpRecursive(false);
 
-            b.LeftChild = a; a.Parent = b;
-            b.RightChild = c; c.Parent = b;
+            b.LeftChild = a;
+            b.RightChild = c;
             b.OnSearchUpRecursive(false);
 
             return b;

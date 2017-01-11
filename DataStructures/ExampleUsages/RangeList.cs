@@ -129,8 +129,8 @@ namespace System.Collections.Generic
     }
 
     /// <summary>
-    /// a tree supporting index operations, it's not literally a search tree, but just use the 'splay' feature
-    /// 支持索引操作的树，它不是严格的搜索树，只是利用了splay的特性
+    /// a tree supporting index operations
+    /// 支持索引操作的树
     /// </summary>
     /// <typeparam name="T">元素类型</typeparam>
     class SplayRangeTree<T> : SplayTree<SplayRangeTreeNode<T>, int>
@@ -144,11 +144,9 @@ namespace System.Collections.Generic
                 foreach (var item in init)
                 {
                     p.RightChild = new SplayRangeTreeNode<T>(item);
-                    p.RightChild.Parent = p;
                     p = p.RightChild;
                 }
             p.RightChild = rnil = new SplayRangeTreeNode<T>(default(T)); // right trailor
-            p.RightChild.Parent = p;
             Splay(p);
         }
 
@@ -188,7 +186,6 @@ namespace System.Collections.Generic
                 if (iter.MoveNext())
                 {
                     p = Root.RightChild.LeftChild = new SplayRangeTreeNode<T>(iter.Current);
-                    p.Parent = Root.RightChild;
                     Count++;
                 }
                 else
@@ -196,7 +193,6 @@ namespace System.Collections.Generic
             while (iter.MoveNext())
             {
                 p.RightChild = new SplayRangeTreeNode<T>(iter.Current);
-                p.RightChild.Parent = p;
                 p = p.RightChild;
                 Count++;
             }
@@ -270,12 +266,19 @@ namespace System.Collections.Generic
         internal int subcount = 1;
         internal T _data;
 
-        public int Key => subcount;
+        /// <remarks>
+        /// The tree is indeed a search tree which the index in the list is the key, but the index cannot be retrieved directly from the field "subcount"
+        /// 这的确是一棵以元素在列表中位置为关键字的搜索树，但这个关键字不能从subcount变量中直接得到
+        /// </remarks>
+        public int Key//=> subcount;
+        {
+            get { throw new NotSupportedException(); }
+        }
 
         public SplayRangeTreeNode(T data)
         {
             _data = data;
-            Parent = LeftChild = RightChild = nil;
+            _par = _lchild = _rchild = nil;
         }
 
         public new SplayRangeTreeNode<T> LeftChild

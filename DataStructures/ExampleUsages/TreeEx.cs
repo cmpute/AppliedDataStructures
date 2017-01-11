@@ -81,7 +81,7 @@ namespace System.Collections.Advanced
 
         TNode KeyValueCheck(TKey key, TNode value)
         {
-            if (_tree.Comparer.Compare(key, value.Key) != 0) throw new ArgumentException("结点键值与输入的参数键值不匹配");
+            if (_tree.KeyComparer.Compare(key, value.Key) != 0) throw new ArgumentException("结点键值与输入的参数键值不匹配");
             return value;
         }
 

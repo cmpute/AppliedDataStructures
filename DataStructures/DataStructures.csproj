@@ -43,6 +43,7 @@
     <Compile Include="ExampleUsages\RangeList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IKeyedNode.cs" />
+    <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
@@ -60,8 +61,8 @@
     <Compile Include="Tree\ISearchTree.cs" />
     <Compile Include="Tree\BinaryTree\TraversalOrder.cs" />
     <Compile Include="Tree\IStaticSearchTree.cs" />
-    <Compile Include="Tree\vEB\vanEmdeBoasTreeNode.cs" />
-    <Compile Include="Tree\vEB\vanEmdeBoasTree.cs" />
+    <Compile Include="Tree\MultiwayTree\vanEmdeBoasTreeNode.cs" />
+    <Compile Include="Tree\MultiwayTree\vanEmdeBoasTree.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

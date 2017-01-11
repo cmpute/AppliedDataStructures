@@ -27,7 +27,7 @@ namespace System.Collections.Advanced
         /// <summary>
         /// 是否支持<see cref="ISearchTreeEquatable{TNode, TKey}"/>的操作
         /// </summary>
-        public bool SupportEquatable { get; set; } = false;
+        public virtual bool SupportEquatable { get; set; } = false;
 
         /// <summary>
         /// 当元素雷同时，是否在中序遍历的意义下保持插入的顺序（先插入者在前），并且搜索时返回第一个插入的元素
@@ -35,7 +35,7 @@ namespace System.Collections.Advanced
         /// </summary>
         public bool KeepInsertOrder { get; set; } = true;
 
-        public IComparer<TKey> Comparer => _comparer;
+        public IComparer<TKey> KeyComparer => _comparer;
 
         /// <summary>
         /// 用replace子树替换u结点
@@ -54,11 +54,7 @@ namespace System.Collections.Advanced
                 else
                     target.Parent.RightChild = replace;
             }
-            if (replace != null)
-            {
-                replace.Parent = target.Parent;
-                replace.SearchUp();
-            }
+            replace.SearchUp();
         }
 
         /// <summary>
@@ -119,7 +115,6 @@ namespace System.Collections.Advanced
                     {
                         // insert into right
                         current.RightChild = node;
-                        node.Parent = current;
                         current.SearchUp();
                         Count++;
                         break;
@@ -132,7 +127,6 @@ namespace System.Collections.Advanced
                     {
                         // insert into left
                         current.LeftChild = node;
-                        node.Parent = current;
                         current.SearchUp();
                         Count++;
                         break;
@@ -171,13 +165,11 @@ namespace System.Collections.Advanced
                 {
                     Transplant(succ, succ.RightChild);
                     succ.RightChild = node.RightChild;
-                    succ.RightChild.Parent = succ;
                 }
 
                 // replace node with successor
                 Transplant(node, succ);
                 succ.LeftChild = node.LeftChild;
-                succ.LeftChild.Parent = succ;
             }
             Count--;
         }

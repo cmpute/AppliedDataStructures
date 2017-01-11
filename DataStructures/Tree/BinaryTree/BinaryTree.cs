@@ -23,12 +23,7 @@ namespace System.Collections.Advanced
         public TNode Root
         {
             get { return _rootTrailer.RightChild as TNode; }
-            protected set
-            {
-                _rootTrailer.RightChild = value;
-                if (value != null)
-                    value.Parent = _rootTrailer;
-            }
+            protected set { _rootTrailer.RightChild = value; }
         }
         public int Count { get; protected set; }
 

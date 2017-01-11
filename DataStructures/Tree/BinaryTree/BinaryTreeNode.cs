@@ -17,7 +17,7 @@ namespace System.Collections.Advanced
     public class BinaryTreeNode
     {
         #region Leaf Trailor
-        static readonly BinaryTreeNode _nil = new BinaryTreeNode() { Parent = null, LeftChild = null, RightChild = null };
+        static readonly BinaryTreeNode _nil = new BinaryTreeNode() { _par = null, _lchild = null, _rchild = null };
         /// <summary>
         /// Trailor of leaf nodes
         /// 叶子节点为空时的哨兵
@@ -53,9 +53,16 @@ namespace System.Collections.Advanced
         internal int _version = 0; // 作为持久数据结构版本记录的标记
 
         #region Relatives
-        public virtual BinaryTreeNode Parent { get; set; } = _nil;
-        public virtual BinaryTreeNode LeftChild { get; set; } = _nil;
-        public virtual BinaryTreeNode RightChild { get; set; } = _nil;
+        protected BinaryTreeNode _par = _nil, _lchild = _nil, _rchild = _nil;
+        /// <remarks>
+        /// Do not edit Parent Manually, setting LeftChild/RightChild will automatically set the Parent property.
+        /// If you want to edit Parent only, access _par instead.
+        /// 不要手动修改Parent属性，在设置LeftChild/RightChild时会自动设置该属性。
+        /// 如果需要仅修改parent值，则请访问_par字段。
+        /// </remarks>
+        public virtual BinaryTreeNode Parent { get { return _par; } }
+        public virtual BinaryTreeNode LeftChild { get { return _lchild; } set { _lchild = value; if (!ReferenceEquals(value, null)) value._par = this; } }
+        public virtual BinaryTreeNode RightChild { get { return _rchild; } set { _rchild = value; if (!ReferenceEquals(value, null)) value._par = this; } }
 
         /// <summary>
         /// 寻找当前结点在二叉树中序遍历中的后继
@@ -197,15 +204,14 @@ namespace System.Collections.Advanced
             var p = Parent;
             p.SearchDown();
             this.SearchDown();
+            
             p.LeftChild = RightChild;
-            p.LeftChild.Parent = p;
-            Parent = p.Parent;
-            if (Parent.LeftChild == p)
-                Parent.LeftChild = this;
+            if (p.Parent.LeftChild == p)
+                p.Parent.LeftChild = this;
             else
-                Parent.RightChild = this;
-            p.Parent = this;
+                p.Parent.RightChild = this;
             RightChild = p;
+
             p.OnSearchUp();
             this.OnSearchUp();
         }
@@ -229,14 +235,13 @@ namespace System.Collections.Advanced
             p.OnSearchDown();
             this.OnSearchDown();
             p.RightChild = LeftChild;
-            p.RightChild.Parent = p;
-            Parent = p.Parent;
-            if (Parent.LeftChild == p)
-                Parent.LeftChild = this;
+
+            if (p.Parent.LeftChild == p)
+                p.Parent.LeftChild = this;
             else
-                Parent.RightChild = this;
-            p.Parent = this;
+                p.Parent.RightChild = this;
             LeftChild = p;
+
             p.OnSearchUp();
             this.OnSearchUp();
         }
