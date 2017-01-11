@@ -11,15 +11,17 @@ namespace System.Collections.Generic.Tests
     public class RangeListTests
     {
         RangeList<int> list = new RangeList<int>();
+        List<int> compare = new List<int>();
+        Random r = new Random();
+        const int cycnum = 10;
 
         [TestInitialize]
         [TestMethod]
         public void RandomGenerate()
         {
-            List<int> compare = new List<int>();
+            compare.Clear();
             list.Clear();
-            Random r = new Random();
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < cycnum; i++)
             {
                 var c = r.Next(100);
                 compare.Add(c);
@@ -27,7 +29,7 @@ namespace System.Collections.Generic.Tests
             }
             list.AddRange(compare);
 
-            for (int i = 0; i < 10; i++)
+            for (int i = 0; i < cycnum; i++)
             {
                 var c = r.Next(100);
                 list.Add(c); compare.Add(c);
@@ -35,98 +37,203 @@ namespace System.Collections.Generic.Tests
             }
             Console.WriteLine("<.");
 
-            Assert.AreEqual(20, list.Count);
+            Assert.AreEqual(cycnum * 2, list.Count);
             Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void AddTest()
         {
-            Assert.Fail();
+            for (int i = 0; i < cycnum; i++)
+            {
+                var c = r.Next(100);
+                list.Add(c); compare.Add(c);
+            }
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void ClearTest()
         {
-            Assert.Fail();
+            list.Clear();
+            Assert.AreEqual(0, list.Count);
+            Assert.AreEqual(0, list.Count());
         }
 
         [TestMethod()]
         public void ContainsTest()
         {
-            Assert.Fail();
+            int c = list[r.Next(list.Count)];
+            Assert.AreEqual(compare.Contains(c), list.Contains(c));
+
+            for (int i = 0; i < cycnum; i++)
+            {
+                c = r.Next(100);
+                Assert.AreEqual(compare.Contains(c), list.Contains(c));
+            }
         }
 
         [TestMethod()]
         public void CopyToTest()
         {
-            Assert.Fail();
+            int[] target = new int[2 * cycnum];
+            list.CopyTo(target, 0);
+            Assert.IsTrue(compare.SequenceEqual(target));
         }
 
         [TestMethod()]
         public void GetEnumeratorTest()
         {
-            Assert.Fail();
+            var iter = compare.GetEnumerator();
+            foreach(var item in list)
+            {
+                iter.MoveNext();
+                Assert.AreEqual(iter.Current, item);
+            }
+        }
+
+        [TestMethod()]
+        public void GetSetTest()
+        {
+            for (int i = 0; i < 2 * cycnum; i++)
+                Assert.AreEqual(compare[i], list[i]);
+
+            for (int i = 0; i < 2 * cycnum; i++)
+            {
+                var c = r.Next(100);
+                compare[i] = c; list[i] = c;
+            }
+
+            for (int i = 0; i < 2 * cycnum; i++)
+                Assert.AreEqual(compare[i], list[i]);
         }
 
         [TestMethod()]
         public void IndexOfTest()
         {
-            Assert.Fail();
+            int c = list[r.Next(list.Count)];
+            Assert.AreEqual(compare.IndexOf(c), list.IndexOf(c));
+
+            for (int i = 0; i < cycnum; i++)
+            {
+                c = r.Next(100);
+                Assert.AreEqual(compare.IndexOf(c), list.IndexOf(c));
+            }
         }
 
         [TestMethod()]
         public void InsertTest()
         {
-            Assert.Fail();
+            for (int i = 0; i < cycnum; i++)
+            {
+                var c = r.Next(100);
+                var index = r.Next(list.Count);
+                list.Insert(index, c); compare.Insert(index, c);
+            }
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void RemoveTest()
         {
-            Assert.Fail();
+            for (int i = 0; i < cycnum; i++)
+            {
+                var val = compare[r.Next(list.Count)];
+                Assert.AreEqual(compare.Remove(val), list.Remove(val));
+                Assert.IsTrue(compare.SequenceEqual(list));
+            }
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void RemoveAtTest()
         {
-            Assert.Fail();
+            for (int i = 0; i < cycnum; i++)
+            {
+                var index = r.Next(list.Count);
+                compare.RemoveAt(index); list.RemoveAt(index);
+                Assert.IsTrue(compare.SequenceEqual(list));
+            }
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void AddRangeTest()
         {
-            Assert.Fail();
+            List<int> temp = new List<int>();
+            for (int i = 0; i < cycnum; i++)
+                temp.Add(r.Next(100));
+
+            list.AddRange(temp);
+            compare.AddRange(temp);
+
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void InsertRangeTest()
         {
-            Assert.Fail();
+            List<int> temp = new List<int>();
+            for (int i = 0; i < cycnum; i++)
+                temp.Add(r.Next(100));
+
+            var index = r.Next(list.Count);
+            compare.InsertRange(index, temp);
+            list.InsertRange(index, temp);
+
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void RemoveRangeTest()
         {
-            Assert.Fail();
+            int start = r.Next(list.Count);
+            int count = r.Next(list.Count - start + 1);
+            list.RemoveRange(start, count);
+            compare.RemoveRange(start, count);
+
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
-        public void RangeOperationTest()
+        public void OperateRangeTest()
         {
-            Assert.Fail();
+            int start = r.Next(list.Count);
+            int count = r.Next(list.Count - start + 1);
+            int add = r.Next(100);
+
+            list.OperateRange(start, count, (ref int target) => target += add);
+            for (int i = 0; i < count; i++)
+                compare[start + i] += add;
+
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
         public void ReverseTest()
         {
-            Assert.Fail();
+            list.Reverse();
+            compare.Reverse();
+            
+            Assert.IsTrue(compare.SequenceEqual(list));
+
+            int start = r.Next(list.Count);
+            int count = r.Next(list.Count - start + 1);
+            list.Reverse(start, count);
+            compare.Reverse(start, count);
+
+            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
-        [TestMethod()]
-        public void ReverseTest1()
+        public void CompareLog()
         {
-            Assert.Fail();
+            Console.WriteLine("[");
+            foreach (var item in list)
+                Console.Write(item + "\t");
+            Console.WriteLine("|");
+            foreach (var item in compare)
+                Console.Write(item + "\t");
+            Console.WriteLine("]");
         }
     }
 }

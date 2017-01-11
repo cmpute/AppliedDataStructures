@@ -32,7 +32,7 @@ namespace System.Collections.Advanced
                 return true;
             return false;
         }
-        public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b)=>!(a==b);
+        public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b) => !(a == b);
         /// <summary>
         /// Method for indicating whether it's leaf trailor in the tree.It should be override whenever nil is re-defined.
         /// 用来判断当前结点是否为叶结点哨兵的方法。如果重新定义了nil对象，则应重载此方法。
@@ -103,7 +103,7 @@ namespace System.Collections.Advanced
 
         internal void SearchDown()
         {
-
+            OnSearchDown();
         }
         internal void SearchUp()
         {
@@ -200,11 +200,10 @@ namespace System.Collections.Advanced
             p.LeftChild = RightChild;
             p.LeftChild.Parent = p;
             Parent = p.Parent;
-            if (Parent != null)
-                if (Parent.LeftChild == p)
-                    Parent.LeftChild = this;
-                else
-                    Parent.RightChild = this;
+            if (Parent.LeftChild == p)
+                Parent.LeftChild = this;
+            else
+                Parent.RightChild = this;
             p.Parent = this;
             RightChild = p;
             p.OnSearchUp();
@@ -232,11 +231,10 @@ namespace System.Collections.Advanced
             p.RightChild = LeftChild;
             p.RightChild.Parent = p;
             Parent = p.Parent;
-            if (Parent != null)
-                if (Parent.LeftChild == p)
-                    Parent.LeftChild = this;
-                else
-                    Parent.RightChild = this;
+            if (Parent.LeftChild == p)
+                Parent.LeftChild = this;
+            else
+                Parent.RightChild = this;
             p.Parent = this;
             LeftChild = p;
             p.OnSearchUp();

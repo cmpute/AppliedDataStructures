@@ -35,12 +35,12 @@ namespace System.Collections.Generic
         {
             get
             {
-                return tree.IndexSearch(index)._data;
+                return tree.IndexSearch(index + 1)._data;
             }
 
             set
             {
-                tree.IndexSearch(index)._data = value;
+                tree.IndexSearch(index + 1)._data = value;
             }
         }
 
@@ -48,7 +48,7 @@ namespace System.Collections.Generic
 
         public bool IsReadOnly => false;
 
-        public void Add(T item) => tree.Insert(new[] { item }, Count - 1);
+        public void Add(T item) => tree.Insert(new[] { item }, Count);
 
         public void Clear() => tree.Clear();
 
@@ -57,32 +57,42 @@ namespace System.Collections.Generic
         public void CopyTo(T[] array, int arrayIndex)
         {
             int current = arrayIndex;
-            var iter = tree.GetEnumerator();
+            var iter = GetEnumerator();
             while (iter.MoveNext())
-                array[current++] = iter.Current._data;
+                array[current++] = iter.Current;
         }
 
-        public IEnumerator GetEnumerator()
+        public IEnumerator<T> GetEnumerator()
         {
-            tree.ApplyAllFlags();
-            return tree.Select(node => node._data).Skip(1).Take(Count).GetEnumerator();
+            List<T> temp = new List<T>(Count);
+            for (int i = 0; i < Count; i++)
+                temp.Add(this[i]);
+            return temp.GetEnumerator();
         }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public int IndexOf(T item)
         {
+            int count = 0;
             if ((Object)item == null)
             {
-                foreach (var node in tree)
+                foreach (var node in tree.Skip(1).Take(tree.Count))
                     if ((Object)(node._data) == null)
-                        return node.subcount;
+                        return count;
+                    else
+                        count++;
                 return -1;
             }
             else
             {
                 EqualityComparer<T> c = EqualityComparer<T>.Default;
 
-                foreach (var node in tree)
-                    if (c.Equals(node._data, item)) return node.subcount;
+                foreach (var node in tree.Skip(1).Take(tree.Count))
+                    if (c.Equals(node._data, item))
+                        return count;
+                    else
+                        count++;
 
                 return -1;
             }
@@ -102,23 +112,19 @@ namespace System.Collections.Generic
             return false;
         }
 
-        public void RemoveAt(int index) => tree.Delete(index);
+        public void RemoveAt(int index) => tree.Delete(index, index);
 
-        IEnumerator<T> IEnumerable<T>.GetEnumerator()
-        {
-            tree.ApplyAllFlags();
-            return tree.Select(node => node._data).Skip(1).Take(Count).GetEnumerator();
-        }
+        IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
         #endregion
 
         #region Range Operations
-        public void AddRange(IEnumerable<T> data) => InsertRange(data, Count - 1);
-        public void InsertRange(IEnumerable<T> data, int index) => tree.Insert(data, index);
-        public T[] RemoveRange(int startIndex, int endIndex) => tree.Delete(startIndex, endIndex);
-        public void RangeOperation(ActionRef<T> operation, int startIndex, int endIndex) => tree.Operate(operation, startIndex, endIndex);
-        public void Reverse() => Reverse(0, Count - 1);
-        public void Reverse(int startIndex, int endIndex) => tree.Reverse(startIndex, endIndex);
+        public void AddRange(IEnumerable<T> data) => InsertRange(Count, data);
+        public void InsertRange(int index, IEnumerable<T> data) => tree.Insert(data, index);
+        public T[] RemoveRange(int index, int count) => tree.Delete(index, index + count - 1);
+        public void OperateRange(int index, int count, ActionRef<T> operation) => tree.Operate(operation, index, index + count - 1);
+        public void Reverse() => Reverse(0, Count);
+        public void Reverse(int index, int count) => tree.Reverse(index, index + count - 1);
         #endregion
     }
 
@@ -146,11 +152,10 @@ namespace System.Collections.Generic
             Splay(p);
         }
 
-        public SplayRangeTreeNode<T> IndexSearch(int index)
+        public SplayRangeTreeNode<T> IndexSearch(int index) // index start from 1.
         {
             SplayRangeTreeNode<T> p = Root;
             p.SearchDown();
-            index++;
             while (index != p.LeftChild.subcount)
             {
                 if (index < p.LeftChild.subcount)
@@ -173,6 +178,7 @@ namespace System.Collections.Generic
         public void Insert(IEnumerable<T> data, int startindex)
         {
             if (data == null) return;
+            if (startindex > Count) throw new ArgumentOutOfRangeException("插入位置不正确");
 
             SelectSegment(startindex, startindex + 1);
 
@@ -199,10 +205,11 @@ namespace System.Collections.Generic
         }
         public T[] Delete(int startindex, int endindex)
         {
-            if (endindex < startindex) throw new InvalidOperationException("操作范围不正确");
+            if (endindex < startindex) throw new ArgumentException("操作范围不正确");
+            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
 
             // Splay segment
-            SelectSegment(startindex, endindex);
+            SelectSegment(startindex, endindex + 2);
 
             // Remove nodes
             var res = Root.RightChild.LeftChild.GetSubtreeEnumerator(TraversalOrder.InOrder);
@@ -223,9 +230,10 @@ namespace System.Collections.Generic
         {
             if (endindex < startindex) throw new InvalidOperationException("操作范围不正确");
             else if (endindex == startindex) return;
+            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
 
             // Splay segment
-            SelectSegment(startindex - 1, endindex + 1);
+            SelectSegment(startindex, endindex + 2);
 
             // Set flag
             Root.RightChild.LeftChild._rev ^= true;
@@ -236,9 +244,10 @@ namespace System.Collections.Generic
         public void Operate(ActionRef<T> optr, int startindex, int endindex)
         {
             if (endindex < startindex) throw new InvalidOperationException("操作范围不正确");
+            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
 
             // Splay segment
-            SelectSegment(startindex - 1, endindex + 1);
+            SelectSegment(startindex, endindex + 2);
 
             // Set flag
             Root.RightChild.LeftChild._operations += optr;
@@ -249,11 +258,6 @@ namespace System.Collections.Generic
         public override void Clear()
         {
             if (Count != 0) Delete(0, Count - 1);
-        }
-        public void ApplyAllFlags()
-        {
-            Splay(lnil);
-            Splay(rnil, lnil);
         }
     }
 
@@ -293,8 +297,8 @@ namespace System.Collections.Generic
                 var temp = LeftChild;
                 LeftChild = RightChild;
                 RightChild = temp;
-                temp.LeftChild._rev ^= _rev;
-                temp.RightChild._rev ^= _rev;
+                LeftChild._rev ^= _rev;
+                RightChild._rev ^= _rev;
                 _rev = false;
             }
             if (_operations != null)
