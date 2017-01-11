@@ -17,7 +17,6 @@ namespace System.Collections.Advanced
     public class BinaryTreeNode
     {
         #region Leaf Trailor
-        // TODO: Check null equal
         static readonly BinaryTreeNode _nil = new BinaryTreeNode() { Parent = null, LeftChild = null, RightChild = null };
         /// <summary>
         /// Trailor of leaf nodes
@@ -28,12 +27,21 @@ namespace System.Collections.Advanced
         public static bool operator ==(BinaryTreeNode a, BinaryTreeNode b)
         {
             if (ReferenceEquals(a, b)) return true;
-            if (((object)a == null || a.Equals(_nil)) &&
-                ((object)b == null || b.Equals(_nil)))
+            if (((object)a == null || a.IsNil()) &&
+                ((object)b == null || b.IsNil()))
                 return true;
             return false;
         }
         public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b)=>!(a==b);
+        /// <summary>
+        /// Method for indicating whether it's leaf trailor in the tree.It should be override whenever nil is re-defined.
+        /// 用来判断当前结点是否为叶结点哨兵的方法。如果重新定义了nil对象，则应重载此方法。
+        /// </summary>
+        /// <returns>如果当前结点是哨兵则返回<c>true</c></returns>
+        protected virtual bool IsNil()
+        {
+            return ReferenceEquals(this, _nil);
+        }
 
         public override string ToString()
         {
@@ -192,7 +200,7 @@ namespace System.Collections.Advanced
             p.LeftChild = RightChild;
             p.LeftChild.Parent = p;
             Parent = p.Parent;
-            if (Parent != null) //TODO: 考虑该判断是否多余
+            if (Parent != null)
                 if (Parent.LeftChild == p)
                     Parent.LeftChild = this;
                 else

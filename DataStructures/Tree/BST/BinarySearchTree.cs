@@ -21,7 +21,7 @@ namespace System.Collections.Advanced
         public BinarySearchTree() : this(Comparer<TKey>.Default) { }
         public BinarySearchTree(IComparer<TKey> comparer)
         {
-            _comparer = comparer;
+            _comparer = comparer ?? Comparer<TKey>.Default;
         }
 
         /// <summary>

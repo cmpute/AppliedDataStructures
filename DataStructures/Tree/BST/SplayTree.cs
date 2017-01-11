@@ -8,6 +8,9 @@ namespace System.Collections.Advanced
 {
     public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
+        public SplayTree() : base() { }
+        public SplayTree(IComparer<TKey> comparer) : base(comparer) { }
+
         /// <summary>
         /// Do rotations(splay) to make <see cref="node"/> the root of the tree
         /// 做一系列旋转使得<see cref="node"/>成为树根

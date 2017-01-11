@@ -20,7 +20,7 @@ namespace System.Collections.Advanced
         public BinaryHeap(IComparer<TValue> comparer)
         {
             _nodes = new List<TValue>();
-            _comparer = comparer;
+            _comparer = comparer ?? Comparer<TValue>.Default;
         }
         /// <summary>
         /// Initialize a heap from a copy of <paramref name="data"/>.
@@ -32,7 +32,7 @@ namespace System.Collections.Advanced
         public BinaryHeap(IEnumerable<TValue> data, IComparer<TValue> comparer)
         {
             _nodes = data.ToArray();
-            _comparer = comparer;
+            _comparer = comparer ?? Comparer<TValue>.Default;
             Heapify();
         }
 
@@ -46,7 +46,7 @@ namespace System.Collections.Advanced
         {
             BinaryHeap<TValue> heap = new BinaryHeap<TValue>();
             heap._nodes = target;
-            heap._comparer = comparer;
+            heap._comparer = comparer ?? Comparer<TValue>.Default;
             heap.Heapify();
             return heap;
         }
