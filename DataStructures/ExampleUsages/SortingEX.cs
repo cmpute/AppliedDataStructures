@@ -19,14 +19,4 @@ namespace System.Collections.Advanced
             while (heap.Count > 0) yield return heap.ExtractMin();
         }
     }
-    class ComparerWrapper<T> : IComparer<T>
-    {
-        Comparison<T> _comparsion;
-        public ComparerWrapper(Comparison<T> comparison)
-        {
-            if (comparison == null) throw new ArgumentNullException("比较delegate不能为空");
-            _comparsion = comparison;
-        }
-        public int Compare(T x, T y) => _comparsion(x, y);
-    }
 }

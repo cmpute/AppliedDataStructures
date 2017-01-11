@@ -60,9 +60,9 @@ namespace System.Collections.Advanced
             }
         }
 
-        protected override TNode Search(TKey key, bool modify)
+        protected override TNode SearchInternal(TKey key, bool modify)
         {
-            var node = base.Search(key, modify);
+            var node = base.SearchInternal(key, modify);
             Splay(node);
             return node;
         }

@@ -62,7 +62,7 @@ namespace System.Collections.Advanced
         /// 内部调用的Search函数
         /// </summary>
         /// <param name="modify">是否在下行过程中调用OnSearchDown</param>
-        protected virtual TNode Search(TKey key, bool modify)
+        protected virtual TNode SearchInternal(TKey key, bool modify)
         {
             TNode current = Root, ret = null;
             while (current != null)
@@ -84,7 +84,7 @@ namespace System.Collections.Advanced
             return ret;
         }
 
-        public TNode Search(TKey key) => Search(key, false);
+        public TNode Search(TKey key) => SearchInternal(key, false);
 
         public virtual TNode Insert(TNode node)
         {
@@ -189,7 +189,7 @@ namespace System.Collections.Advanced
 
         public TNode Delete(TKey key)
         {
-            TNode current = Search(key, true);
+            TNode current = SearchInternal(key, true);
             DeleteInternal(current);
             return current;
         }
