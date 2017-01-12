@@ -6,6 +6,12 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
+    /// <summary>
+    /// Cartesian Tree, a kind of binary search tree which is a priority queue at the same time
+    /// 笛卡尔树，一种同时满足搜索树和堆性质的二叉树
+    /// </summary>
+    /// <typeparam name="TNode">结点类型</typeparam>
+    /// <typeparam name="TKey">关键字类型</typeparam>
     public class CartesianTree<TNode, TKey> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TNode> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
         #region fields and ctor.

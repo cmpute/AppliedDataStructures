@@ -60,6 +60,7 @@
     <Compile Include="Tree\BST\CartesianTreeTests.cs" />
     <Compile Include="Tree\BST\SplayTreeTests.cs" />
     <Compile Include="Tree\BST\BinarySearchTreeTests.cs" />
+    <Compile Include="Tree\BST\TreapTests.cs" />
     <Compile Include="Tree\Heap\BinaryHeapTests.cs" />
   </ItemGroup>
   <ItemGroup>

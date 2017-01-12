@@ -51,6 +51,8 @@
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
     <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
     <Compile Include="ExampleUsages\TreeEx.cs" />
+    <Compile Include="Tree\BST\Treap.cs" />
+    <Compile Include="Tree\BST\TreapNode.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />

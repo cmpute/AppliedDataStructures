@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     /// <summary>
-    /// Binary Heap
-    /// 二叉堆
+    /// Binary Heap, a simplest implementation of heap
+    /// 二叉堆，堆的最简单的实现
     /// </summary>
     /// <typeparam name="TValue">结点上存储的数据类型</typeparam>
     /// <typeparam name="TPrior">优先级关键字的类型</typeparam>

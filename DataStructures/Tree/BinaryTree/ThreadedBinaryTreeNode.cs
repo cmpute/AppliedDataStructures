@@ -10,6 +10,10 @@ namespace System.Collections.Advanced
     /// Node of a threaded binary tree
     /// 线索二叉树的结点
     /// </summary>
+    /// <remarks>
+    /// Threads are added to make traversing faster, but in balanced binary tree (in which bunch of rotations will be executed), the thread-update cost a lot, and thus a BBT node should not be added with threads.
+    /// 增加线索是为了加速遍历，但在平衡二叉树中（这种树中会进行很多旋转操作），更新线索非常费时，因此不应该在平衡二叉树中增加线索
+    /// </remarks>
     public class ThreadedBinaryTreeNode : BinaryTreeNode
     {
         /* There is no more edit in BinaryTree Members, All modifications are in the ThreadedBinaryTreeNode class.

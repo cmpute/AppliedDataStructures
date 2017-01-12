@@ -59,9 +59,10 @@ namespace System.Collections.Advanced.Tests
             foreach(var node in del)
             {
                 Console.WriteLine($"delete [{node.Key}]{node.Data}");
+
                 compare.Remove(node);
                 tree.Delete(node);
-                if (!compare.OrderBy(n => n.Key).SequenceEqual(tree)) System.Diagnostics.Debugger.Break();
+
                 CompareLog();
             }
 
