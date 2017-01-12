@@ -61,8 +61,26 @@ namespace System.Collections.Advanced
         /// 如果需要仅修改parent值，则请访问_par字段。
         /// </remarks>
         public virtual BinaryTreeNode Parent { get { return _par; } }
-        public virtual BinaryTreeNode LeftChild { get { return _lchild; } set { _lchild = value; if (!ReferenceEquals(value, null)) value._par = this; } }
-        public virtual BinaryTreeNode RightChild { get { return _rchild; } set { _rchild = value; if (!ReferenceEquals(value, null)) value._par = this; } }
+        public virtual BinaryTreeNode LeftChild
+        {
+            get { return _lchild; }
+            set
+            {
+                if (value == this) throw new InvalidOperationException("不能将自己设为自己的孩子");
+                _lchild = value;
+                if (!ReferenceEquals(value, null)) value._par = this;
+            }
+        }
+        public virtual BinaryTreeNode RightChild
+        {
+            get { return _rchild; }
+            set
+            {
+                if (value == this) throw new InvalidOperationException("不能将自己设为自己的孩子");
+                _rchild = value;
+                if (!ReferenceEquals(value, null)) value._par = this;
+            }
+        }
 
         /// <summary>
         /// 寻找当前结点在二叉树中序遍历中的后继
@@ -103,6 +121,18 @@ namespace System.Collections.Advanced
                 current = current.Parent;
             }
             return current;
+        }
+
+        /// <summary>
+        /// make parent of this the parent of <paramref name="newChild"/>
+        /// 让当前结点的父亲成为<paramref name="newChild"/>的父亲
+        /// </summary>
+        public void TransplantParent(BinaryTreeNode newChild)
+        {
+            if (Parent.LeftChild == this)
+                Parent.LeftChild = newChild;
+            else
+                Parent.RightChild = newChild;
         }
         #endregion
 
@@ -206,10 +236,7 @@ namespace System.Collections.Advanced
             this.SearchDown();
             
             p.LeftChild = RightChild;
-            if (p.Parent.LeftChild == p)
-                p.Parent.LeftChild = this;
-            else
-                p.Parent.RightChild = this;
+            p.TransplantParent(this);
             RightChild = p;
 
             p.OnSearchUp();
@@ -234,12 +261,9 @@ namespace System.Collections.Advanced
             var p = Parent;
             p.OnSearchDown();
             this.OnSearchDown();
-            p.RightChild = LeftChild;
 
-            if (p.Parent.LeftChild == p)
-                p.Parent.LeftChild = this;
-            else
-                p.Parent.RightChild = this;
+            p.RightChild = LeftChild;
+            p.TransplantParent(this);
             LeftChild = p;
 
             p.OnSearchUp();

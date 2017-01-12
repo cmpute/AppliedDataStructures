@@ -38,22 +38,16 @@ namespace System.Collections.Advanced
         public IComparer<TKey> KeyComparer => _comparer;
 
         /// <summary>
-        /// 用replace子树替换u结点
+        /// 用<paramref name="replace"/>子树替换<paramref name="target"/>结点
         /// </summary>
         /// <param name="target">被替换结点</param>
         /// <param name="replace">替换的结点</param>
-        private void Transplant(BinaryTreeNode target, BinaryTreeNode replace)
+        protected void Transplant(BinaryTreeNode target, BinaryTreeNode replace)
         {
-            if (target.Parent == _rootTrailer)
-                Root = replace as TNode;
-            else
-            {
-                target.Parent.SearchDown();
-                if (target == target.Parent.LeftChild)
-                    target.Parent.LeftChild = replace;
-                else
-                    target.Parent.RightChild = replace;
-            }
+            if (target == replace) return;
+
+            target.Parent.SearchDown();
+            target.TransplantParent(replace);
             replace.SearchUp();
         }
 

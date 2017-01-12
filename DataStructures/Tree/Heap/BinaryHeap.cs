@@ -93,7 +93,6 @@ namespace System.Collections.Advanced
             int loc = (data as IIndexedHeapNode)?.IndexInHeap ?? _nodes.IndexOf(data);
             PercolateUp(loc);
             PercolateDown(loc);
-            throw new NotImplementedException();
         }
 
         private void PercolateUp(int loc)

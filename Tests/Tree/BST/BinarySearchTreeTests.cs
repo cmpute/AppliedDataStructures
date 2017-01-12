@@ -77,7 +77,7 @@ namespace System.Collections.Advanced.Tests
 
         public override string ToString()
         {
-            return "BSTNode, Key=" + Key;
+            return $"[{Key}]={Data}";
         }
     }
 }

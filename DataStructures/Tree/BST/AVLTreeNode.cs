@@ -53,10 +53,7 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected static AVLTreeNode<TKey> Connect34(AVLTreeNode<TKey> a, AVLTreeNode<TKey> b, AVLTreeNode<TKey> c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
         {
-            var parent = top.Parent;
-            if (parent.LeftChild == top)
-                parent.LeftChild = b;
-            else parent.RightChild = b;
+            top.TransplantParent(b);
 
             a.LeftChild = t0;
             a.RightChild = t1;

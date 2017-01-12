@@ -43,6 +43,7 @@
     <Compile Include="ExampleUsages\RangeList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IKeyedNode.cs" />
+    <Compile Include="IMergable.cs" />
     <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />

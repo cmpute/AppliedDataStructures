@@ -33,15 +33,8 @@ namespace System.Collections.Generic
 
         public T this[int index]
         {
-            get
-            {
-                return tree.IndexSearch(index + 1)._data;
-            }
-
-            set
-            {
-                tree.IndexSearch(index + 1)._data = value;
-            }
+            get { return tree.IndexSearch(index + 1)._data; }
+            set { tree.IndexSearch(index + 1)._data = value; }
         }
 
         public int Count => tree.Count;

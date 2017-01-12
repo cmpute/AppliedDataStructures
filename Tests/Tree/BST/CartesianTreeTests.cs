@@ -24,36 +24,79 @@ namespace System.Collections.Advanced.Tests
 
             List<BSTValueNode> temp = new List<BSTValueNode>();
             for (int i = 0; i < cycnum; i++)
-                temp.Add(new BSTValueNode(i) { Data = r.Next(100) });
+                temp.Add(new BSTValueNode(r.Next(100)) { Data = r.Next(100) });
 
-            tree = new CartesianTree<BSTValueNode, int>(temp, (node1, node2) => node1.Data - node2.Data);
+            temp.Sort((node1, node2) => Comparer<int>.Default.Compare(node1.Key, node2.Key));
+            tree = new CartesianTree<BSTValueNode, int>(temp, (node1, node2) => node1.Data - node2.Data) { SupportEquatable = true };
             compare.AddRange(temp);
+
             CompareLog();
-            Assert.IsTrue(temp.SequenceEqual(tree));
+            Assert.IsTrue(compare.OrderBy(node => node.Key).SequenceEqual(tree));
+        }
+
+        [TestMethod]
+        public void InsertTest()
+        {
+            for (int i = 0; i < cycnum; i++)
+            {
+                var node = new BSTValueNode(r.Next(100)) { Data = r.Next(100) };
+                compare.Add(node);
+                tree.Insert(node);
+            }
+
+            CompareLog();
+            Assert.IsTrue(compare.OrderBy(node => node.Key).SequenceEqual(tree));
+        }
+
+        [TestMethod]
+        public void DeleteTest()
+        {
+            List<BSTValueNode> del = new List<BSTValueNode>();
+            foreach (var node in tree)
+                if (r.Next() % 2 == 0)
+                    del.Add(node);
+            
+            foreach(var node in del)
+            {
+                Console.WriteLine($"delete [{node.Key}]{node.Data}");
+                compare.Remove(node);
+                tree.Delete(node);
+                if (!compare.OrderBy(n => n.Key).SequenceEqual(tree)) System.Diagnostics.Debugger.Break();
+                CompareLog();
+            }
+
+            Assert.IsTrue(compare.OrderBy(node => node.Key).SequenceEqual(tree));
         }
 
         [TestMethod()]
         public void MinTest()
         {
-            Assert.Fail();
+            Assert.AreEqual(compare.Min(node => node.Data), tree.Min().Data);
         }
 
         [TestMethod()]
         public void ExtractMinTest()
         {
-            Assert.Fail();
+            while (tree.Count > 0)
+                Assert.AreEqual(tree.Min(), tree.ExtractMin());
         }
 
         [TestMethod()]
         public void PriorityUpdateTest()
         {
-            Assert.Fail();
-        }
+            var change = new List<BSTValueNode>();
+            foreach (var node in tree)
+                if (r.Next() % 2 == 0)
+                    change.Add(node);
 
-        [TestMethod()]
-        public void MergeTest()
-        {
-            Assert.Fail();
+            foreach(var node in change)
+            {
+                node.Data += r.Next(100) - r.Next(100);
+                tree.PriorityUpdate(node);
+                 
+                CompareLog();
+                Assert.IsTrue(compare.OrderBy(t => t.Key).SequenceEqual(tree));
+            }
         }
 
         [TestMethod()]
@@ -70,10 +113,10 @@ namespace System.Collections.Advanced.Tests
         {
             Console.Write("[");
             foreach (var item in tree)
-                Console.Write($"[{item.Data}]{item.Key}\t");
+                Console.Write($"[{item.Key}]{item.Data}\t");
             Console.WriteLine("|");
             foreach (var item in compare)
-                Console.Write($"[{item.Data}]{item.Key}\t");
+                Console.Write($"[{item.Key}]{item.Data}\t");
             Console.WriteLine("]");
         }
     }

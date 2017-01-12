@@ -7,8 +7,8 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     /// <summary>
-    /// a.k.a Heap, capable of returning min value with IComparer
-    /// 亦称Heap，能够在给定比较器的情况下返回最小值
+    /// a.k.a Heap (MinHeap), capable of returning min value with IComparer
+    /// 亦称堆(最小堆)，能够在给定比较器的情况下返回最小值
     /// </summary>
     /// <typeparam name="TValue">
     /// Type of values stored in PQ
@@ -43,12 +43,5 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="data">需要更新的结点</param>
         void PriorityUpdate(TValue data);
-        /// <summary>
-        /// Merge two Priority Queues
-        /// 合并两个堆
-        /// </summary>
-        /// <param name="another">另一个优先级队列</param>
-        /// <returns>合并后的队</returns>
-        IPriorityQueue<TValue> Merge(IPriorityQueue<TValue> another);
     }
 }

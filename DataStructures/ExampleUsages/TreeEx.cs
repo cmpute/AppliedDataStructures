@@ -22,12 +22,17 @@ namespace System.Collections.Advanced
         public static IDictionary<TKey,TNode> ToDictionary<TNode, TKey>(this BinarySearchTree<TNode, TKey> tree) where TNode : BinaryTreeNode, IKeyedNode<TKey> => new BinarySearchTreeDictionary<TNode, TKey>(tree);
 
         /// <summary>
+        /// Get the inorder enumerator of subtree, root of which is <paramref name="partialroot"/>
+        /// 获取以<paramref name="partialroot"/>为根的子树的中序遍历器
+        /// </summary>
+        /// <param name="partialroot">需要遍历的子树的根</param>
+        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot) where TNode : BinaryTreeNode => new BinaryTree<TNode>.InOrderEnumerator(partialroot);
+        /// <summary>
         /// Get the enumerator of subtree, root of which is <paramref name="partialroot"/>
         /// 获取以<paramref name="partialroot"/>为根的子树的遍历器
         /// </summary>
         /// <param name="order">二叉树遍历方式</param>
         /// <param name="partialroot">需要遍历的子树的根</param>
-        /// <returns></returns>
         public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraversalOrder order) where TNode : BinaryTreeNode
         {
             switch (order)
