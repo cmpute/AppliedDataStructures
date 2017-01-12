@@ -10,7 +10,7 @@ namespace System.Collections.Advanced
     {
         static Random prior_rand = new Random();
         public TKey Key { get; set; }
-        internal int Priority;
+        internal int Priority { get; set; }
 
         public CartesianTreeNode(TKey key)
         {

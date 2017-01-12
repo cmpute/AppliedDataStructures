@@ -44,12 +44,13 @@
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IKeyedNode.cs" />
     <Compile Include="IMergable.cs" />
-    <Compile Include="Tree\BinaryTree\ThreadedBinaryTreeNode.cs" />
+    <Compile Include="Tree\Binary\DoublyChainedTreeNode.cs" />
+    <Compile Include="Tree\Binary\ThreadedBinaryTreeNode.cs" />
     <Compile Include="Tree\BST\Treap.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
-    <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
+    <Compile Include="Tree\Binary\CompactTree.cs" />
     <Compile Include="ExampleUsages\TreeEx.cs" />
     <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\CartesianTreeNode.cs" />
@@ -57,16 +58,18 @@
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />
     <Compile Include="Tree\BST\SplayTree.cs" />
-    <Compile Include="Tree\BinaryTree\BinaryTree.cs" />
-    <Compile Include="Tree\BinaryTree\BinaryTreeNode.cs" />
+    <Compile Include="Tree\Binary\BinaryTree.cs" />
+    <Compile Include="Tree\Binary\BinaryTreeNode.cs" />
     <Compile Include="IPriorityQueue.cs" />
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ISearchTree.cs" />
-    <Compile Include="Tree\BinaryTree\TraversalOrder.cs" />
+    <Compile Include="Tree\Binary\TraversalOrder.cs" />
     <Compile Include="Tree\IStaticSearchTree.cs" />
-    <Compile Include="Tree\MultiwayTree\vanEmdeBoasTreeNode.cs" />
-    <Compile Include="Tree\MultiwayTree\vanEmdeBoasTree.cs" />
+    <Compile Include="Tree\Multiway\IMultiwayTreeNode.cs" />
+    <Compile Include="Tree\Multiway\KWayTreeNode.cs" />
+    <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
+    <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

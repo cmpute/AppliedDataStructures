@@ -7,12 +7,12 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     /// <summary>
-    /// Binary Heap, a simplest implementation of heap
-    /// 二叉堆，堆的最简单的实现
+    /// Binary Heap, a most succinct implementation of heap
+    /// 二叉堆，堆的最精炼的实现
     /// </summary>
     /// <typeparam name="TValue">结点上存储的数据类型</typeparam>
     /// <typeparam name="TPrior">优先级关键字的类型</typeparam>
-    public class BinaryHeap<TValue> : DenseBinaryTree<TValue>, IPriorityQueue<TValue>
+    public class BinaryHeap<TValue> : CompactTree<TValue>, IPriorityQueue<TValue>
     {
         IComparer<TValue> _comparer;
 

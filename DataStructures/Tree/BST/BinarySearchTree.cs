@@ -15,7 +15,7 @@ namespace System.Collections.Advanced
     /// </remarks>
     public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
-        protected IComparer<TKey> _comparer;
+        IComparer<TKey> _comparer;
         Random _rand = new Random();
 
         public BinarySearchTree() : this(Comparer<TKey>.Default) { }
