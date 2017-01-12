@@ -57,10 +57,10 @@
     <Compile Include="Tree\BinaryTree\BinaryTreeNodeTests.cs" />
     <Compile Include="Tree\BinaryTree\ThreadedBinaryTreeNodeTests.cs" />
     <Compile Include="Tree\BST\AVLTreeTests.cs" />
-    <Compile Include="Tree\BST\CartesianTreeTests.cs" />
+    <Compile Include="Tree\BST\TreapTests.cs" />
     <Compile Include="Tree\BST\SplayTreeTests.cs" />
     <Compile Include="Tree\BST\BinarySearchTreeTests.cs" />
-    <Compile Include="Tree\BST\TreapTests.cs" />
+    <Compile Include="Tree\BST\CartesianTreeTests.cs" />
     <Compile Include="Tree\Heap\BinaryHeapTests.cs" />
   </ItemGroup>
   <ItemGroup>

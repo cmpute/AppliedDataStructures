@@ -45,14 +45,14 @@
     <Compile Include="IKeyedNode.cs" />
     <Compile Include="IMergable.cs" />
     <Compile Include="Tree\BinaryTree\ThreadedBinaryTreeNode.cs" />
-    <Compile Include="Tree\BST\CartesianTree.cs" />
+    <Compile Include="Tree\BST\Treap.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
     <Compile Include="Tree\BinaryTree\DenseBinaryTree.cs" />
     <Compile Include="ExampleUsages\TreeEx.cs" />
-    <Compile Include="Tree\BST\Treap.cs" />
-    <Compile Include="Tree\BST\TreapNode.cs" />
+    <Compile Include="Tree\BST\CartesianTree.cs" />
+    <Compile Include="Tree\BST\CartesianTreeNode.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\ISearchTreeEquatable.cs" />

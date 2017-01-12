@@ -7,26 +7,264 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     /// <summary>
-    /// Treap, a kind of randomized(balanced) Binary Search Tree
-    /// 树堆， 一种随机(平衡二叉树)
+    /// Treap, a kind of binary search tree which is heap-ordered
+    /// 树堆，一种同时满足搜索树和堆序性质的二叉树
     /// </summary>
-    /// <typeparam name="TNode">结点的类型</typeparam>
-    /// <typeparam name="TKey">比较的关键字</typeparam>
-    /// <remarks>
-    /// Treap is based on <see cref="CartesianTree{TNode, TKey}"/>, it make the priority of every node a random number, thus makes the tree balanced.
-    /// 树堆基于笛卡尔树，它使每一个结点的权重为一个随机数来使得二叉树平衡。
-    /// </remarks>
-    public class Treap<TNode, TKey> : CartesianTree<TNode, TKey> where TNode : TreapNode<TKey>
+    /// <typeparam name="TNode">结点类型</typeparam>
+    /// <typeparam name="TKey">关键字类型</typeparam>
+    public class Treap<TNode, TKey> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TNode> where TNode : BinaryTreeNode, IKeyedNode<TKey>
     {
-        public Treap() : this(Comparer<TKey>.Default) { }
-        public Treap(IEnumerable<TNode> initNodesSorted) : this(initNodesSorted, Comparer<TKey>.Default) { }
-        public Treap(IComparer<TKey> comparer) : this(null, comparer) { }
+        #region fields and ctor.
+        IComparer<TNode> _priorityComparer;
+        public IComparer<TNode> PriorityComparer => _priorityComparer;
+
+        public Treap(Comparison<TNode> priorityComparison) : this(new ComparerWrapper<TNode>(priorityComparison)) { }
+        public Treap(IComparer<TNode> priorityComparer) : this(null, priorityComparer) { }
+        public Treap(IEnumerable<TNode> initNodesKeySorted, Comparison<TNode> priorityComparison) : this(initNodesKeySorted, new ComparerWrapper<TNode>(priorityComparison)) { }
+        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TNode> priorityComparer) : this(initNodesKeySorted, priorityComparer, Comparer<TKey>.Default) { }
+        public Treap(IComparer<TNode> priorityComparer, IComparer<TKey> keyComparer) : this(null, priorityComparer, keyComparer) { }
+        public Treap(IEnumerable<TNode> initNodesKeySorted, Comparison<TNode> priorityComparison, IComparer<TKey> keyComparer) : this(initNodesKeySorted, new ComparerWrapper<TNode>(priorityComparison), keyComparer) { }
         /// <summary>
-        /// Build Cartesian Tree by the key comparer and initial nodes sorted by key comparer
-        /// 根据初始数据和关键字比较器构造树堆
+        /// Build Treap by initial nodes sorted by key, priority comparer and key comparer
+        /// 根据初始数据和关键字、权值比较器构造树堆
         /// </summary>
-        /// <param name="initNodesSorted">initial nodes sorted by key 按照关键字已经排好序的结点</param>
-        /// <param name="comparer">关键字比较器</param>
-        public Treap(IEnumerable<TNode> initNodesSorted, IComparer<TKey> comparer) : base(initNodesSorted, (node1, node2) => node1.Priority - node2.Priority, comparer) { }
+        /// <param name="initNodesKeySorted">initial nodes sorted by key 按照关键字已经排好序的结点</param>
+        /// <param name="priorityComparer">权重比较器</param>
+        /// <param name="keyComparer">关键字比较器</param>
+        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TNode> priorityComparer, IComparer<TKey> keyComparer) : base(keyComparer)
+        {
+            if (priorityComparer == null) throw new ArgumentNullException("优先级比较器不能为空");
+            _priorityComparer = priorityComparer;
+
+            if (initNodesKeySorted != null)
+            {
+                var iter = initNodesKeySorted.GetEnumerator();
+                if (!iter.MoveNext()) return;
+
+                TNode stacktail = iter.Current;
+                Root = stacktail;
+                var lastkey = iter.Current.Key;
+                while (iter.MoveNext())
+                {
+                    // check if data is key-ordered.
+                    if (keyComparer.Compare(lastkey, iter.Current.Key) > 0) throw new ArgumentException("输入的原始集合没有按照关键字进行排序");
+
+                    // find insert position
+                    while (stacktail != null)
+                        if (_priorityComparer.Compare(iter.Current, stacktail) < 0)
+                            stacktail = stacktail.Parent as TNode;
+                        else break;
+                    
+                    // insert
+                    var c = iter.Current;
+                    if (stacktail != null)
+                    {
+                        c.LeftChild = stacktail.RightChild;
+                        stacktail.RightChild = c;
+                    }
+                    else
+                    {
+                        c.LeftChild = Root;
+                        Root = c;
+                    }
+
+                    // update stack
+                    stacktail = c;
+                }
+            }
+        }
+        #endregion
+
+        /// <summary>
+        /// merge two subtree, all keys of <paramref name="left"/> should be smaller than <paramref name="right"/>
+        /// 合并两个子树，子树必须满足<paramref name="left"/>的键值均比<paramref name="right"/>小
+        /// </summary>
+        /// <param name="left">键值较小的子树</param>
+        /// <param name="right">键值较大的子树</param>
+        /// <returns>合并后的子树</returns>
+        private BinaryTreeNode MergeSub(BinaryTreeNode left, BinaryTreeNode right)
+        {
+            if (left as TNode == null)
+                return right;
+            if (right as TNode == null)
+                return left;
+            if (_priorityComparer.Compare(left as TNode, right as TNode) > 0)
+            {
+                right.LeftChild.SearchDown();
+                right.LeftChild = MergeSub(left, right.LeftChild);
+                right.LeftChild.SearchUp();
+                return right;
+            }
+            else
+            {
+                left.RightChild.SearchDown();
+                left.RightChild = MergeSub(left.RightChild, right);
+                left.RightChild.SearchUp();
+                return left;
+            }
+        }
+
+        protected override void DeleteInternal(TNode node)
+        {
+            Transplant(node, MergeSub(node.LeftChild, node.RightChild));
+        }
+
+        public override TNode Insert(TNode node)
+        {
+            var res = base.Insert(node);
+            if (res == node) // not already exist
+                PercolateUp(res);
+            return res;
+        }
+
+        protected void PercolateUp(TNode target)
+        {
+            TNode c = target;
+            TNode p = c.Parent as TNode;
+            while (p != null && _priorityComparer.Compare(p, c) > 0)
+            {
+                if (c == p.LeftChild) c.Zig();
+                else c.Zag();
+                p = (c = p).Parent as TNode;
+            }
+        }
+        /// <remarks>
+        /// A naive and complicated implementation of percolating down.
+        /// 下滤的复杂暴力写法
+        /// </remarks>
+        protected void PercolateDown(TNode target)
+        {
+            TNode c = target;
+            while (true)
+            {
+                TNode l = c.LeftChild as TNode, r = c.RightChild as TNode;
+                // Primitive cases
+                if (l == null)
+                {
+                    if (r != null && _priorityComparer.Compare(c, r) > 0)
+                        r.Zag(); // exchange c with r.
+                    break;
+                }
+                else if (r == null)
+                {
+                    if (_priorityComparer.Compare(c, l) > 0)
+                        l.Zig(); // exchange c with l.
+                    break;
+                }
+                // General cases
+                else if (_priorityComparer.Compare(c, l) > 0)
+                    if (_priorityComparer.Compare(c, r) > 0)
+                    {
+                        c.Parent.SearchDown();
+                        c.SearchDown();
+                        l.SearchDown();
+                        r.SearchDown();
+                        // c is in the middle
+                        c.RightChild = r.LeftChild;
+                        c.LeftChild = l.RightChild;
+
+                        if (_priorityComparer.Compare(l, r) > 0)
+                        {
+                            /* c>l>r, Transform into
+                             *   r
+                             *  /
+                             * l
+                             *  \
+                             *   c
+                             */
+                            c.TransplantParent(r);
+                            l.RightChild = c;
+                            r.LeftChild = l;
+
+                            c.SearchUp();
+                            l.SearchUp();
+                            r.SearchUp();
+                        }
+                        else
+                        {
+                            /* c>r>l, Transform into
+                             * l
+                             *  \
+                             *   r
+                             *  /
+                             * c
+                             */
+                            c.TransplantParent(l);
+                            l.RightChild = r;
+                            r.LeftChild = c;
+
+                            c.SearchUp();
+                            r.SearchUp();
+                            l.SearchUp();
+                        }
+                    }
+                    else
+                    {
+                        /* r>c>l Transform into
+                        * l
+                        *  \
+                        *   c
+                        *    \
+                        *     r
+                        */
+                        c.Parent.SearchDown();
+                        c.SearchDown();
+                        l.SearchDown();
+
+                        c.LeftChild = l.RightChild;
+
+                        c.TransplantParent(l);
+                        l.RightChild = c;
+
+                        c.SearchUp();
+                        l.SearchUp();
+                    }
+                else if (_priorityComparer.Compare(c, r) > 0)
+                {
+                    /* l>c>r Transform into
+                    *     r
+                    *    /
+                    *   c
+                    *  /
+                    * l
+                    */
+                    c.Parent.SearchDown();
+                    c.SearchDown();
+                    r.SearchDown();
+
+                    c.RightChild = r.LeftChild;
+
+                    c.TransplantParent(r);
+                    r.LeftChild = c;
+
+                    c.SearchUp();
+                    r.SearchUp();
+                }
+                else break; // already in order
+            }
+        }
+
+        #region IPriorityQueue & IMergable Implementation
+        public TNode Min() => Root;
+
+        public TNode ExtractMin()
+        {
+            var res = Root;
+            Delete(Root);
+            return res;
+        }
+
+        void IPriorityQueue<TNode>.Insert(TNode data) => Insert(data);
+
+        /// <remarks>
+        /// This implementation use the complicate <see cref="PercolateDown"/>, a easier way to achieve this is to delete <paramref name="data"/> and insert it back again
+        /// 这个方法的实现使用了复杂的<see cref="PercolateDown"/>方法，一个更简单的做法是直接删除data再重新插入
+        /// </remarks>
+        public void PriorityUpdate(TNode data)
+        {
+            PercolateUp(data);
+            PercolateDown(data);
+        }
+        #endregion
     }
 }
