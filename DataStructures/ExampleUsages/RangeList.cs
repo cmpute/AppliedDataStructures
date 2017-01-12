@@ -201,7 +201,7 @@ namespace System.Collections.Generic
             SelectSegment(startindex, endindex + 2);
 
             // Remove nodes
-            var res = Root.RightChild.LeftChild.GetSubtreeEnumerator(TraversalOrder.InOrder);
+            var res = Root.RightChild.LeftChild.GetSubtreeEnumerator(TraverseOrder.InOrder);
             Root.RightChild.LeftChild = SplayRangeTreeNode<T>.nil;
 
             // Update

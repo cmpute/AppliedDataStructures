@@ -33,17 +33,17 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="order">二叉树遍历方式</param>
         /// <param name="partialroot">需要遍历的子树的根</param>
-        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraversalOrder order) where TNode : BinaryTreeNode
+        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraverseOrder order) where TNode : BinaryTreeNode
         {
             switch (order)
             {
-                case TraversalOrder.InOrder:
+                case TraverseOrder.InOrder:
                     return new BinaryTree<TNode>.InOrderEnumerator(partialroot);
-                case TraversalOrder.PreOrder:
+                case TraverseOrder.PreOrder:
                     return new BinaryTree<TNode>.PreOrderEnumerator(partialroot);
-                case TraversalOrder.PostOrder:
+                case TraverseOrder.PostOrder:
                     return new BinaryTree<TNode>.PostOrderEnumerator(partialroot);
-                case TraversalOrder.LevelOrder:
+                case TraverseOrder.LevelOrder:
                     return new BinaryTree<TNode>.LevelOrderEnumerator(partialroot);
                 default:
                     return null;

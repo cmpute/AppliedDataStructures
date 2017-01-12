@@ -28,7 +28,7 @@ namespace System.Collections.Advanced
         public int Count { get; protected set; }
 
         
-        public IEnumerator<TNode> GetEnumerator(TraversalOrder order) => Root.GetSubtreeEnumerator(order);
+        public IEnumerator<TNode> GetEnumerator(TraverseOrder order) => Root.GetSubtreeEnumerator(order);
         /// <summary>
         /// Return InOrder Enumerator by default
         /// 默认返回中序遍历器

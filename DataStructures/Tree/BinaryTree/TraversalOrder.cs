@@ -4,7 +4,7 @@
     /// Indicating traversing order of the tree
     /// 用来标志遍历（二叉）树时的顺序
     /// </summary>
-    public enum TraversalOrder
+    public enum TraverseOrder
     {
         /********** Depth First (DFS) **********/
 
