@@ -12,7 +12,7 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <remarks>
     /// Doubly-chained tree (a.k.a first-child next-sibling binary tree, left-child right-sibling binary tree, filial-heir chain)
-    /// 双链树（亦称孩子-兄弟二叉树，二叉链表）是一种通过二叉树来表示多叉树的结构。
+    /// 双链树（亦称孩子-兄弟二叉树）是一种通过二叉树来表示多叉树的结构。
     /// </remarks>
     public class DoublyChainedTreeNode : BinaryTreeNode, IMultiwayTreeNode
     {
