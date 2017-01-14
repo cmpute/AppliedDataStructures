@@ -44,7 +44,9 @@
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IKeyedNode.cs" />
     <Compile Include="IMergable.cs" />
+    <Compile Include="Tree\Binary\BinaryTreeEnumerator.cs" />
     <Compile Include="Tree\Binary\DoublyChainedTreeNode.cs" />
+    <Compile Include="Tree\Binary\IBinaryTreeNode.cs" />
     <Compile Include="Tree\Binary\ThreadedBinaryTreeNode.cs" />
     <Compile Include="Tree\BST\Treap.cs" />
     <Compile Include="Tree\BST\AVLTree.cs" />
@@ -67,7 +69,7 @@
     <Compile Include="Tree\Binary\TraversalOrder.cs" />
     <Compile Include="Tree\IStaticSearchTree.cs" />
     <Compile Include="Tree\Multiway\IMultiwayTreeNode.cs" />
-    <Compile Include="Tree\Multiway\KWayTreeNode.cs" />
+    <Compile Include="Tree\Multiway\KaryTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
   </ItemGroup>

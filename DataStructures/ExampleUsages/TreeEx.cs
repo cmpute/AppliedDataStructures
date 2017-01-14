@@ -19,14 +19,16 @@ namespace System.Collections.Advanced
         /// <summary>
         /// 将二叉搜索树转换为<see cref="IDictionary{TKey, TValue}"/>对象，以提供字典操作
         /// </summary>
-        public static IDictionary<TKey,TNode> ToDictionary<TNode, TKey>(this BinarySearchTree<TNode, TKey> tree) where TNode : BinaryTreeNode, IKeyedNode<TKey> => new BinarySearchTreeDictionary<TNode, TKey>(tree);
+        public static IDictionary<TKey, TNode> ToDictionary<TNode, TKey>(this BinarySearchTree<TNode, TKey> tree) where TNode : BinaryTreeNode, IKeyedNode<TKey> => new BinarySearchTreeDictionary<TNode, TKey>(tree);
+
+        #region Traversal
 
         /// <summary>
         /// Get the inorder enumerator of subtree, root of which is <paramref name="partialroot"/>
         /// 获取以<paramref name="partialroot"/>为根的子树的中序遍历器
         /// </summary>
         /// <param name="partialroot">需要遍历的子树的根</param>
-        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot) where TNode : BinaryTreeNode => new BinaryTree<TNode>.InOrderEnumerator(partialroot);
+        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot) where TNode : BinaryTreeNode => new BinaryTreeEnumerator<TNode>.InOrderEnumerator(partialroot);
         /// <summary>
         /// Get the enumerator of subtree, root of which is <paramref name="partialroot"/>
         /// 获取以<paramref name="partialroot"/>为根的子树的遍历器
@@ -38,17 +40,94 @@ namespace System.Collections.Advanced
             switch (order)
             {
                 case TraverseOrder.InOrder:
-                    return new BinaryTree<TNode>.InOrderEnumerator(partialroot);
+                    return new BinaryTreeEnumerator<TNode>.InOrderEnumerator(partialroot);
                 case TraverseOrder.PreOrder:
-                    return new BinaryTree<TNode>.PreOrderEnumerator(partialroot);
+                    return new BinaryTreeEnumerator<TNode>.PreOrderEnumerator(partialroot);
                 case TraverseOrder.PostOrder:
-                    return new BinaryTree<TNode>.PostOrderEnumerator(partialroot);
+                    return new BinaryTreeEnumerator<TNode>.PostOrderEnumerator(partialroot);
                 case TraverseOrder.LevelOrder:
-                    return new BinaryTree<TNode>.LevelOrderEnumerator(partialroot);
+                    return new BinaryTreeEnumerator<TNode>.LevelOrderEnumerator(partialroot);
                 default:
                     return null;
             }
         }
+
+        public static IEnumerable<IBinaryTreeNode> TraverseSubtree(this IBinaryTreeNode partialroot) => TraverseSubtree(partialroot, TraverseOrder.InOrder);
+        /// <summary>
+        /// enumerate the subtree with the root <paramref name="partialroot"/>
+        /// 遍历以<paramref name="partialroot"/>为根的子树
+        /// </summary>
+        /// <param name="partialroot">需要遍历的子树的根</param>
+        /// <param name="order">二叉树遍历方式</param>
+        public static IEnumerable<IBinaryTreeNode> TraverseSubtree(this IBinaryTreeNode partialroot, TraverseOrder order) where TNode : IBinaryTreeNode
+        {
+            var current = new IBinaryTreeNode[] { partialroot };
+            switch (order)
+            {
+                case TraverseOrder.InOrder:
+                    return partialroot.LeftChild.TraverseSubtree(order)
+                        .Concat(current)
+                        .Concat(partialroot.RightChild.TraverseSubtree(order));
+                case TraverseOrder.PreOrder:
+                    return current
+                        .Concat(partialroot.LeftChild.TraverseSubtree(order))
+                        .Concat(partialroot.RightChild.TraverseSubtree(order));
+                case TraverseOrder.PostOrder:
+                    return partialroot.LeftChild.TraverseSubtree(order)
+                        .Concat(partialroot.RightChild.TraverseSubtree(order))
+                        .Concat(current);
+                case TraverseOrder.LevelOrder:
+                    return LevelOrderTraverse(partialroot);
+                default:
+                    return null;
+            }
+        }
+        private static IEnumerable<IBinaryTreeNode> LevelOrderTraverse(IBinaryTreeNode partialroot)
+        {
+            var queue = new Queue<IBinaryTreeNode>();
+            queue.Enqueue(partialroot);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                if (current.LeftChild != null) queue.Enqueue(current.LeftChild);
+                if (current.RightChild != null) queue.Enqueue(current.RightChild);
+                yield return current;
+            }
+        }
+
+        public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot) => TraverseSubtree(partialroot, TraverseOrder.InOrder);
+        public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order)
+        {
+            var current = new IMultiwayTreeNode[] { partialroot };
+            switch (order)
+            {
+                case TraverseOrder.InOrder:
+                    throw new NotSupportedException("多叉树不支持中序遍历");
+                case TraverseOrder.PreOrder:
+                    return current.Concat(partialroot.Children);
+                case TraverseOrder.PostOrder:
+                    return partialroot.Children.Reverse().Concat(current);
+                case TraverseOrder.LevelOrder:
+                    return LevelOrderTraverse(partialroot);
+                default:
+                    return null;
+            }
+        }
+        private static IEnumerable<IMultiwayTreeNode> LevelOrderTraverse(IMultiwayTreeNode partialroot)
+        {
+            var queue = new Queue<IMultiwayTreeNode>();
+            queue.Enqueue(partialroot);
+            while (queue.Count > 0)
+            {
+                var current = queue.Dequeue();
+                if (current.Children != null)
+                    foreach (var node in current.Children)
+                        queue.Enqueue(node);
+                yield return current;
+            }
+        }
+
+        #endregion
     }
 
     class BinarySearchTreeDictionary<TNode, TKey> : ICollection<TNode>, IDictionary<TKey,TNode> where TNode : BinaryTreeNode, IKeyedNode<TKey>

@@ -23,7 +23,23 @@ namespace System.Collections.Advanced
     /// PS: K-ary Search Tree is abbriviated as KST.
     /// 注：k路搜索树的简写是KST
     /// </remarks>
-    public class KWayTreeNode : IMultiwayTreeNode
+    public class KaryTreeNode : IMultiwayTreeNode
     {
+        List<KaryTreeNode> _children;
+
+        /// <summary>
+        /// The maximum count of children
+        /// 最大孩子数
+        /// </summary>
+        public int MaxDegree { get; private set; }
+
+        public List<KaryTreeNode> Children;
+        IReadOnlyList<IMultiwayTreeNode> IMultiwayTreeNode.Children => _children;
+
+        public KaryTreeNode(int maxDegree)
+        {
+            MaxDegree = maxDegree;
+            _children = new List<KaryTreeNode>(maxDegree);
+        }
     }
 }

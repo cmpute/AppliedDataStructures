@@ -14,7 +14,7 @@ namespace System.Collections.Advanced
     /// 继承结点可以在结点上维护额外信息减小操作的时间复杂度
     /// 结点没有保留双亲指针，因为部分树不需要向上回溯的过程
     /// </remarks>
-    public class BinaryTreeNode
+    public class BinaryTreeNode : IBinaryTreeNode
     {
         #region Leaf Trailor
         static readonly BinaryTreeNode _nil = new BinaryTreeNode() { _par = null, _lchild = null, _rchild = null };
@@ -71,6 +71,7 @@ namespace System.Collections.Advanced
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
         }
+        IBinaryTreeNode IBinaryTreeNode.LeftChild => LeftChild;
         public virtual BinaryTreeNode RightChild
         {
             get { return _rchild; }
@@ -81,6 +82,7 @@ namespace System.Collections.Advanced
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
         }
+        IBinaryTreeNode IBinaryTreeNode.RightChild => RightChild;
 
         /// <summary>
         /// 寻找当前结点在二叉树中序遍历中的后继
@@ -127,7 +129,7 @@ namespace System.Collections.Advanced
         /// make parent of this the parent of <paramref name="newChild"/>
         /// 让当前结点的父亲成为<paramref name="newChild"/>的父亲
         /// </summary>
-        public void TransplantParent(BinaryTreeNode newChild)
+        internal void TransplantParent(BinaryTreeNode newChild)
         {
             if (Parent.LeftChild == this)
                 Parent.LeftChild = newChild;

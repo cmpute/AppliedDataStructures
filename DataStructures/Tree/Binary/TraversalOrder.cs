@@ -11,16 +11,14 @@
         /// <summary>
         /// 前序遍历
         /// </summary>
-        /// <remarks>Binary Tree only.</remarks>
         PreOrder,
         /// <summary>
-        /// 中序遍历
+        /// 中序遍历, Binary Tree only
         /// </summary>
         InOrder,
         /// <summary>
         /// 后序遍历
         /// </summary>
-        /// <remarks>Binary Tree only.</remarks>
         PostOrder,
 
         /********** Breadth First (BFS) **********/
