@@ -72,6 +72,7 @@
     <Compile Include="Tree\Multiway\KaryTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
+    <Compile Include="Tree\TreeKind.cs" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

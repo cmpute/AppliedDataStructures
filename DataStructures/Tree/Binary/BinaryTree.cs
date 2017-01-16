@@ -26,8 +26,12 @@ namespace System.Collections.Advanced
             protected set { _rootTrailer.RightChild = value; }
         }
         public int Count { get; protected set; }
+        public virtual void Clear()
+        {
+            Root = null;
+            Count = 0;
+        }
 
-        
         public IEnumerator<TNode> GetEnumerator(TraverseOrder order) => Root.GetSubtreeEnumerator(order);
         /// <summary>
         /// Return InOrder Enumerator by default

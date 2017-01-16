@@ -18,5 +18,6 @@ namespace System.Collections.Advanced
         /// 获取有根树的根
         /// </summary>
         TNode Root { get; }
+        void Clear();
     }
 }

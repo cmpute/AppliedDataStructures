@@ -31,6 +31,12 @@ namespace System.Collections.Advanced
         /// <returns>删除掉的结点，结点不在树中则返回<c>null</c></returns>
         TNode Delete(TKey key);
         /// <summary>
+        /// 在搜索树中删除指定的结点
+        /// </summary>
+        /// <param name="node">需要删除的结点</param>
+        /// <returns>如果结点存在且删除成功则返回true</returns>
+        bool Delete(TNode node);
+        /// <summary>
         /// 在搜索树中插入结点，如果已存在同样Key值的结点则返回该结点
         /// </summary>
         /// <param name="node">需要插入的结点，结点已存在于树中则返回该结点</param>
@@ -48,7 +54,7 @@ namespace System.Collections.Advanced
         }
         public int Compare(T x, T y) => _comparison(x, y);
 
-        public bool Equals(T x, T y) => _comparison(x, y) == 0;
+        public bool Equals(T x, T y) => _comparison(x, y) == 0; 
 
         public int GetHashCode(T obj)
         {

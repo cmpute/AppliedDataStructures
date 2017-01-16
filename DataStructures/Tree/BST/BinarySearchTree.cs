@@ -251,11 +251,5 @@ namespace System.Collections.Advanced
                 }
             }
         }
-
-        public virtual void Clear()
-        {
-            Root = null;
-            Count = 0;
-        }
     }
 }
