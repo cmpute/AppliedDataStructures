@@ -260,13 +260,10 @@ namespace System.Collections.Generic
         internal T _data;
 
         /// <remarks>
-        /// The tree is indeed a search tree which the index in the list is the key, but the index cannot be retrieved directly from the field "subcount"
-        /// 这的确是一棵以元素在列表中位置为关键字的搜索树，但这个关键字不能从subcount变量中直接得到
+        /// The tree is a search tree which the index in the list is the key
+        /// 这是一棵以元素在列表中位置为关键字的搜索树
         /// </remarks>
-        public int Key//=> subcount;
-        {
-            get { throw new NotSupportedException(); }
-        }
+        public int Key => LeftChild.subcount;
 
         public SplayRangeTreeNode(T data)
         {
