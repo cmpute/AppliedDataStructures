@@ -12,7 +12,7 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <typeparam name="TNode">结点类型</typeparam>
     /// <typeparam name="TKey">关键字类型</typeparam>
-    public class Treap<TNode, TKey> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TNode> where TNode : BinaryTreeNode, IKeyedNode<TKey>
+    public class Treap<TNode, TKey> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TNode> where TNode : BinaryTreeNode, IKeyProvider<TKey>
     {
         #region fields and ctor.
         IComparer<TNode> _priorityComparer;
@@ -109,9 +109,9 @@ namespace System.Collections.Advanced
             Transplant(node, MergeSub(node.LeftChild, node.RightChild));
         }
 
-        public override TNode Insert(TNode node)
+        public override TNode InsertInternal(TNode node)
         {
-            var res = base.Insert(node);
+            var res = base.InsertInternal(node);
             if (res == node) // not already exist
                 PercolateUp(res);
             return res;
@@ -172,7 +172,7 @@ namespace System.Collections.Advanced
                              *  \
                              *   c
                              */
-                            c.TransplantParent(r);
+                            c.TransferParent(r);
                             l.RightChild = c;
                             r.LeftChild = l;
 
@@ -189,7 +189,7 @@ namespace System.Collections.Advanced
                              *  /
                              * c
                              */
-                            c.TransplantParent(l);
+                            c.TransferParent(l);
                             l.RightChild = r;
                             r.LeftChild = c;
 
@@ -213,7 +213,7 @@ namespace System.Collections.Advanced
 
                         c.LeftChild = l.RightChild;
 
-                        c.TransplantParent(l);
+                        c.TransferParent(l);
                         l.RightChild = c;
 
                         c.SearchUp();
@@ -234,7 +234,7 @@ namespace System.Collections.Advanced
 
                     c.RightChild = r.LeftChild;
 
-                    c.TransplantParent(r);
+                    c.TransferParent(r);
                     r.LeftChild = c;
 
                     c.SearchUp();
@@ -250,11 +250,11 @@ namespace System.Collections.Advanced
         public TNode ExtractMin()
         {
             var res = Root;
-            Delete(Root);
+            DeleteNode(Root);
             return res;
         }
 
-        void IPriorityQueue<TNode>.Insert(TNode data) => Insert(data);
+        void IPriorityQueue<TNode>.Insert(TNode data) => InsertNode(data);
 
         /// <remarks>
         /// This implementation use the complicate <see cref="PercolateDown"/>, a easier way to achieve this is to delete <paramref name="data"/> and insert it back again

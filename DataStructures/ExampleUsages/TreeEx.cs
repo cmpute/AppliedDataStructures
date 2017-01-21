@@ -17,13 +17,13 @@ namespace System.Collections.Advanced
         /// </summary>
         public static ICollection<TNode> ToCollection<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
-            where TNode : IKeyedNode<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
+            where TNode : IKeyProvider<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
         /// <summary>
         /// 将二叉搜索树转换为<see cref="IDictionary{TKey, TValue}"/>对象，以提供字典操作
         /// </summary>
         public static IDictionary<TKey, TNode> ToDictionary<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
-            where TNode : IKeyedNode<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
+            where TNode : IKeyProvider<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
 
         #region Traversal
 
@@ -203,7 +203,7 @@ namespace System.Collections.Advanced
 
     class SearchTreeDictionary<TStructure, TNode, TKey> : ICollection<TNode>, IDictionary<TKey, TNode>
         where TStructure : ISearchTree<TNode, TKey>
-        where TNode : IKeyedNode<TKey>
+        where TNode : IKeyProvider<TKey>
     {
         TStructure _tree;
         public SearchTreeDictionary(TStructure tree) { _tree = tree; }

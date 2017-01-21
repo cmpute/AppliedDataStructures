@@ -68,7 +68,7 @@ namespace System.Collections.Advanced.Tests
     }
 
 
-    class BSTValueNode : BinaryTreeNode, IKeyedNode<int>
+    class BSTValueNode : BinaryTreeNode, IKeyProvider<int>
     {
         static int order = 1;
         public int Data { get; set; }

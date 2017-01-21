@@ -13,7 +13,8 @@ namespace System.Collections.Advanced
     /// <remarks>
     /// Insert and Delete implementations are naive ones
     /// </remarks>
-    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, ISearchTreeEquatable<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
+    public class BinarySearchTree<TNode, TKey> : BinaryTree<TNode>, IEquatableSearchTree<TNode, TKey> 
+        where TNode : BinaryTreeNode, IKeyProvider<TKey>
     {
         IComparer<TKey> _comparer;
         Random _rand = new Random();
@@ -25,7 +26,7 @@ namespace System.Collections.Advanced
         }
 
         /// <summary>
-        /// 是否支持<see cref="ISearchTreeEquatable{TNode, TKey}"/>的操作
+        /// 是否支持<see cref="IEquatableSearchTree{TNode, TKey}"/>的操作
         /// </summary>
         public virtual bool SupportEquatable { get; set; } = false;
 
@@ -47,9 +48,11 @@ namespace System.Collections.Advanced
             if (target == replace) return;
 
             target.Parent.SearchDown();
-            target.TransplantParent(replace);
+            target.TransferParent(replace);
             replace.SearchUp();
         }
+
+        #region Internal Implementations
 
         /// <summary>
         /// Internal Search Method
@@ -78,9 +81,43 @@ namespace System.Collections.Advanced
             return ret;
         }
 
-        public TNode Search(TKey key) => SearchInternal(key, false);
+        /// <summary>
+        /// 删除指定结点，由内部调用，确保删除的结点在内部
+        /// </summary>
+        /// <param name="node">需要删除的结点</param>
+        protected virtual void DeleteInternal(TNode node)
+        {
+            if (node == null) return;
+            if (node.LeftChild == null)
+                Transplant(node, node.RightChild);
+            else if (node.RightChild == null)
+                Transplant(node, node.LeftChild);
+            else
+            {
+                //find successor
+                node.SearchDown();
+                var succ = node.RightChild;
+                while (succ.LeftChild != null)
+                {
+                    succ.SearchDown();
+                    succ = succ.LeftChild;
+                }
 
-        public virtual TNode Insert(TNode node)
+                // replace successor with its child
+                if (succ.Parent != node)
+                {
+                    Transplant(succ, succ.RightChild);
+                    succ.RightChild = node.RightChild;
+                }
+
+                // replace node with successor
+                Transplant(node, succ);
+                succ.LeftChild = node.LeftChild;
+            }
+            Count--;
+        }
+
+        public virtual TNode InsertInternal(TNode node)
         {
             if (Root == null)
             {
@@ -132,41 +169,11 @@ namespace System.Collections.Advanced
             return node;
         }
 
-        /// <summary>
-        /// 删除指定结点，由内部调用，确保删除的结点在内部
-        /// </summary>
-        /// <param name="node">需要删除的结点</param>
-        protected virtual void DeleteInternal(TNode node)
-        {
-            if (node == null) return;
-            if (node.LeftChild == null)
-                Transplant(node, node.RightChild);
-            else if (node.RightChild == null)
-                Transplant(node, node.LeftChild);
-            else
-            {
-                //find successor
-                node.SearchDown();
-                var succ = node.RightChild;
-                while (succ.LeftChild != null)
-                {
-                    succ.SearchDown();
-                    succ = succ.LeftChild;
-                }
+        #endregion
 
-                // replace successor with its child
-                if (succ.Parent != node)
-                {
-                    Transplant(succ, succ.RightChild);
-                    succ.RightChild = node.RightChild;
-                }
+        public TNode SearchNode(TKey key) => SearchInternal(key, false);
 
-                // replace node with successor
-                Transplant(node, succ);
-                succ.LeftChild = node.LeftChild;
-            }
-            Count--;
-        }
+        public TNode InsertNode(TNode node) => InsertInternal(node);
 
         /// <summary>
         /// Delete certain node
@@ -174,52 +181,23 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="node">需要删除的结点</param>
         /// <return>结点在树中并且删除成功则返回true，否则返回false</return>
-        public bool Delete(TNode node)
+        public bool DeleteNode(TNode node)
         {
-            if (!SearchAll(node.Key).Contains(node)) return false;
+            if (!SearchNodeAll(node.Key).Contains(node)) return false;
             DeleteInternal(node);
             return true;
         }
 
-        public TNode Delete(TKey key)
+        public TNode DeleteNode(TKey key)
         {
             TNode current = SearchInternal(key, true);
             DeleteInternal(current);
             return current;
         }
 
-        /// <summary>
-        /// Find the first successor, key of which is not equal to <see cref="key"/> of the node with the <see cref="key"/>
-        /// 寻找关键字为<see cref="key"/>结点的第一个关键字不等于<see cref="key"/>的后继
-        /// </summary>
-        /// <returns>第一个关键字不为key的后继</returns>
-        public virtual TNode Successor(TKey key)
+        public virtual IEnumerable<TNode> SearchNodeAll(TKey key)
         {
-            var ret = Search(key)?.Successor() as TNode;
-            if (SupportEquatable)
-                while (ret != null && _comparer.Compare(ret.Key, key) == 0)
-                    ret = ret.Successor() as TNode;
-            return ret as TNode;
-        }
-
-        /// <summary>
-        /// Find the first predecessor, key of which is not equal to <see cref="key"/> of the node with the <see cref="key"/>
-        /// 寻找关键字为<see cref="key"/>结点的第一个关键字不等于<see cref="key"/>的前驱
-        /// </summary>
-        /// <returns>第一个关键字不为key的前驱</returns>
-        public virtual TNode Predecessor(TKey key)
-        {
-            var ret = Search(key)?.Predecessor() as TNode;
-            if (SupportEquatable)
-                while (ret != null && _comparer.Compare(ret.Key, key) == 0)
-                    ret = ret.Predecessor() as TNode;
-            if (ret == _rootTrailer) ret = null;//当访问到哨兵时返回空
-            return ret as TNode;
-        }
-
-        public virtual IEnumerable<TNode> SearchAll(TKey key)
-        {
-            TNode current = Search(key);
+            TNode current = SearchNode(key);
 
             if (!SupportEquatable)
                 yield return current;
@@ -251,5 +229,41 @@ namespace System.Collections.Advanced
                 }
             }
         }
+        //TODO: DeleteAll can be improved for better time cost
+        public IEnumerable<TNode> DeleteNodeAll(TKey key)
+            => SearchNodeAll(key).Select(node => { DeleteInternal(node); return node; });
+
+        #region Auxiliary Methods
+
+        /// <summary>
+        /// Find the first successor, key of which is not equal to <see cref="key"/> of the node with the <see cref="key"/>
+        /// 寻找关键字为<see cref="key"/>结点的第一个关键字不等于<see cref="key"/>的后继
+        /// </summary>
+        /// <returns>第一个关键字不为key的后继</returns>
+        public virtual TNode Successor(TKey key)
+        {
+            var ret = SearchNode(key)?.Successor() as TNode;
+            if (SupportEquatable)
+                while (ret != null && _comparer.Compare(ret.Key, key) == 0)
+                    ret = ret.Successor() as TNode;
+            return ret as TNode;
+        }
+
+        /// <summary>
+        /// Find the first predecessor, key of which is not equal to <see cref="key"/> of the node with the <see cref="key"/>
+        /// 寻找关键字为<see cref="key"/>结点的第一个关键字不等于<see cref="key"/>的前驱
+        /// </summary>
+        /// <returns>第一个关键字不为key的前驱</returns>
+        public virtual TNode Predecessor(TKey key)
+        {
+            var ret = SearchNode(key)?.Predecessor() as TNode;
+            if (SupportEquatable)
+                while (ret != null && _comparer.Compare(ret.Key, key) == 0)
+                    ret = ret.Predecessor() as TNode;
+            if (ret == _rootTrailer) ret = null;//当访问到哨兵时返回空
+            return ret as TNode;
+        }
+
+        #endregion
     }
 }

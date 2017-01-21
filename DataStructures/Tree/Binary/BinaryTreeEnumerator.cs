@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
-{
-    public static class BinaryTreeEnumerator<TNode> where TNode : BinaryTreeNode
+{ 
+    public static class BinaryTreeEnumerator<TNode>
+        where TNode : class, IBinaryTreeNode, IPersistent
     {
         /// <summary>
         /// Enumerator for preorder, inorder and postorder traversing
@@ -25,7 +26,7 @@ namespace System.Collections.Advanced
                 if (root != null)
                 {
                     _root = root;
-                    _version = root._version;
+                    _version = root.Version;
                     _stack = new Stack<TNode>();
                 }
                 else _null = true;
@@ -37,7 +38,7 @@ namespace System.Collections.Advanced
             public bool MoveNext()
             {
                 if (_null) return false;
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_current == null)
                 {
@@ -49,7 +50,7 @@ namespace System.Collections.Advanced
             }
             public void Reset()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _stack.Clear();
@@ -170,7 +171,7 @@ namespace System.Collections.Advanced
             internal LevelOrderEnumerator(TNode root)
             {
                 _root = root;
-                _version = root._version;
+                _version = root.Version;
                 _queue = new Queue<TNode>();
                 if (root != null) _queue.Enqueue(root);
             }
@@ -179,7 +180,7 @@ namespace System.Collections.Advanced
             public void Dispose() { }
             public bool MoveNext()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_queue.Count == 0) return false;
                 _current = _queue.Dequeue();
@@ -189,7 +190,7 @@ namespace System.Collections.Advanced
             }
             public void Reset()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _queue.Clear();

@@ -14,7 +14,7 @@ namespace System.Collections.Advanced
     /// 继承结点可以在结点上维护额外信息减小操作的时间复杂度
     /// 结点没有保留双亲指针，因为部分树不需要向上回溯的过程
     /// </remarks>
-    public class BinaryTreeNode : IBinaryTreeNode
+    public class BinaryTreeNode : IBinaryTreeNode, IPersistent
     {
         #region Leaf Trailor
         static readonly BinaryTreeNode _nil = new BinaryTreeNode() { _par = null, _lchild = null, _rchild = null };
@@ -50,7 +50,7 @@ namespace System.Collections.Advanced
         }
         #endregion
 
-        internal int _version = 0; // 作为持久数据结构版本记录的标记
+        public int Version { get; private set; } = 0; // 作为持久数据结构版本记录的标记
 
         #region Relatives
         protected BinaryTreeNode _par = _nil, _lchild = _nil, _rchild = _nil;
@@ -71,7 +71,6 @@ namespace System.Collections.Advanced
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
         }
-        IBinaryTreeNode IBinaryTreeNode.LeftChild => LeftChild;
         public virtual BinaryTreeNode RightChild
         {
             get { return _rchild; }
@@ -82,6 +81,9 @@ namespace System.Collections.Advanced
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
         }
+
+        IBinaryTreeNode IBinaryTreeNode.Parent => Parent;
+        IBinaryTreeNode IBinaryTreeNode.LeftChild => LeftChild;
         IBinaryTreeNode IBinaryTreeNode.RightChild => RightChild;
 
         /// <summary>
@@ -129,7 +131,7 @@ namespace System.Collections.Advanced
         /// make parent of this the parent of <paramref name="newChild"/>
         /// 让当前结点的父亲成为<paramref name="newChild"/>的父亲
         /// </summary>
-        internal void TransplantParent(BinaryTreeNode newChild)
+        internal void TransferParent(BinaryTreeNode newChild)
         {
             if (Parent.LeftChild == this)
                 Parent.LeftChild = newChild;
@@ -146,12 +148,12 @@ namespace System.Collections.Advanced
         }
         internal void SearchUp()
         {
-            _version++;
+            Version++;
 
-            if (LeftChild != null && LeftChild._version > _version)
-                _version = LeftChild._version;
-            if (RightChild != null && RightChild._version > _version)
-                _version = RightChild._version;
+            if (LeftChild != null && LeftChild.Version > Version)
+                Version = LeftChild.Version;
+            if (RightChild != null && RightChild.Version > Version)
+                Version = RightChild.Version;
             OnSearchUp();
             OnSearchUpRecursive();
 
@@ -160,15 +162,15 @@ namespace System.Collections.Advanced
                 BinaryTreeNode current = Parent;
                 while (current != null)
                 {
-                    var temp = _version;
+                    var temp = Version;
 
                     var nsearchup = !current.OnSearchUpRecursive();
-                    if (current.LeftChild != null && current.LeftChild._version > _version)
-                        _version = current.LeftChild._version;
-                    if (current.RightChild != null && current.RightChild._version > _version)
-                        _version = current.RightChild._version;
+                    if (current.LeftChild != null && current.LeftChild.Version > Version)
+                        Version = current.LeftChild.Version;
+                    if (current.RightChild != null && current.RightChild.Version > Version)
+                        Version = current.RightChild.Version;
 
-                    if (temp == _version && nsearchup) break; // No updating any more
+                    if (temp == Version && nsearchup) break; // No updating any more
                     current = current.Parent;
                 }
             }
@@ -238,7 +240,7 @@ namespace System.Collections.Advanced
             this.SearchDown();
             
             p.LeftChild = RightChild;
-            p.TransplantParent(this);
+            p.TransferParent(this);
             RightChild = p;
 
             p.OnSearchUp();
@@ -265,7 +267,7 @@ namespace System.Collections.Advanced
             this.OnSearchDown();
 
             p.RightChild = LeftChild;
-            p.TransplantParent(this);
+            p.TransferParent(this);
             LeftChild = p;
 
             p.OnSearchUp();

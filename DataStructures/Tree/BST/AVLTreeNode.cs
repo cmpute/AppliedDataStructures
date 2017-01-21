@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class AVLTreeNode<TKey> : BinaryTreeNode, IKeyedNode<TKey>
+    public class AVLTreeNode<TKey> : BinaryTreeNode, IKeyProvider<TKey>
     {
         public TKey Key { get; set; }
         public int Height { get; private set; } = 1;
@@ -53,7 +53,7 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected static AVLTreeNode<TKey> Connect34(AVLTreeNode<TKey> a, AVLTreeNode<TKey> b, AVLTreeNode<TKey> c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
         {
-            top.TransplantParent(b);
+            top.TransferParent(b);
 
             a.LeftChild = t0;
             a.RightChild = t1;

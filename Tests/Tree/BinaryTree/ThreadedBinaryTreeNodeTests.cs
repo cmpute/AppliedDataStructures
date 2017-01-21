@@ -68,7 +68,7 @@ namespace System.Collections.Advanced.Tests
         }
     }
 
-    class ThreadedBSTNode : ThreadedBinaryTreeNode, IKeyedNode<int>
+    class ThreadedBSTNode : ThreadedBinaryTreeNode, IKeyProvider<int>
     {
         public int Key { get; set; }
         public override string ToString() => "Key=" + Key;

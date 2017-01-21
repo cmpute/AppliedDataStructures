@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
+    public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyProvider<TKey>
     {
         public SplayTree() : base() { }
         public SplayTree(IComparer<TKey> comparer) : base(comparer) { }
