@@ -65,8 +65,8 @@
     <Compile Include="Tree\BST\SplayTree.cs" />
     <Compile Include="Tree\Binary\BinaryTree.cs" />
     <Compile Include="Tree\Binary\BinaryTreeNode.cs" />
-    <Compile Include="Definitions\IPriorityQueue.cs" />
-    <Compile Include="Definitions\IRootedTree.cs" />
+    <Compile Include="IPriorityQueue.cs" />
+    <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ISearchTree.cs" />
     <Compile Include="Tree\Binary\TraverseOrder.cs" />
@@ -74,7 +74,7 @@
     <Compile Include="Tree\Multiway\KaryTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
-    <Compile Include="Definitions\TreeKind.cs" />
+    <Compile Include="Tree\TreeKind.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
