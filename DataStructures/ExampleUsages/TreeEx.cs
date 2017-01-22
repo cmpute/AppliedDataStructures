@@ -33,7 +33,8 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="order">二叉树遍历方式</param>
         /// <param name="partialroot">需要遍历的子树的根</param>
-        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraverseOrder order = TraverseOrder.InOrder) where TNode : BinaryTreeNode
+        public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
+            where TNode : class, IBinaryTreeNode, IPersistent
         {
             switch (order)
             {
@@ -57,9 +58,9 @@ namespace System.Collections.Advanced
         /// <param name="partialroot">需要遍历的子树的根</param>
         /// <param name="order">二叉树遍历方式</param>
         /// <return>a collection of node and depth of the node</return>
-        public static IEnumerable<Tuple<BinaryTreeNode, int>> TraverseSubtree(this BinaryTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder, int startDepth = 0)
+        public static IEnumerable<Tuple<IBinaryTreeNode, int>> TraverseSubtree(this IBinaryTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder, int startDepth = 0)
         {
-            var current = new Tuple<BinaryTreeNode, int>[] { new Tuple<BinaryTreeNode, int>(partialroot, startDepth) };
+            var current = new Tuple<IBinaryTreeNode, int>[] { new Tuple<IBinaryTreeNode, int>(partialroot, startDepth) };
             switch (order)
             {
                 case TraverseOrder.InOrder:
@@ -80,15 +81,15 @@ namespace System.Collections.Advanced
                     return null;
             }
         }
-        private static IEnumerable<Tuple<BinaryTreeNode, int>> LevelOrderTraverse(BinaryTreeNode partialroot, int startDepth)
+        private static IEnumerable<Tuple<IBinaryTreeNode, int>> LevelOrderTraverse(IBinaryTreeNode partialroot, int startDepth)
         {
-            var queue = new Queue<Tuple<BinaryTreeNode, int>>();
-            queue.Enqueue(new Tuple<BinaryTreeNode, int>(partialroot, startDepth));
+            var queue = new Queue<Tuple<IBinaryTreeNode, int>>();
+            queue.Enqueue(new Tuple<IBinaryTreeNode, int>(partialroot, startDepth));
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.Item1.LeftChild != null) queue.Enqueue(new Tuple<BinaryTreeNode, int>(current.Item1.LeftChild, current.Item2 + 1));
-                if (current.Item1.RightChild != null) queue.Enqueue(new Tuple<BinaryTreeNode, int>(current.Item1.RightChild, current.Item2 + 1));
+                if (!SentinelEx.EqualNull(current.Item1.LeftChild)) queue.Enqueue(new Tuple<IBinaryTreeNode, int>(current.Item1.LeftChild, current.Item2 + 1));
+                if (!SentinelEx.EqualNull(current.Item1.RightChild)) queue.Enqueue(new Tuple<IBinaryTreeNode, int>(current.Item1.RightChild, current.Item2 + 1));
                 yield return current;
             }
         }
@@ -117,7 +118,7 @@ namespace System.Collections.Advanced
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (current.Item1.Children != null)
+                if (SentinelEx.NotEqualNull(current.Item1.Children))
                     foreach (var node in current.Item1.Children)
                         queue.Enqueue(new Tuple<IMultiwayTreeNode, int>(node, startDepth + 1));
                 yield return current;
@@ -128,17 +129,18 @@ namespace System.Collections.Advanced
 
         #region Tree Type Judging
 
-        public static TreeKind JudgeKind<TNode>(this BinaryTree<TNode> tree) where TNode : BinaryTreeNode
+        public static TreeKind JudgeKind<TNode>(this IRootedTree<TNode> tree)
+            where TNode : class, IBinaryTreeNode
         {
             var last = tree.Root;
-            if (last == null) throw new InvalidOperationException("树不能为空");
+            if (SentinelEx.EqualNull(last)) throw new InvalidOperationException("树不能为空");
             TreeKind result = TreeKind.Ordinary;
 
             int degreelog = tree.Root.GetDegree();
             int nstrict = 0;
             int depthlog = -1;
             bool newline = false, completeflag = true;
-            foreach (var current in tree.Root.TraverseSubtree(TraverseOrder.LevelOrder))
+            foreach (var current in LevelOrderTraverse(tree.Root, 0))
             {
                 var node = current.Item1;
                 var depth = current.Item2;
@@ -162,7 +164,7 @@ namespace System.Collections.Advanced
                 }
                 last = node as TNode;
             }
-            if (last != tree.Root && last.Parent.LeftChild == null)
+            if (last != tree.Root && SentinelEx.EqualNull(last.Parent.LeftChild))
                 completeflag = false;
             if (nstrict == 0)
                 if (degreelog == 2)
@@ -170,24 +172,24 @@ namespace System.Collections.Advanced
                 else
                     result |= TreeKind.Strict;
             if (nstrict <= 1 && completeflag)
-                if (!newline && (last == tree.Root || last.Parent.RightChild != null))
+                if (!newline && (last == tree.Root || !SentinelEx.EqualNull(last.Parent.RightChild)))
                     result |= TreeKind.Perfect;
                 else
                     result |= TreeKind.Complete;
             return result;
         }
-        public static int GetDegree(this BinaryTreeNode node)
+        public static int GetDegree(this IBinaryTreeNode node)
         {
-            if (node.LeftChild != null)
-                if (node.RightChild != null)
+            if (SentinelEx.NotEqualNull(node.LeftChild))
+                if (SentinelEx.NotEqualNull(node.RightChild))
                     return 2;
                 else
                     return 1;
-            else if (node.RightChild != null)
+            else if (SentinelEx.NotEqualNull(node.RightChild))
                 return 1;
             else return 0;
         }
-        public static int GetDegree(this IMultiwayTreeNode node) => node.Children?.Count(cnode => cnode != null) ?? 0;
+        public static int GetDegree(this IMultiwayTreeNode node) => node.Children?.Count(cnode => SentinelEx.NotEqualNull(cnode)) ?? 0;
         private static bool AreChildrenLeftPadding(this IMultiwayTreeNode node)
         {
             if (node.Children == null) return true;
@@ -213,11 +215,11 @@ namespace System.Collections.Advanced
 
         public bool IsReadOnly => false;
 
-        public void Add(TNode item) => _tree.Insert(item);
+        public void Add(TNode item) => _tree.InsertNode(item);
 
         public void Clear() => _tree.Clear();
 
-        public bool Contains(TNode item) => _tree.Search(item.Key) != null;
+        public bool Contains(TNode item) => _tree.SearchNode(item.Key) != null;
 
         public void CopyTo(TNode[] array, int arrayIndex)
         {
@@ -229,7 +231,7 @@ namespace System.Collections.Advanced
 
         public IEnumerator<TNode> GetEnumerator() => _tree.GetEnumerator();
 
-        public bool Remove(TNode item) => _tree.Delete(item);
+        public bool Remove(TNode item) => _tree.DeleteNode(item);
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
         #endregion
@@ -246,16 +248,16 @@ namespace System.Collections.Advanced
         {
             get
             {
-                return _tree.Search(key);
+                return _tree.SearchNode(key);
             }
 
             set
             {
-                var target = _tree.Search(key);
+                var target = _tree.SearchNode(key);
                 if (!target.Equals(value))
                 {
-                    _tree.Delete(key);
-                    _tree.Insert(value);
+                    _tree.DeleteNode(key);
+                    _tree.InsertNode(value);
                 }
             }
         }
@@ -266,11 +268,11 @@ namespace System.Collections.Advanced
 
         public void Add(KeyValuePair<TKey, TNode> item) => Add(item.Key, item.Value);
 
-        public void Add(TKey key, TNode value) => _tree.Insert(KeyValueCheck(key, value));
+        public void Add(TKey key, TNode value) => _tree.InsertNode(KeyValueCheck(key, value));
 
         public bool Contains(KeyValuePair<TKey, TNode> item) => Contains(KeyValueCheck(item.Key, item.Value));
 
-        public bool ContainsKey(TKey key) => _tree.Search(key) != null;
+        public bool ContainsKey(TKey key) => _tree.SearchNode(key) != null;
 
         public void CopyTo(KeyValuePair<TKey, TNode>[] array, int arrayIndex)
         {
@@ -280,13 +282,13 @@ namespace System.Collections.Advanced
                 array[current++] = new KeyValuePair<TKey, TNode>(iter.Current.Key, iter.Current);
         }
 
-        public bool Remove(TKey key) => _tree.Delete(key) != null;
+        public bool Remove(TKey key) => _tree.DeleteNode(key) != null;
 
-        public bool Remove(KeyValuePair<TKey, TNode> item) => _tree.Delete(KeyValueCheck(item.Key, item.Value));
+        public bool Remove(KeyValuePair<TKey, TNode> item) => _tree.DeleteNode(KeyValueCheck(item.Key, item.Value));
 
         public bool TryGetValue(TKey key, out TNode value)
         {
-            value = _tree.Search(key);
+            value = _tree.SearchNode(key);
             return value != null;
         }
 

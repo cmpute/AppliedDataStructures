@@ -41,7 +41,7 @@ namespace System.Collections.Advanced.Tests
             {
                 var node = new Node(r.Next(100));
                 compare.Add(node);
-                tree.Insert(node);
+                tree.InsertNode(node);
             }
 
             Assert.IsTrue(compare.OrderBy(node => node.Key).SequenceEqual(tree));
@@ -54,7 +54,7 @@ namespace System.Collections.Advanced.Tests
             foreach (var node in del)
             {
                 compare.Remove(node);
-                tree.Delete(node);
+                tree.DeleteNode(node);
             }
 
             Assert.IsTrue(compare.OrderBy(node => node.Key).SequenceEqual(tree));

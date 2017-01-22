@@ -24,7 +24,7 @@ namespace System.Collections.Advanced.Tests
             {
                 int c = r.Next();
                 list.Add(c, c);
-                tree.Insert(new Node { Key = c });
+                tree.InsertNode(new Node { Key = c });
                 Assert.IsTrue(tree.Select((node) => node.Key).SequenceEqual(list.Select((pair) => pair.Value)));
             }
         }
@@ -36,7 +36,7 @@ namespace System.Collections.Advanced.Tests
             int j = 0;
             for (int i = 0; i < nodenum; i++, j = 0)
             {
-                tree.Insert(new Node() { Key = i });
+                tree.InsertNode(new Node() { Key = i });
                 foreach (var t in tree)
                 {
                     Assert.AreEqual(j++, t.Key);
@@ -47,7 +47,7 @@ namespace System.Collections.Advanced.Tests
 
             for (int i = nodenum - 1; i >= 0; i--, j = 0)
             {
-                tree.Delete(i);
+                tree.DeleteNode(i);
                 foreach (var t in tree)
                 {
                     Assert.AreEqual(j++, t.Key);

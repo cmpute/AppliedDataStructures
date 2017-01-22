@@ -17,7 +17,7 @@ namespace System.Collections.Advanced.Tests
         void NewNode(int value)
         {
             var node = new BSTValueNode(value);
-            tree.Insert(node);
+            tree.InsertNode(node);
             nodes.Add(node);
         }
         [TestInitialize]
@@ -39,10 +39,10 @@ namespace System.Collections.Advanced.Tests
         [TestMethod()]
         public void DeleteTest()
         {
-            Assert.IsTrue(nodes.Remove(tree.Delete(6)));
-            Assert.IsTrue(nodes.Remove(tree.Delete(4)));
-            Assert.IsTrue(nodes.Remove(tree.Delete(2)));
-            Assert.AreEqual(null, tree.Delete(5));
+            Assert.IsTrue(nodes.Remove(tree.DeleteNode(6)));
+            Assert.IsTrue(nodes.Remove(tree.DeleteNode(4)));
+            Assert.IsTrue(nodes.Remove(tree.DeleteNode(2)));
+            Assert.AreEqual(null, tree.DeleteNode(5));
         }
 
         [TestMethod()]
@@ -61,9 +61,9 @@ namespace System.Collections.Advanced.Tests
         public void SearchAllTest()
         {
             if (tree.KeepInsertOrder)
-                Assert.IsTrue(tree.SearchAll(4).SequenceEqual(nodes.Where(val => val.Key == 4)));
+                Assert.IsTrue(tree.SearchNodeAll(4).SequenceEqual(nodes.Where(val => val.Key == 4)));
             else
-                Assert.AreEqual(0, tree.SearchAll(4).Except(nodes.Where(val => val.Key == 4)).Count());
+                Assert.AreEqual(0, tree.SearchNodeAll(4).Except(nodes.Where(val => val.Key == 4)).Count());
         }
     }
 

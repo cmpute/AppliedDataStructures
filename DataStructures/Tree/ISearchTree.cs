@@ -11,7 +11,7 @@ namespace System.Collections.Advanced
     /// 静态搜索树的抽象接口
     /// </summary>
     public interface IStaticSearchTree<out TNode, in TKey> : IRootedTree<TNode>
-        where TNode : IKeyProvider<TKey>
+        //where TNode : IKeyProvider<TKey>
     {
         /// <summary>
         /// 在搜索树中根据关键字搜索结点
@@ -26,8 +26,11 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <typeparam name="TNode">结点类型</typeparam>
     /// <typeparam name="TKey">关键字类型</typeparam>
+    /// <remarks>
+    /// A search tree is a tree that every node of it has a key, and the key of leftchild is larger/smaller than rightchild.
+    /// </remarks>
     public interface ISearchTree<TNode, in TKey> : IStaticSearchTree<TNode, TKey>
-        where TNode : IKeyProvider<TKey>
+        //where TNode : IKeyProvider<TKey>
     {
         /// <summary>
         /// 在搜索树中插入结点，如果已存在同样Key值的结点则返回该结点

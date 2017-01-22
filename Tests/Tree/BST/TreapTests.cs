@@ -41,7 +41,7 @@ namespace System.Collections.Advanced.Tests
             {
                 var node = new BSTValueNode(r.Next(100)) { Data = r.Next(100) };
                 compare.Add(node);
-                tree.Insert(node);
+                tree.InsertNode(node);
             }
 
             CompareLog();
@@ -61,7 +61,7 @@ namespace System.Collections.Advanced.Tests
                 Console.WriteLine($"delete [{node.Key}]{node.Data}");
 
                 compare.Remove(node);
-                tree.Delete(node);
+                tree.DeleteNode(node);
 
                 CompareLog();
             }

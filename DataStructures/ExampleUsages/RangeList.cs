@@ -132,14 +132,14 @@ namespace System.Collections.Generic
         public SplayRangeTree(IEnumerable<T> init) : base()
         {
             SupportEquatable = false;
-            var p = Root = lnil = new SplayRangeTreeNode<T>(default(T)); // left trailor
+            var p = Root = lnil = new SplayRangeTreeNode<T>(default(T)); // left trailer
             if (init != null)
                 foreach (var item in init)
                 {
                     p.RightChild = new SplayRangeTreeNode<T>(item);
                     p = p.RightChild;
                 }
-            p.RightChild = rnil = new SplayRangeTreeNode<T>(default(T)); // right trailor
+            p.RightChild = rnil = new SplayRangeTreeNode<T>(default(T)); // right trailer
             Splay(p);
         }
 
@@ -314,9 +314,9 @@ namespace System.Collections.Generic
             subcount = LeftChild.subcount + RightChild.subcount + 1;
         }
 
-        protected override bool IsNil()
+        public override bool IsSentinel()
         {
-            return ReferenceEquals(this, nil) || base.IsNil();
+            return ReferenceEquals(this, nil) || base.IsSentinel();
         }
     }
 }

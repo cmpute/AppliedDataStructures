@@ -10,12 +10,11 @@ namespace System.Collections.Advanced
     /// van Emde Boas Tree (a.k.a vEB-tree)
     /// </summary>
     /// <typeparam name="TNode"></typeparam>
-    /// <typeparam name="TKey"></typeparam>
-    public class vanEmdeBoasTree<TNode, TKey> : ISearchTree<TNode, TKey> where TNode : vanEmdeBoasTreeNode
+    /// <remarks>
+    /// A Search Tree works based on comparison, but vEB tree works on bits, so vEB is technically not a search tree.
+    /// </remarks>
+    public class vanEmdeBoasTree<TNode, TData> : IRootedTree<TNode> where TNode : vanEmdeBoasTreeNode<TData>
     {
-        IComparer<TKey> _comparer;
-        public IComparer<TKey> KeyComparer => _comparer;
-
         public int Count
         {
             get
@@ -26,31 +25,22 @@ namespace System.Collections.Advanced
 
         public TNode Root { get; protected set; }
 
-        TNode Successor(TKey key) { throw new NotImplementedException(); }
-        TNode Predecessor(TKey key) { throw new NotImplementedException(); }
-        
+        TNode Successor(int key) { throw new NotImplementedException(); }
+        TNode Predecessor(int key) { throw new NotImplementedException(); }
 
-        public TNode Search(TKey key)
+        /// <summary>
+        /// 若关键字不存在则创建新结点，否则根据关键字寻找该结点，并且返回
+        /// </summary>
+        /// <param name="key">新建结点的关键字</param>
+        /// <returns>创建或搜索到的结点</returns>
+        public TNode CreateNode(int key) { throw new NotImplementedException(); }
+
+        public TNode DeleteNode(int key)
         {
             throw new NotImplementedException();
         }
 
-        public TNode Delete(TKey key)
-        {
-            throw new NotImplementedException();
-        }
-
-        public TNode Insert(TNode node)
-        {
-            throw new NotImplementedException();
-        }
-
-        public IEnumerator<TNode> GetEnumerator()
-        {
-            throw new NotImplementedException();
-        }
-
-        IEnumerator IEnumerable.GetEnumerator()
+        public TNode SearchNode(int key)
         {
             throw new NotImplementedException();
         }
@@ -60,9 +50,16 @@ namespace System.Collections.Advanced
             throw new NotImplementedException();
         }
 
-        public bool Delete(TNode node)
+        public IEnumerator<TNode> GetEnumerator()
         {
             throw new NotImplementedException();
+        }
+
+        IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
+
+        public void TrimExcess()
+        {
+
         }
     }
 }

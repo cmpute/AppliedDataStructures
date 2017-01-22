@@ -14,7 +14,7 @@ namespace System.Collections.Advanced
     /// 继承结点可以在结点上维护额外信息减小操作的时间复杂度
     /// 结点没有保留双亲指针，因为部分树不需要向上回溯的过程
     /// </remarks>
-    public class BinaryTreeNode : IBinaryTreeNode, IPersistent
+    public class BinaryTreeNode : IBinaryTreeNode, IPersistent, IHasSentinel
     {
         #region Leaf Trailor
         static readonly BinaryTreeNode _nil = new BinaryTreeNode() { _par = null, _lchild = null, _rchild = null };
@@ -27,18 +27,18 @@ namespace System.Collections.Advanced
         public static bool operator ==(BinaryTreeNode a, BinaryTreeNode b)
         {
             if (ReferenceEquals(a, b)) return true;
-            if (((object)a == null || a.IsNil()) &&
-                ((object)b == null || b.IsNil()))
+            if (((object)a == null || a.IsSentinel()) &&
+                ((object)b == null || b.IsSentinel()))
                 return true;
             return false;
         }
         public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b) => !(a == b);
         /// <summary>
-        /// Method for indicating whether it's leaf trailor in the tree.It should be override whenever nil is re-defined.
+        /// Method for indicating whether it's leaf sentinel in the tree.It should be override whenever nil is re-defined.
         /// 用来判断当前结点是否为叶结点哨兵的方法。如果重新定义了nil对象，则应重载此方法。
         /// </summary>
         /// <returns>如果当前结点是哨兵则返回<c>true</c></returns>
-        protected virtual bool IsNil()
+        public virtual bool IsSentinel()
         {
             return ReferenceEquals(this, _nil);
         }

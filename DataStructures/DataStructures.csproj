@@ -43,10 +43,9 @@
     <Compile Include="ComparerWrapper.cs" />
     <Compile Include="ExampleUsages\RangeList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
-    <Compile Include="IMultimap.cs" />
     <Compile Include="IDataProvider.cs" />
+    <Compile Include="IHasSentinel.cs" />
     <Compile Include="IMergable.cs" />
-    <Compile Include="IMap.cs" />
     <Compile Include="IPersistent.cs" />
     <Compile Include="Tree\Binary\BinaryTreeEnumerator.cs" />
     <Compile Include="Tree\Binary\DoublyChainedTreeNode.cs" />

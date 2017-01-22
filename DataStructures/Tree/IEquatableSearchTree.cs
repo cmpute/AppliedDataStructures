@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced
 {
     public interface IStaticEquatableSearchTree<out TNode, in TKey> : IStaticSearchTree<TNode, TKey>
-        where TNode : IKeyProvider<TKey>
+        //where TNode : IKeyProvider<TKey>
     {
-        IEnumerable<TNode> SearchNodeAll(TKey key);
+        //IEnumerable<TNode> SearchNodeAll(TKey key);
     }
     public interface IEquatableSearchTree<TNode, in TKey> : IStaticEquatableSearchTree<TNode, TKey>, ISearchTree<TNode, TKey>
         where TNode : IKeyProvider<TKey>

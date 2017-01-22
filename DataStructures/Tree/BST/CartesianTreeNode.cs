@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class CartesianTreeNode<TKey> : BinaryTreeNode, IKeyedNode<TKey>
+    public class CartesianTreeNode<TKey> : BinaryTreeNode, IKeyProvider<TKey>
     {
         static Random prior_rand = new Random();
         public TKey Key { get; set; }

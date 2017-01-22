@@ -67,9 +67,9 @@ namespace System.Collections.Advanced
             return node;
         }
 
-        public override TNode Insert(TNode node)
+        public override TNode InsertInternal(TNode node)
         {
-            var res = base.Insert(node);
+            var res = base.InsertInternal(node);
             Splay(res);
             return res;
         }

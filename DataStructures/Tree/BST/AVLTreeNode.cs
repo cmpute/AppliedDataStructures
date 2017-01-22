@@ -88,7 +88,7 @@ namespace System.Collections.Advanced
                     //   v   t2
                     //  / \
                     // t0 t1
-                    return Connect34(v, p, g, v.LeftChild, v.RightChild, p.RightChild, g.RightChild,g); // zig
+                    return Connect34(v, p, g, v.LeftChild, v.RightChild, p.RightChild, g.RightChild, g); // zig
                 }
                 else
                 {
@@ -99,7 +99,7 @@ namespace System.Collections.Advanced
                     //   t0  v
                     //      / \
                     //     t1 t2
-                    return Connect34(p, v, g, p.LeftChild, v.LeftChild, v.RightChild, g.RightChild,g); // zag-zig
+                    return Connect34(p, v, g, p.LeftChild, v.LeftChild, v.RightChild, g.RightChild, g); // zag-zig
                 }
             else
             {
@@ -112,7 +112,7 @@ namespace System.Collections.Advanced
                     //      v   t3
                     //     / \
                     //    t1 t2
-                    return Connect34(g, v, p, g.LeftChild, v.LeftChild, v.RightChild, p.RightChild,g); // zig-zag
+                    return Connect34(g, v, p, g.LeftChild, v.LeftChild, v.RightChild, p.RightChild, g); // zig-zag
                 }
                 else
                 {
@@ -123,7 +123,7 @@ namespace System.Collections.Advanced
                     //   t1  v
                     //      / \
                     //     t2 t3
-                    return Connect34(g, p, v, g.LeftChild, p.LeftChild, v.LeftChild, v.RightChild,g); // zig
+                    return Connect34(g, p, v, g.LeftChild, p.LeftChild, v.LeftChild, v.RightChild, g); // zig
                 }
             }
         }
