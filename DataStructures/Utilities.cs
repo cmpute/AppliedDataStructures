@@ -9,7 +9,7 @@ namespace System.Collections.Advanced
     static class Utils
     {
 
-        //2^ceil(log2(n))
+        //ceil(log2(n))
         public static int Ceil2(double n)
         {
             int a = 1, c = 0;
@@ -18,7 +18,7 @@ namespace System.Collections.Advanced
                 a <<= 1;
                 c++;
             }
-            return 1 << c;
+            return c;
         }
     }
 }

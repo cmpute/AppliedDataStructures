@@ -15,7 +15,7 @@ namespace System.Collections.Advanced
     /// </remarks>
     public class vanEmdeBoasTree<TNode, TData> : IRootedTree<TNode> where TNode : vanEmdeBoasTreeNode<TData>
     {
-        private const int _defaultCapacity = 4;
+        private const int _defaultCapacity = 8;
 
         TNode _root = null;
         Func<int, TNode> _new;
@@ -26,6 +26,7 @@ namespace System.Collections.Advanced
         public vanEmdeBoasTree(Func<int, TNode> newNode) : this(_defaultCapacity, newNode) { }
         public vanEmdeBoasTree(int initsize, Func<int, TNode> newNode)
         {
+            if (initsize < 2) initsize = _defaultCapacity;
             _new = newNode;
             _root = _new(Utils.Ceil2(initsize));
         }
@@ -79,7 +80,7 @@ namespace System.Collections.Advanced
 
         public void Clear()
         {
-            _root = _new(Capacity);
+            _root = _new(Utils.Ceil2(Capacity));
         }
 
         public IEnumerator<TNode> GetEnumerator()
@@ -96,7 +97,7 @@ namespace System.Collections.Advanced
         }
 
         public IDictionary<int, TData> ToDictionary()
-            => Root.TraverseSubtree(0, (level, node, index) => level + index * (node as vanEmdeBoasTreeNode<TData>).lsqrt, TraverseOrder.PreOrder)
+            => Root.TraverseSubtree(0, (level, node, index) => level + index * (1 << ((node as vanEmdeBoasTreeNode<TData>).UniverseBits >> 1)), TraverseOrder.PreOrder)
                 .SelectMany(res =>
                 {
                     var node = (res.Item1 as vanEmdeBoasTreeNode<TData>);

@@ -14,7 +14,7 @@ namespace System.Collections.Advanced.Tests
         Dictionary<int, int> compare;
         vanEmdeBoasTree<vanEmdeBoasTreeNode<int>, int> tree;
         Random r = new Random();
-        const int _size = 64;
+        const int _size = 1 << 6;
 
         [TestInitialize]
         [TestMethod]
@@ -155,6 +155,7 @@ namespace System.Collections.Advanced.Tests
 
             for (int i = 8; i < _size; i++)
             {
+                var tempdic = tree.ToDictionary();
                 if (!compare.ContainsKey(i))
                     continue;
                 compare.Remove(i);
@@ -165,7 +166,7 @@ namespace System.Collections.Advanced.Tests
 
             Assert.AreEqual(8, tree.Capacity);
             EqualTest(8);
-            
+
             if (!compare.ContainsKey(3))
             {
                 value = r.Next();
@@ -180,7 +181,7 @@ namespace System.Collections.Advanced.Tests
                 compare.Remove(i);
                 tree.DeleteNode(i);
             }
-
+            
             tree.TrimExcess();
 
             Assert.AreEqual(4, tree.Capacity);
