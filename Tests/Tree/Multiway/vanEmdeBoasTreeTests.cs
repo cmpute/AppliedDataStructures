@@ -14,15 +14,15 @@ namespace System.Collections.Advanced.Tests
         Dictionary<int, int> compare;
         vanEmdeBoasTree<vanEmdeBoasTreeNode<int>, int> tree;
         Random r = new Random();
-        const int size = 64;
+        const int _size = 64;
 
         [TestInitialize]
         [TestMethod]
         public void Generate()
         {
-            compare = new Dictionary<int, int>(size);
-            tree = new vanEmdeBoasTree<vanEmdeBoasTreeNode<int>, int>(size, (size) => new vanEmdeBoasTreeNode<int>(size));
-            for (int i = 0; i < size; i++)
+            compare = new Dictionary<int, int>(_size);
+            tree = new vanEmdeBoasTree<vanEmdeBoasTreeNode<int>, int>(_size, (size) => new vanEmdeBoasTreeNode<int>(size));
+            for (int i = 0; i < _size; i++)
             {
                 if (r.Next() % 2 == 0)
                     continue;
@@ -31,10 +31,10 @@ namespace System.Collections.Advanced.Tests
                 tree.InsertNode(i, value);
             }
             
-            EqualTest();
+            EqualTest(_size);
         }
 
-        public void EqualTest()
+        public void EqualTest(int size)
         {
             Assert.AreEqual(size, tree.Capacity);
             Assert.AreEqual(compare.Count, tree.Count);
@@ -51,7 +51,7 @@ namespace System.Collections.Advanced.Tests
         [TestMethod()]
         public void DeleteNodeTest()
         {
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < _size; i++)
             {
                 if (r.Next() % 2 == 0)
                     continue;
@@ -63,13 +63,13 @@ namespace System.Collections.Advanced.Tests
                 Assert.AreEqual(rc, rr);
             }
 
-            EqualTest();
+            EqualTest(_size);
         }
 
         [TestMethod()]
         public void SearchNodeTest()
         {
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < _size; i++)
             {
                 Assert.AreEqual(compare.ContainsKey(i), tree.Contains(i));
                 if (compare.ContainsKey(i))
@@ -85,7 +85,7 @@ namespace System.Collections.Advanced.Tests
 
             Assert.AreEqual(0, tree.Count);
 
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < _size; i++)
             {
                 if (r.Next() % 2 == 0)
                     continue;
@@ -94,13 +94,13 @@ namespace System.Collections.Advanced.Tests
                 tree.InsertNode(i, value);
             }
 
-            EqualTest();
+            EqualTest(_size);
         }
 
         [TestMethod()]
         public void UpdateTest()
         {
-            for (int i = 0; i < size; i++)
+            for (int i = 0; i < _size; i++)
             {
                 if (r.Next() % 2 == 0)
                     continue;
@@ -113,7 +113,7 @@ namespace System.Collections.Advanced.Tests
                     compare.Add(i, value);
             }
 
-            EqualTest();
+            EqualTest(_size);
         }
 
         [TestMethod]
@@ -142,10 +142,65 @@ namespace System.Collections.Advanced.Tests
             Assert.IsTrue(keycol.SequenceEqual(compare.Keys.Reverse()));
         }
 
-        //[TestMethod()]
-        //public void TrimExcessTest()
-        //{
-        //    Assert.Fail();
-        //}
+        [TestMethod()]
+        public void TrimExcessTest()
+        {
+            //ensures size = 8
+            var value = r.Next();
+            if (!compare.ContainsKey(7))
+            {
+                compare.Add(7, value);
+                tree.InsertNode(7, value);
+            }
+
+            for (int i = 8; i < _size; i++)
+            {
+                if (!compare.ContainsKey(i))
+                    continue;
+                compare.Remove(i);
+                tree.DeleteNode(i);
+            }
+
+            tree.TrimExcess();
+
+            Assert.AreEqual(8, tree.Capacity);
+            EqualTest(8);
+            
+            if (!compare.ContainsKey(3))
+            {
+                value = r.Next();
+                compare.Add(3, value);
+                tree.InsertNode(3, value);
+            }
+
+            for (int i = 4; i < 8; i++)
+            {
+                if (!compare.ContainsKey(i))
+                    continue;
+                compare.Remove(i);
+                tree.DeleteNode(i);
+            }
+
+            tree.TrimExcess();
+
+            Assert.AreEqual(4, tree.Capacity);
+            EqualTest(4);
+        }
+
+        [TestMethod()]
+        public void ExpandTest()
+        {
+            var value = r.Next();
+            compare.Add(200, value);
+            tree.InsertNode(200, value);
+
+            EqualTest(_size * _size);
+
+            compare.Remove(200);
+            Assert.AreEqual(value, tree.DeleteNode(200));
+
+            tree.TrimExcess();
+            EqualTest(_size);
+        }
     }
 }

@@ -22,7 +22,7 @@ namespace System.Collections.Advanced
         public int Count => Root?.Count ?? 0;
         public int Capacity => Root?.UniverseSize ?? _defaultCapacity;
 
-        public TNode Root { get { return _root; } }
+        public TNode Root => _root;
         public vanEmdeBoasTree(Func<int, TNode> newNode) : this(_defaultCapacity, newNode) { }
         public vanEmdeBoasTree(int initsize, Func<int, TNode> newNode)
         {
@@ -33,17 +33,11 @@ namespace System.Collections.Advanced
         public int? Successor(int key) => Root.Successor(key);
         public int? Predecessor(int key) => Root.Predecessor(key);
 
-        private void AddLevel()
-        {
-            var newroot = _new(_root.UniverseSize << 1);
-            var newminkey = _root.Min.Value;
-            var newmin = _root.Remove(newminkey);
-            newroot.Create(newminkey, newmin.GetData(), _new);
-        }
         private void EnsureCapacity(int key)
         {
             while (key > Capacity)
-                AddLevel();
+                _root = _root.ExpandUp(_new) as TNode;
+            if (_root == null) throw new Exception("在扩容过程中出现异常造成根节点为空");
         }
 
         public bool Contains(int key) => _root.Contains(key);
@@ -55,11 +49,18 @@ namespace System.Collections.Advanced
         /// <returns>创建或搜索到的结点</returns>
         public bool InsertNode(int key, TData data)
         {
-            if (_root == null) _root = _new(_defaultCapacity);
+            if (_root == null) _root = _new(Utils.Ceil2(key));
+            else EnsureCapacity(key);
             vanEmdeBoasTreeDataInfo<TData> t;
             return Root.Create(key, data, out t, _new);
         }
 
+        public TData DeleteNode(int key)
+        {
+            TData res;
+            DeleteNode(key, out res);
+            return res;
+        }
         public bool DeleteNode(int key, out TData removedData)
         {
             if (Contains(key))
@@ -90,7 +91,8 @@ namespace System.Collections.Advanced
 
         public void TrimExcess()
         {
-            throw new NotImplementedException();
+            _root = _root.TrimDown(_new) as TNode;
+            if (_root == null) throw new Exception("在收缩过程中出现异常造成根节点为空");
         }
 
         public IDictionary<int, TData> ToDictionary()
