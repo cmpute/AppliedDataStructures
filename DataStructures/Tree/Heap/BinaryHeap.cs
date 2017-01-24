@@ -10,17 +10,19 @@ namespace System.Collections.Advanced
     /// Binary Heap, a most succinct implementation of heap
     /// 二叉堆，堆的最精炼的实现
     /// </summary>
-    /// <typeparam name="TValue">结点上存储的数据类型</typeparam>
+    /// <typeparam name="TValue">结点上存储的数据类型
+    /// <para>如果<typeparamref name="TValue"/>实现了<see cref="IIndexedHeapNode"/>接口，那么<see cref="PriorityUpdate(TValue)"/>操作会进行得更快</para>
+    /// </typeparam>
     /// <typeparam name="TPrior">优先级关键字的类型</typeparam>
     public class BinaryHeap<TValue> : CompactTree<TValue>, IPriorityQueue<TValue>
     {
         IComparer<TValue> _comparer;
 
         public BinaryHeap() : this(Comparer<TValue>.Default) { }
-        public BinaryHeap(IComparer<TValue> comparer)
+        public BinaryHeap(IComparer<TValue> priorityComparer)
         {
             _nodes = new List<TValue>();
-            _comparer = comparer ?? Comparer<TValue>.Default;
+            _comparer = priorityComparer ?? Comparer<TValue>.Default;
         }
         /// <summary>
         /// Initialize a heap from a copy of <paramref name="data"/>.
@@ -29,10 +31,10 @@ namespace System.Collections.Advanced
         /// <param name="data">初始数据</param>
         /// <remarks>如果想要在原数据上进行操作，请使用<see cref="Heapify"/>方法</remarks>
         public BinaryHeap(IEnumerable<TValue> data) : this(data, Comparer<TValue>.Default) { }
-        public BinaryHeap(IEnumerable<TValue> data, IComparer<TValue> comparer)
+        public BinaryHeap(IEnumerable<TValue> data, IComparer<TValue> priorityComparer)
         {
             _nodes = data.ToList();
-            _comparer = comparer ?? Comparer<TValue>.Default;
+            _comparer = priorityComparer ?? Comparer<TValue>.Default;
             Heapify();
         }
 

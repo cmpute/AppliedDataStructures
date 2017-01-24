@@ -12,18 +12,22 @@ namespace System.Collections.Advanced
     /// </summary>
     public static class TreeEx
     {
+        #region Adapters
+
         /// <summary>
         /// 将二叉搜索树转换为<see cref="ICollection{T}"/>对象，以提供集合操作
         /// </summary>
         public static ICollection<TNode> ToCollection<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
-            where TNode : IKeyProvider<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
+            where TNode : IKeyProvider<TKey> => new SearchTreeDictionaryAdapter<TSource, TNode, TKey>(tree);
         /// <summary>
         /// 将二叉搜索树转换为<see cref="IDictionary{TKey, TValue}"/>对象，以提供字典操作
         /// </summary>
         public static IDictionary<TKey, TNode> ToDictionary<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
-            where TNode : IKeyProvider<TKey> => new SearchTreeDictionary<TSource, TNode, TKey>(tree);
+            where TNode : IKeyProvider<TKey> => new SearchTreeDictionaryAdapter<TSource, TNode, TKey>(tree);
+        
+        #endregion
 
         #region Traversal
 
@@ -57,13 +61,13 @@ namespace System.Collections.Advanced
         /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with certain information (of type <typeparamref name="TLevel"/>) of the node
         /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点有关信息(<typeparamref name="TLevel"/>类型的)
         /// </summary>
+        /// <typeparam name="TLevel">提供的每层结点额外信息的类型</typeparam>
         /// <param name="partialroot">需要遍历的子树的根</param>
+        /// <param name="seed">附加参数的初始值</param>
         /// <param name="leftlevelfunc">遍历到某一层结点时将附加参数传给下一层左孩子时需要进行的操作</param>
         /// <param name="rightlevelfunc">遍历到某一层结点时将附加参数传给下一层右孩子时需要进行的操作</param>
-        /// <param name="seed">附加参数的初始值</param>
         /// <param name="order">二叉树遍历方式</param>
-        /// <typeparam name="TLevel">提供的每层结点额外信息的类型</typeparam>
-        /// <return>a collection of node and depth of the node</return>
+        /// <return>遍历得到的结点与附加参数的集合</return>
         public static IEnumerable<Tuple<IBinaryTreeNode, TLevel>> TraverseSubtree<TLevel>(
             this IBinaryTreeNode partialroot,
             TLevel seed,
@@ -117,6 +121,17 @@ namespace System.Collections.Advanced
 
         public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
             => partialroot.TraverseSubtree<object>(null, null, order).Select(res => res.Item1);
+        /// <summary>
+        /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with certain information (of type <typeparamref name="TLevel"/>) of the node
+        /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点有关信息(<typeparamref name="TLevel"/>类型的)
+        /// </summary>
+        /// <typeparam name="TLevel">提供的每层结点额外信息的类型</typeparam>
+        /// <param name="partialroot">需要遍历的子树的根</param>
+        /// <param name="seed">附加参数的初始值</param>
+        /// <param name="levelfunc">遍历到某一层结点时将附加参数传给下一层孩子时需要进行的操作。第一个参数是该层的附加参数，
+        /// 第二个参数是遍历到的结点，第三个是遍历到的结点在上层结点孩子结点中的编号</param>
+        /// <param name="order">多叉树遍历方式</param>
+        /// <returns>遍历得到的结点与附加参数的集合</returns>
         public static IEnumerable<Tuple<IMultiwayTreeNode, TLevel>> TraverseSubtree<TLevel>(
             this IMultiwayTreeNode partialroot,
             TLevel seed,
@@ -246,12 +261,12 @@ namespace System.Collections.Advanced
         #endregion
     }
 
-    class SearchTreeDictionary<TStructure, TNode, TKey> : ICollection<TNode>, IDictionary<TKey, TNode>
+    class SearchTreeDictionaryAdapter<TStructure, TNode, TKey> : ICollection<TNode>, IDictionary<TKey, TNode>
         where TStructure : ISearchTree<TNode, TKey>
         where TNode : IKeyProvider<TKey>
     {
         TStructure _tree;
-        public SearchTreeDictionary(TStructure tree) { _tree = tree; }
+        public SearchTreeDictionaryAdapter(TStructure tree) { _tree = tree; }
 
         #region ICollection Members
         public int Count => _tree.Count;

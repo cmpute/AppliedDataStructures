@@ -40,7 +40,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ComparerWrapper.cs" />
     <Compile Include="ExampleUsages\RangeList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IDataProvider.cs" />

@@ -129,14 +129,14 @@ namespace System.Collections.Advanced.Tests
             int? key = 0;
 
             if (tree.Contains(0)) keycol.Add(0);
-            while ((key = tree.Successor(key.Value)) != null)
+            while ((key = tree.SuccessorKey(key.Value)) != null)
                 keycol.Add(key.Value);
 
             Assert.IsTrue(keycol.SequenceEqual(compare.Keys));
 
             keycol.Clear();
             key = tree.Capacity;
-            while ((key = tree.Predecessor(key.Value)) != null)
+            while ((key = tree.PredecessorKey(key.Value)) != null)
                 keycol.Add(key.Value);
 
             Assert.IsTrue(keycol.SequenceEqual(compare.Keys.Reverse()));

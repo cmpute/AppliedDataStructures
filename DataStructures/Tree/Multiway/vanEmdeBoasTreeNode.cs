@@ -18,22 +18,41 @@ namespace System.Collections.Advanced
     public class vanEmdeBoasTreeNode<TData> : IMultiwayTreeNode
     {
         readonly int u;
-        readonly int lsqrt, hsqrt, lsbits;// lowbit/highbit divider
+        readonly int lsqrt, hsqrt, lsbits;// low/high bit divider
         int num;
         vanEmdeBoasTreeNode<TData>[] _clusters;
         vanEmdeBoasTreeNode<object> _summary; // summary doesn't need data
         static readonly Func<int, vanEmdeBoasTreeNode<object>> createsummary
             = (size) => new vanEmdeBoasTreeNode<object>(size);
 
+        /// <summary>
+        /// Min key
+        /// 结点中最小的关键字
+        /// </summary>
         public int? Min { get; protected set; }
+        /// <summary>
+        /// Max key
+        /// 结点中最大的关键字
+        /// </summary>
         public int? Max { get; protected set; }
+        /// <summary>
+        /// Data of min key
+        /// 结点中最小关键字存储的数据
+        /// </summary>
         public TData MinData { get; protected set; }
+        /// <summary>
+        /// 结点中最大关键字存储的数据
+        /// </summary>
         public TData MaxData { get; protected set; }
         /// <summary>
         /// size of clusters stored in this node, also known as 'universal set size' of the node.
         /// 结点存储的簇的规模，也就是所谓“全集”的大小
         /// </summary>
         public int UniverseSize => 1 << u;
+        /// <summary>
+        /// UniverseSize described in binary bits
+        /// 二进制位数表示的全集大小
+        /// </summary>
         public int UniverseBits => u;
         public vanEmdeBoasTreeNode<TData>[] Clusters => _clusters;
         /// <summary>
@@ -41,6 +60,10 @@ namespace System.Collections.Advanced
         /// 不为空的元素的个数
         /// </summary>
         public int Count => num;
+        /// <summary>
+        /// Summary of clusters
+        /// 子簇的缩略结点
+        /// </summary>
         public vanEmdeBoasTreeNode<object> Summary
         {
             get
@@ -52,7 +75,8 @@ namespace System.Collections.Advanced
         /// <summary>
         /// this property returns <see cref="Clusters"/>
         /// </summary>
-        public IReadOnlyList<IMultiwayTreeNode> Children => Clusters;
+        [Obsolete]
+        public IReadOnlyCollection<IMultiwayTreeNode> Children => Clusters;
 
         /// <summary>
         /// 新建一个vEB树的节点
@@ -105,7 +129,7 @@ namespace System.Collections.Advanced
         /// <param name="key">插入结点的关键字</param>
         /// <param name="data">需要插入的数据</param>
         /// <param name="info">返回插入的位置信息</param>
-        /// <param name="newNode">创建新结点的方法</param>
+        /// <param name="newNode">创建新结点的方法， 参数是结点全域大小， 用以生成自定义的结点</param>
         /// <returns>如果关键字不存在则返回<c>true</c>，关键字已存在则返回<c>false</c></returns>
         public bool Create(int key, TData data, out vanEmdeBoasTreeDataInfo<TData> info, Func<int, vanEmdeBoasTreeNode<TData>> newNode)
         {
@@ -241,6 +265,10 @@ namespace System.Collections.Advanced
             num--;
             return res;
         }
+        /// <summary>
+        /// Find the smallest key bigger than <paramref name="key"/>
+        /// 获取集合中比<paramref name="key"/>大的最小键值
+        /// </summary>
         public int? Successor(int key)
         {
             if (u == 1)
@@ -266,6 +294,10 @@ namespace System.Collections.Advanced
                 }
             }
         }
+        /// <summary>
+        /// Find the biggest key smaller than <paramref name="key"/>
+        /// 获取集合中比<paramref name="key"/>小的最大键值
+        /// </summary>
         public int? Predecessor(int key)
         {
             if (u == 1)
@@ -367,8 +399,21 @@ namespace System.Collections.Advanced
     {
         internal bool remove;
         internal TData rmdata;
+        /// <summary>
+        /// Node hit by operations
+        /// 操作命中的结点
+        /// </summary>
         public vanEmdeBoasTreeNode<TData> HitNode;
+        /// <summary>
+        /// If the data is the MinData
+        /// 操作是否命中的是最小的结点
+        /// </summary>
         public bool HitMin;
+        /// <summary>
+        /// Get the data in the position described by the node.
+        /// 获取结构体表示的数据位的数据
+        /// </summary>
+        /// <returns></returns>
         public TData GetData() => remove ? rmdata : (HitMin ? HitNode.MinData : HitNode.MaxData);
 
         public static vanEmdeBoasTreeDataInfo<TData> Null => default(vanEmdeBoasTreeDataInfo<TData>);

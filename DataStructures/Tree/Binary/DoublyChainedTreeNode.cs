@@ -16,7 +16,7 @@ namespace System.Collections.Advanced
     /// </remarks>
     public class DoublyChainedTreeNode : BinaryTreeNode, IMultiwayTreeNode
     {
-        public IReadOnlyList<IMultiwayTreeNode> Children => new List<DoublyChainedTreeNode>(EnumerateChildren());
+        public IReadOnlyCollection<IMultiwayTreeNode> Children => EnumerateChildren().ToList();
 
         public IEnumerable<DoublyChainedTreeNode> EnumerateChildren()
         {

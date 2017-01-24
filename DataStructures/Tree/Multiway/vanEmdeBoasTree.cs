@@ -23,16 +23,34 @@ namespace System.Collections.Advanced
         public int Capacity => Root?.UniverseSize ?? _defaultCapacity;
 
         public TNode Root => _root;
+        
+        /// <summary>
+        /// 创建一棵自定义结点新的vEB树
+        /// </summary>
+        /// <param name="newNode">创建新结点的方法</param>
         public vanEmdeBoasTree(Func<int, TNode> newNode) : this(_defaultCapacity, newNode) { }
+        /// <summary>
+        /// 创建一棵自定义结点且有初始大小的vEB树
+        /// </summary>
+        /// <param name="initsize">树全域的初始大小</param>
+        /// <param name="newNode">创建新结点的方法</param>
         public vanEmdeBoasTree(int initsize, Func<int, TNode> newNode)
         {
             if (initsize < 2) initsize = _defaultCapacity;
             _new = newNode;
             _root = _new(Utils.Ceil2(initsize));
         }
-
-        public int? Successor(int key) => Root.Successor(key);
-        public int? Predecessor(int key) => Root.Predecessor(key);
+        
+        /// <summary>
+        /// Find the smallest key bigger than <paramref name="key"/>
+        /// 获取集合中比<paramref name="key"/>大的最小键值
+        /// </summary>
+        public int? SuccessorKey(int key) => Root.Successor(key);
+        /// <summary>
+        /// Find the biggest key smaller than <paramref name="key"/>
+        /// 获取集合中比<paramref name="key"/>小的最大键值
+        /// </summary>
+        public int? PredecessorKey(int key) => Root.Predecessor(key);
 
         private void EnsureCapacity(int key)
         {
@@ -78,6 +96,9 @@ namespace System.Collections.Advanced
 
         public TData SearchNode(int key) => _root.Search(key).GetData();
 
+        /// <summary>
+        /// 清空存有的键值
+        /// </summary>
         public void Clear()
         {
             _root = _new(Utils.Ceil2(Capacity));
@@ -90,6 +111,10 @@ namespace System.Collections.Advanced
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
+        /// <summary>
+        /// Reorganize the root node making the capacity as small as possible.
+        /// 重新组织根节点使得结点数目尽可能小
+        /// </summary>
         public void TrimExcess()
         {
             _root = _root.TrimDown(_new) as TNode;
