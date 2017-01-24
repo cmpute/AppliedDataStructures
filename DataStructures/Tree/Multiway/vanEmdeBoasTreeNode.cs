@@ -75,8 +75,7 @@ namespace System.Collections.Advanced
         /// <summary>
         /// this property returns <see cref="Clusters"/>
         /// </summary>
-        [Obsolete]
-        public IReadOnlyCollection<IMultiwayTreeNode> Children => Clusters;
+        IReadOnlyCollection<IMultiwayTreeNode> IMultiwayTreeNode.Children => Clusters;
 
         /// <summary>
         /// 新建一个vEB树的节点

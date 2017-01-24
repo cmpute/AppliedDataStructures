@@ -12,18 +12,18 @@ namespace System.Collections.Advanced
     /// </summary>
     /// <typeparam name="TNode">结点类型</typeparam>
     /// <typeparam name="TKey">关键字类型</typeparam>
-    public class Treap<TNode, TKey> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TNode> where TNode : BinaryTreeNode, IKeyProvider<TKey>
+    public class Treap<TNode, TKey, TPriority> : BinarySearchTree<TNode, TKey>, IPriorityQueue<TPriority, TNode> 
+        where TNode : BinaryTreeNode, IKeyProvider<TKey>, IPriorityProvider<TPriority>
     {
         #region fields and ctor.
-        IComparer<TNode> _priorityComparer;
-        public IComparer<TNode> PriorityComparer => _priorityComparer;
+        IComparer<TPriority> _priorityComparer;
+        public IComparer<TPriority> PriorityComparer => _priorityComparer;
 
-        public Treap(Comparison<TNode> priorityComparison) : this(new ComparerWrapper<TNode>(priorityComparison)) { }
-        public Treap(IComparer<TNode> priorityComparer) : this(null, priorityComparer) { }
-        public Treap(IEnumerable<TNode> initNodesKeySorted, Comparison<TNode> priorityComparison) : this(initNodesKeySorted, new ComparerWrapper<TNode>(priorityComparison)) { }
-        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TNode> priorityComparer) : this(initNodesKeySorted, priorityComparer, Comparer<TKey>.Default) { }
-        public Treap(IComparer<TNode> priorityComparer, IComparer<TKey> keyComparer) : this(null, priorityComparer, keyComparer) { }
-        public Treap(IEnumerable<TNode> initNodesKeySorted, Comparison<TNode> priorityComparison, IComparer<TKey> keyComparer) : this(initNodesKeySorted, new ComparerWrapper<TNode>(priorityComparison), keyComparer) { }
+        public Treap() : this(Comparer<TPriority>.Default) { }
+        public Treap(IEnumerable<TNode> initNodesKeySorted) : this(initNodesKeySorted, Comparer<TPriority>.Default) { }
+        public Treap(IComparer<TPriority> priorityComparer) : this(null, priorityComparer) { }
+        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TPriority> priorityComparer) : this(initNodesKeySorted, priorityComparer, Comparer<TKey>.Default) { }
+        public Treap(IComparer<TPriority> priorityComparer, IComparer<TKey> keyComparer) : this(null, priorityComparer, keyComparer) { }
         /// <summary>
         /// Build Treap by initial nodes sorted by key, priority comparer and key comparer
         /// 根据初始数据和关键字、权值比较器构造树堆
@@ -31,7 +31,7 @@ namespace System.Collections.Advanced
         /// <param name="initNodesKeySorted">initial nodes sorted by key 按照关键字已经排好序的结点</param>
         /// <param name="priorityComparer">权重比较器</param>
         /// <param name="keyComparer">关键字比较器</param>
-        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TNode> priorityComparer, IComparer<TKey> keyComparer) : base(keyComparer)
+        public Treap(IEnumerable<TNode> initNodesKeySorted, IComparer<TPriority> priorityComparer, IComparer<TKey> keyComparer) : base(keyComparer)
         {
             if (priorityComparer == null) throw new ArgumentNullException("优先级比较器不能为空");
             _priorityComparer = priorityComparer;
@@ -51,7 +51,7 @@ namespace System.Collections.Advanced
 
                     // find insert position
                     while (stacktail != null)
-                        if (_priorityComparer.Compare(iter.Current, stacktail) < 0)
+                        if (_priorityComparer.Compare(iter.Current.Priority, stacktail.Priority) < 0)
                             stacktail = stacktail.Parent as TNode;
                         else break;
                     
@@ -88,7 +88,7 @@ namespace System.Collections.Advanced
                 return right;
             if (right as TNode == null)
                 return left;
-            if (_priorityComparer.Compare(left as TNode, right as TNode) > 0)
+            if (_priorityComparer.Compare((left as TNode).Priority, (right as TNode).Priority) > 0)
             {
                 right.LeftChild.SearchDown();
                 right.LeftChild = MergeSub(left, right.LeftChild);
@@ -121,7 +121,7 @@ namespace System.Collections.Advanced
         {
             TNode c = target;
             TNode p = c.Parent as TNode;
-            while (p != null && _priorityComparer.Compare(p, c) > 0)
+            while (p != null && _priorityComparer.Compare(p.Priority, c.Priority) > 0)
             {
                 if (c == p.LeftChild) c.Zig();
                 else c.Zag();
@@ -141,19 +141,19 @@ namespace System.Collections.Advanced
                 // Primitive cases
                 if (l == null)
                 {
-                    if (r != null && _priorityComparer.Compare(c, r) > 0)
+                    if (r != null && _priorityComparer.Compare(c.Priority, r.Priority) > 0)
                         r.Zag(); // exchange c with r.
                     break;
                 }
                 else if (r == null)
                 {
-                    if (_priorityComparer.Compare(c, l) > 0)
+                    if (_priorityComparer.Compare(c.Priority, l.Priority) > 0)
                         l.Zig(); // exchange c with l.
                     break;
                 }
                 // General cases
-                else if (_priorityComparer.Compare(c, l) > 0)
-                    if (_priorityComparer.Compare(c, r) > 0)
+                else if (_priorityComparer.Compare(c.Priority, l.Priority) > 0)
+                    if (_priorityComparer.Compare(c.Priority, r.Priority) > 0)
                     {
                         c.Parent.SearchDown();
                         c.SearchDown();
@@ -163,7 +163,7 @@ namespace System.Collections.Advanced
                         c.RightChild = r.LeftChild;
                         c.LeftChild = l.RightChild;
 
-                        if (_priorityComparer.Compare(l, r) > 0)
+                        if (_priorityComparer.Compare(l.Priority, r.Priority) > 0)
                         {
                             /* c>l>r, Transform into
                              *   r
@@ -219,7 +219,7 @@ namespace System.Collections.Advanced
                         c.SearchUp();
                         l.SearchUp();
                     }
-                else if (_priorityComparer.Compare(c, r) > 0)
+                else if (_priorityComparer.Compare(c.Priority, r.Priority) > 0)
                 {
                     /* l>c>r Transform into
                     *     r
@@ -254,7 +254,7 @@ namespace System.Collections.Advanced
             return res;
         }
 
-        void IPriorityQueue<TNode>.Insert(TNode data) => InsertNode(data);
+        void IPriorityQueue<TPriority, TNode>.Insert(TNode data) => InsertNode(data);
 
         /// <remarks>
         /// This implementation use the complicate <see cref="PercolateDown"/>, a easier way to achieve this is to delete <paramref name="data"/> and insert it back again

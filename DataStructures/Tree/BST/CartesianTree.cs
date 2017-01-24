@@ -16,7 +16,7 @@ namespace System.Collections.Advanced
     /// Cartesian Tree is based on <see cref="Treap{TNode, TKey}"/>, it make the priority of every node a random number, thus makes the tree balanced.
     /// 笛卡尔树基于树堆，它使每一个结点的权重为一个随机数来使得二叉树平衡。
     /// </remarks>
-    public class CartesianTree<TNode, TKey> : Treap<TNode, TKey> where TNode : CartesianTreeNode<TKey>
+    public class CartesianTree<TNode, TKey> : Treap<TNode, TKey, int> where TNode : CartesianTreeNode<TKey>
     {
         public CartesianTree() : this(Comparer<TKey>.Default) { }
         public CartesianTree(IEnumerable<TNode> initNodesSorted) : this(initNodesSorted, Comparer<TKey>.Default) { }
@@ -27,6 +27,6 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="initNodesSorted">initial nodes sorted by key 按照关键字已经排好序的结点</param>
         /// <param name="comparer">关键字比较器</param>
-        public CartesianTree(IEnumerable<TNode> initNodesSorted, IComparer<TKey> comparer) : base(initNodesSorted, (node1, node2) => node1.Priority - node2.Priority, comparer) { }
+        public CartesianTree(IEnumerable<TNode> initNodesSorted, IComparer<TKey> comparer) : base(initNodesSorted, Comparer<int>.Default, comparer) { }
     }
 }

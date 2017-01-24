@@ -59,6 +59,7 @@
     <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\CartesianTreeNode.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
+    <Compile Include="Tree\Heap\IHeap.cs" />
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
     <Compile Include="Tree\IEquatableSearchTree.cs" />
     <Compile Include="Tree\BST\SplayTree.cs" />

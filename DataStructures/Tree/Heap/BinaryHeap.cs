@@ -14,14 +14,15 @@ namespace System.Collections.Advanced
     /// <para>如果<typeparamref name="TValue"/>实现了<see cref="IIndexedHeapNode"/>接口，那么<see cref="PriorityUpdate(TValue)"/>操作会进行得更快</para>
     /// </typeparam>
     /// <typeparam name="TPrior">优先级关键字的类型</typeparam>
-    public class BinaryHeap<TValue> : CompactTree<TValue>, IPriorityQueue<TValue>
+    public class BinaryHeap<TValue> : CompactTree<TValue>, IHeap<TValue, TValue>, IMergable<IPriorityQueue<TValue, TValue>>
     {
         IComparer<TValue> _comparer;
+        public IComparer<TValue> PriorityComparer => _comparer;
 
         public BinaryHeap() : this(Comparer<TValue>.Default) { }
         public BinaryHeap(IComparer<TValue> priorityComparer)
         {
-            _nodes = new List<TValue>();
+            Nodes = new List<TValue>();
             _comparer = priorityComparer ?? Comparer<TValue>.Default;
         }
         /// <summary>
@@ -33,7 +34,7 @@ namespace System.Collections.Advanced
         public BinaryHeap(IEnumerable<TValue> data) : this(data, Comparer<TValue>.Default) { }
         public BinaryHeap(IEnumerable<TValue> data, IComparer<TValue> priorityComparer)
         {
-            _nodes = data.ToList();
+            Nodes = data.ToList();
             _comparer = priorityComparer ?? Comparer<TValue>.Default;
             Heapify();
         }
@@ -47,7 +48,7 @@ namespace System.Collections.Advanced
         public static BinaryHeap<TValue> Heapify(IList<TValue> target, IComparer<TValue> comparer)
         {
             BinaryHeap<TValue> heap = new BinaryHeap<TValue>();
-            heap._nodes = target;
+            heap.Nodes = target;
             heap._comparer = comparer ?? Comparer<TValue>.Default;
             heap.Heapify();
             return heap;
@@ -67,8 +68,8 @@ namespace System.Collections.Advanced
             if (Count == 0) throw new InvalidOperationException("堆为空");
 
             var min = Root;
-            _nodes[0] = _nodes[Count - 1];
-            _nodes.RemoveAt(Count - 1);
+            Nodes[0] = Nodes[Count - 1];
+            Nodes.RemoveAt(Count - 1);
 
             if (Count == 0) return min;
             UpdateIndex(0);
@@ -78,21 +79,23 @@ namespace System.Collections.Advanced
 
         public void Insert(TValue data)
         {
-            _nodes.Add(data);
+            Nodes.Add(data);
             UpdateIndex(Count - 1);
             PercolateUp(Count - 1);
         }
 
-        public IPriorityQueue<TValue> Merge(IPriorityQueue<TValue> another)
+        public void Merge(IPriorityQueue<TValue, TValue> another)
         {
-            throw new NotImplementedException();
+            foreach (var node in another)
+                Nodes.Add(node);
+            Heapify();
         }
 
         public TValue Min() => Root;
          
         public void PriorityUpdate(TValue data)
         {
-            int loc = (data as IIndexedHeapNode)?.IndexInHeap ?? _nodes.IndexOf(data);
+            int loc = (data as IIndexedHeapNode)?.IndexInHeap ?? Nodes.IndexOf(data);
             PercolateUp(loc);
             PercolateDown(loc);
         }
@@ -102,7 +105,7 @@ namespace System.Collections.Advanced
             int current = loc, parent = current >> 1;
             while (current > 0)
             {
-                if (_comparer.Compare(_nodes[parent], _nodes[current]) > 0)
+                if (_comparer.Compare(Nodes[parent], Nodes[current]) > 0)
                     SwapNode(current, parent);
                 else break;
                 current = parent;
@@ -115,9 +118,9 @@ namespace System.Collections.Advanced
             int current = loc, min = current << 1;
             if (min >= Count) return; // No children, else the minimum is left child.
             if ((min | 1) < Count) //if has right child
-                if (_comparer.Compare(_nodes[min], _nodes[min | 1]) > 0) // and right child is smaller
+                if (_comparer.Compare(Nodes[min], Nodes[min | 1]) > 0) // and right child is smaller
                     min |= 1; // then right child is the minimum
-            if (_comparer.Compare(_nodes[current], _nodes[min]) > 0) // children is smaller
+            if (_comparer.Compare(Nodes[current], Nodes[min]) > 0) // children is smaller
             {
                 SwapNode(current, min);
                 PercolateDown(min);
@@ -126,17 +129,17 @@ namespace System.Collections.Advanced
 
         private void SwapNode(int i, int j)
         {
-            var temp = _nodes[i];
-            _nodes[i] = _nodes[j];
-            _nodes[j] = temp;
+            var temp = Nodes[i];
+            Nodes[i] = Nodes[j];
+            Nodes[j] = temp;
             UpdateIndex(i);
             UpdateIndex(j);
         }
 
         private void UpdateIndex(int loc)
         {
-            if (_nodes[loc] is IIndexedHeapNode)
-                (_nodes[loc] as IIndexedHeapNode).IndexInHeap = loc;
+            if (Nodes[loc] is IIndexedHeapNode)
+                (Nodes[loc] as IIndexedHeapNode).IndexInHeap = loc;
         }
     }
 }

@@ -17,7 +17,7 @@ namespace System.Collections.Advanced
     /// MaxHeap can be turned into MinHeap by changing IComparer
     /// 最大堆可以通过改变比较方式变成最小堆
     /// </remarks>
-    public interface IPriorityQueue<TValue>
+    public interface IPriorityQueue<TPrior, TValue> : IReadOnlyCollection<TValue>
     {
         /// <summary>
         /// The same as<see cref="Queue{T}.Peek"/>. Return the minimum in the queue
@@ -43,5 +43,6 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="data">需要更新的结点</param>
         void PriorityUpdate(TValue data);
+        IComparer<TPrior> PriorityComparer { get; }
     }
 }
