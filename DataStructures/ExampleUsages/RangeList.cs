@@ -132,14 +132,14 @@ namespace System.Collections.Generic
         public SplayRangeTree(IEnumerable<T> init) : base()
         {
             SupportEquatable = false;
-            var p = Root = lnil = new SplayRangeTreeNode<T>(default(T)); // left trailor
+            var p = Root = lnil = new SplayRangeTreeNode<T>(default(T)); // left trailer
             if (init != null)
                 foreach (var item in init)
                 {
                     p.RightChild = new SplayRangeTreeNode<T>(item);
                     p = p.RightChild;
                 }
-            p.RightChild = rnil = new SplayRangeTreeNode<T>(default(T)); // right trailor
+            p.RightChild = rnil = new SplayRangeTreeNode<T>(default(T)); // right trailer
             Splay(p);
         }
 
@@ -250,7 +250,7 @@ namespace System.Collections.Generic
         }
     }
 
-    class SplayRangeTreeNode<T> : BinaryTreeNode, IKeyedNode<int>
+    class SplayRangeTreeNode<T> : BinaryTreeNode, IKeyProvider<int>
     {
         internal static readonly SplayRangeTreeNode<T> nil = new SplayRangeTreeNode<T>(default(T)) { subcount = 0 };
 
@@ -260,10 +260,15 @@ namespace System.Collections.Generic
         internal T _data;
 
         /// <remarks>
+        /// The tree is indeed a search tree which the index in the list is the key, but the index cannot be retrieved directly from the field "subcount"
+        /// 这的确是一棵以元素在列表中位置为关键字的搜索树，但这个关键字不能从subcount变量中直接得到
         /// The tree is a search tree which the index in the list is the key
         /// 这是一棵以元素在列表中位置为关键字的搜索树
         /// </remarks>
-        public int Key => LeftChild.subcount;
+        public int Key//=> subcount;
+        {
+            get { throw new NotSupportedException(); }
+        }
 
         public SplayRangeTreeNode(T data)
         {
@@ -309,9 +314,9 @@ namespace System.Collections.Generic
             subcount = LeftChild.subcount + RightChild.subcount + 1;
         }
 
-        protected override bool IsNil()
+        public override bool IsSentinel()
         {
-            return ReferenceEquals(this, nil) || base.IsNil();
+            return ReferenceEquals(this, nil) || base.IsSentinel();
         }
     }
 }

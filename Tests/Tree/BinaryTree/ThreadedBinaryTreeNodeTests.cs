@@ -23,7 +23,7 @@ namespace System.Collections.Advanced.Tests
         void NewNode(int value)
         {
             var node = new ThreadedBSTNode() { Key = value };
-            tree.Insert(node);
+            tree.InsertNode(node);
 
             Check();
         }
@@ -36,9 +36,9 @@ namespace System.Collections.Advanced.Tests
             NewNode(4); NewNode(9); NewNode(7);
             NewNode(4);
 
-            tree.Delete(4); Check();
-            tree.Delete(2); Check();
-            tree.Delete(7); Check();
+            tree.DeleteNode(4); Check();
+            tree.DeleteNode(2); Check();
+            tree.DeleteNode(7); Check();
         }
 
         private IEnumerable<ThreadedBSTNode> SuccessorTest()
@@ -68,7 +68,7 @@ namespace System.Collections.Advanced.Tests
         }
     }
 
-    class ThreadedBSTNode : ThreadedBinaryTreeNode, IKeyedNode<int>
+    class ThreadedBSTNode : ThreadedBinaryTreeNode, IKeyProvider<int>
     {
         public int Key { get; set; }
         public override string ToString() => "Key=" + Key;

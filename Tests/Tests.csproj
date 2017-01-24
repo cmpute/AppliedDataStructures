@@ -63,6 +63,7 @@
     <Compile Include="Tree\BST\BinarySearchTreeTests.cs" />
     <Compile Include="Tree\BST\CartesianTreeTests.cs" />
     <Compile Include="Tree\Heap\BinaryHeapTests.cs" />
+    <Compile Include="Tree\Multiway\vanEmdeBoasTreeTests.cs" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\DataStructures\DataStructures.csproj">

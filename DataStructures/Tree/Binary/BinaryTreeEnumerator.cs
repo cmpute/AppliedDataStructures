@@ -5,8 +5,9 @@ using System.Text;
 using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
-{
-    public static class BinaryTreeEnumerator<TNode> where TNode : BinaryTreeNode
+{ 
+    public static class BinaryTreeEnumerator<TNode>
+        where TNode : class, IBinaryTreeNode, IPersistent
     {
         /// <summary>
         /// Enumerator for preorder, inorder and postorder traversing
@@ -22,10 +23,10 @@ namespace System.Collections.Advanced
 
             internal RecursiveEnumerator(TNode root)
             {
-                if (root != null)
+                if (SentinelEx.NotEqualNull(root))
                 {
                     _root = root;
-                    _version = root._version;
+                    _version = root.Version;
                     _stack = new Stack<TNode>();
                 }
                 else _null = true;
@@ -37,11 +38,11 @@ namespace System.Collections.Advanced
             public bool MoveNext()
             {
                 if (_null) return false;
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
-                if (_current == null)
+                if (SentinelEx.EqualNull(_current))
                 {
-                    if (_root == null) return false;
+                    if (SentinelEx.EqualNull(_root)) return false;
                     InitPosition();
                     return true;
                 }
@@ -49,7 +50,7 @@ namespace System.Collections.Advanced
             }
             public void Reset()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _stack.Clear();
@@ -68,7 +69,7 @@ namespace System.Collections.Advanced
             protected override void InitPosition()
             {
                 _current = _root;
-                while (_current.LeftChild != null)
+                while (SentinelEx.NotEqualNull(_current.LeftChild))
                 {
                     _stack.Push(_current);
                     _current = _current.LeftChild as TNode;
@@ -76,11 +77,11 @@ namespace System.Collections.Advanced
             }
             protected override bool MoveNextInternal()
             {
-                if (_current.RightChild != null)
+                if (SentinelEx.NotEqualNull(_current.RightChild))
                 {
                     _stack.Push(_current);
                     _current = _current.RightChild as TNode;
-                    while (_current.LeftChild != null)
+                    while (SentinelEx.NotEqualNull(_current.LeftChild))
                     {
                         _stack.Push(_current);
                         _current = _current.LeftChild as TNode;
@@ -108,9 +109,9 @@ namespace System.Collections.Advanced
             }
             protected override bool MoveNextInternal()
             {
-                if (_current.RightChild != null)
+                if (SentinelEx.NotEqualNull(_current.RightChild))
                     _stack.Push(_current.RightChild as TNode);
-                if (_current.LeftChild != null)
+                if (SentinelEx.NotEqualNull(_current.LeftChild))
                 {
                     _current = _current.LeftChild as TNode;
                     return true;
@@ -137,18 +138,18 @@ namespace System.Collections.Advanced
                 if (_stack.Peek().LeftChild != _current && _stack.Peek().RightChild != _current)
                 {
                     TNode temp = _stack.Peek();
-                    while (temp != null)
+                    while (SentinelEx.NotEqualNull(temp))
                     {
-                        if (temp.LeftChild != null)
+                        if (SentinelEx.NotEqualNull(temp.LeftChild))
                         {
-                            if (temp.RightChild != null)
+                            if (SentinelEx.NotEqualNull(temp.RightChild))
                                 _stack.Push(temp.RightChild as TNode);
                             _stack.Push(temp.LeftChild as TNode);
 
                         }
                         else
                         {
-                            if (temp.RightChild != null)
+                            if (SentinelEx.NotEqualNull(temp.RightChild))
                                 _stack.Push(temp.RightChild as TNode);
                             else break;
                         }
@@ -170,7 +171,7 @@ namespace System.Collections.Advanced
             internal LevelOrderEnumerator(TNode root)
             {
                 _root = root;
-                _version = root._version;
+                _version = root.Version;
                 _queue = new Queue<TNode>();
                 if (root != null) _queue.Enqueue(root);
             }
@@ -179,17 +180,17 @@ namespace System.Collections.Advanced
             public void Dispose() { }
             public bool MoveNext()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 if (_queue.Count == 0) return false;
                 _current = _queue.Dequeue();
-                if (_current.LeftChild != null) _queue.Enqueue(_current.LeftChild as TNode);
-                if (_current.RightChild != null) _queue.Enqueue(_current.RightChild as TNode);
+                if (SentinelEx.NotEqualNull(_current.LeftChild)) _queue.Enqueue(_current.LeftChild as TNode);
+                if (SentinelEx.NotEqualNull(_current.RightChild)) _queue.Enqueue(_current.RightChild as TNode);
                 return true;
             }
             public void Reset()
             {
-                if (_version != _root._version)
+                if (_version != _root.Version)
                     throw new InvalidOperationException("在枚举过程中树被修改过");
                 _current = null;
                 _queue.Clear();

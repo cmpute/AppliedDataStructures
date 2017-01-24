@@ -15,6 +15,6 @@ namespace System.Collections.Advanced
         /// <summary>
         /// 当前结点的孩子列表
         /// </summary>
-        IReadOnlyList<IMultiwayTreeNode> Children { get; }
+        IReadOnlyCollection<IMultiwayTreeNode> Children { get; }
     }
 }

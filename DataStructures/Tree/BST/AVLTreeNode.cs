@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class AVLTreeNode<TKey> : BinaryTreeNode, IKeyedNode<TKey>
+    public class AVLTreeNode<TKey> : BinaryTreeNode, IKeyProvider<TKey>
     {
         public TKey Key { get; set; }
         public int Height { get; private set; } = 1;
@@ -53,7 +53,7 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected static AVLTreeNode<TKey> Connect34(AVLTreeNode<TKey> a, AVLTreeNode<TKey> b, AVLTreeNode<TKey> c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
         {
-            top.TransplantParent(b);
+            top.TransferParent(b);
 
             a.LeftChild = t0;
             a.RightChild = t1;
@@ -88,7 +88,7 @@ namespace System.Collections.Advanced
                     //   v   t2
                     //  / \
                     // t0 t1
-                    return Connect34(v, p, g, v.LeftChild, v.RightChild, p.RightChild, g.RightChild,g); // zig
+                    return Connect34(v, p, g, v.LeftChild, v.RightChild, p.RightChild, g.RightChild, g); // zig
                 }
                 else
                 {
@@ -99,7 +99,7 @@ namespace System.Collections.Advanced
                     //   t0  v
                     //      / \
                     //     t1 t2
-                    return Connect34(p, v, g, p.LeftChild, v.LeftChild, v.RightChild, g.RightChild,g); // zag-zig
+                    return Connect34(p, v, g, p.LeftChild, v.LeftChild, v.RightChild, g.RightChild, g); // zag-zig
                 }
             else
             {
@@ -112,7 +112,7 @@ namespace System.Collections.Advanced
                     //      v   t3
                     //     / \
                     //    t1 t2
-                    return Connect34(g, v, p, g.LeftChild, v.LeftChild, v.RightChild, p.RightChild,g); // zig-zag
+                    return Connect34(g, v, p, g.LeftChild, v.LeftChild, v.RightChild, p.RightChild, g); // zig-zag
                 }
                 else
                 {
@@ -123,7 +123,7 @@ namespace System.Collections.Advanced
                     //   t1  v
                     //      / \
                     //     t2 t3
-                    return Connect34(g, p, v, g.LeftChild, p.LeftChild, v.LeftChild, v.RightChild,g); // zig
+                    return Connect34(g, p, v, g.LeftChild, p.LeftChild, v.LeftChild, v.RightChild, g); // zig
                 }
             }
         }

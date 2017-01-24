@@ -15,28 +15,20 @@ namespace System.Collections.Advanced
     /// </remarks>
     public abstract class CompactTree<TNode> : IRootedTree<TNode>
     {
-        protected IList<TNode> _nodes;
+        protected virtual IList<TNode> Nodes { get; set; }
 
         /// <inheritdoc/>
-        public int Count => _nodes.Count;
+        public int Count => Nodes.Count;
 
         /// <inheritdoc/>
-        public TNode Root => _nodes.Count > 0 ? _nodes[0] : default(TNode);
+        public TNode Root => Nodes.Count > 0 ? Nodes[0] : default(TNode);
 
         /// <inheritdoc/>
-        public IEnumerator<TNode> GetEnumerator() => _nodes.GetEnumerator();
+        public IEnumerator<TNode> GetEnumerator() => Nodes.GetEnumerator();
 
         /// <inheritdoc/>
-        IEnumerator IEnumerable.GetEnumerator() => _nodes.GetEnumerator();
+        IEnumerator IEnumerable.GetEnumerator() => Nodes.GetEnumerator();
 
-        /// <summary>
-        /// 如果是用<see cref="List{T}"/>存储的结点数据，那么该方法将会调用<see cref="List{T}.TrimExcess"/>方法。
-        /// </summary>
-        public virtual void TrimExcess()
-        {
-            (_nodes as List<TNode>)?.TrimExcess();
-        }
-
-        public void Clear() => _nodes.Clear();
+        public void Clear() => Nodes.Clear();
     }
 }

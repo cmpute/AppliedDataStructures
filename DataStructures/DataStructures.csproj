@@ -42,8 +42,10 @@
   <ItemGroup>
     <Compile Include="ExampleUsages\RangeList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
-    <Compile Include="IKeyedNode.cs" />
+    <Compile Include="IDataProvider.cs" />
+    <Compile Include="IHasSentinel.cs" />
     <Compile Include="IMergable.cs" />
+    <Compile Include="IPersistent.cs" />
     <Compile Include="Tree\Binary\BinaryTreeEnumerator.cs" />
     <Compile Include="Tree\Binary\DoublyChainedTreeNode.cs" />
     <Compile Include="Tree\Binary\IBinaryTreeNode.cs" />
@@ -57,8 +59,9 @@
     <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\CartesianTreeNode.cs" />
     <Compile Include="Tree\Heap\BinaryHeap.cs" />
+    <Compile Include="Tree\Heap\IHeap.cs" />
     <Compile Include="Tree\Heap\IIndexedHeapNode.cs" />
-    <Compile Include="Tree\ISearchTreeEquatable.cs" />
+    <Compile Include="Tree\IEquatableSearchTree.cs" />
     <Compile Include="Tree\BST\SplayTree.cs" />
     <Compile Include="Tree\Binary\BinaryTree.cs" />
     <Compile Include="Tree\Binary\BinaryTreeNode.cs" />
@@ -66,15 +69,14 @@
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ISearchTree.cs" />
-    <Compile Include="Tree\Binary\TraversalOrder.cs" />
-    <Compile Include="Tree\IStaticSearchTree.cs" />
+    <Compile Include="Tree\Binary\TraverseOrder.cs" />
     <Compile Include="Tree\Multiway\IMultiwayTreeNode.cs" />
     <Compile Include="Tree\Multiway\KaryTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
     <Compile Include="Tree\TreeKind.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
-  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

@@ -34,7 +34,7 @@ namespace System.Collections.Advanced
         public int MaxDegree { get; private set; }
 
         public List<KaryTreeNode> Children;
-        IReadOnlyList<IMultiwayTreeNode> IMultiwayTreeNode.Children => _children;
+        IReadOnlyCollection<IMultiwayTreeNode> IMultiwayTreeNode.Children => _children;
 
         public KaryTreeNode(int maxDegree)
         {

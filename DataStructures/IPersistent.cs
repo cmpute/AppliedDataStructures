@@ -6,10 +6,8 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public interface IBinaryTreeNode
+    public interface IPersistent
     {
-        IBinaryTreeNode Parent { get; }
-        IBinaryTreeNode LeftChild { get; }
-        IBinaryTreeNode RightChild { get; }
+        int Version { get; }
     }
 }

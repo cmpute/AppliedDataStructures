@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace System.Collections.Advanced
 {
-    public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyedNode<TKey>
+    public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyProvider<TKey>
     {
         public SplayTree() : base() { }
         public SplayTree(IComparer<TKey> comparer) : base(comparer) { }
@@ -67,9 +67,9 @@ namespace System.Collections.Advanced
             return node;
         }
 
-        public override TNode Insert(TNode node)
+        public override TNode InsertInternal(TNode node)
         {
-            var res = base.Insert(node);
+            var res = base.InsertInternal(node);
             Splay(res);
             return res;
         }

@@ -13,11 +13,12 @@ namespace System.Collections.Advanced.Tests
     {
         BinaryHeap<int> heap = new BinaryHeap<int>();
         BinaryHeap<BinaryHeapValueNode> heapr = new BinaryHeap<BinaryHeapValueNode>(new BHVNComparer());
+        List<int> compare = new List<int>();
 
         [TestInitialize()]
         public void Generate()
         {
-            heap.Clear(); heapr.Clear();
+            heap.Clear(); heapr.Clear(); compare.Clear();
             Random r = new Random();
             Console.WriteLine("Test Data:");
             for (int i = 0; i < 20; i++)
@@ -26,6 +27,7 @@ namespace System.Collections.Advanced.Tests
                 Console.Write(t + "\t");
                 heapr.Insert(new BinaryHeapValueNode() { Key = t });
                 heap.Insert(t);
+                compare.Add(t);
             }
             Console.WriteLine("<.");
         }
@@ -33,10 +35,34 @@ namespace System.Collections.Advanced.Tests
         [TestMethod()]
         public void ExtractMinTest()
         {
-            while (heap.Count > 0)
+            compare.Sort((x, y) => y - x); //descending
+            while (compare.Count > 0)
+            {
+                Assert.AreEqual(heap.Min(), compare[compare.Count - 1]);
                 Assert.AreEqual(heap.Min(), heap.ExtractMin());
-            while (heapr.Count > 0)
+                Assert.AreEqual(heapr.Min().Key, compare[compare.Count - 1]);
                 Assert.AreEqual(heapr.Min(), heapr.ExtractMin());
+                compare.RemoveAt(compare.Count - 1);
+            }
+        }
+
+        [TestMethod()]
+        public void MergeTest()
+        {
+            var heapt = new BinaryHeap<int>();
+            var heaprt = new BinaryHeap<BinaryHeapValueNode>(new BHVNComparer());
+            Random r = new Random();
+            for (int i = 0; i < 20; i++)
+            {
+                int t = r.Next(100);
+                heaprt.Insert(new BinaryHeapValueNode() { Key = t });
+                heapt.Insert(t);
+                compare.Add(t);
+            }
+
+            heap.Merge(heapt);
+            heapr.Merge(heaprt);
+            ExtractMinTest();
         }
     }
 
