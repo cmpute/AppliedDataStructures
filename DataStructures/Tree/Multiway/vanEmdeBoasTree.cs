@@ -15,51 +15,94 @@ namespace System.Collections.Advanced
     /// </remarks>
     public class vanEmdeBoasTree<TNode, TData> : IRootedTree<TNode> where TNode : vanEmdeBoasTreeNode<TData>
     {
-        public int Count
+        private const int _defaultCapacity = 4;
+
+        TNode _root = null;
+        Func<int, TNode> _new;
+        public int Count => Root?.Count ?? 0;
+        public int Capacity => Root?.UniverseSize ?? _defaultCapacity;
+
+        public TNode Root { get { return _root; } }
+        public vanEmdeBoasTree(Func<int, TNode> newNode) : this(_defaultCapacity, newNode) { }
+        public vanEmdeBoasTree(int initsize, Func<int, TNode> newNode)
         {
-            get
-            {
-                throw new NotImplementedException();
-            }
+            _new = newNode;
+            _root = _new(Utils.Ceil2(initsize));
         }
 
-        public TNode Root { get; protected set; }
+        public int? Successor(int key) => Root.Successor(key);
+        public int? Predecessor(int key) => Root.Predecessor(key);
 
-        TNode Successor(int key) { throw new NotImplementedException(); }
-        TNode Predecessor(int key) { throw new NotImplementedException(); }
+        private void AddLevel()
+        {
+            var newroot = _new(_root.UniverseSize << 1);
+            var newminkey = _root.Min.Value;
+            var newmin = _root.Remove(newminkey);
+            newroot.Create(newminkey, newmin.GetData(), _new);
+        }
+        private void EnsureCapacity(int key)
+        {
+            while (key > Capacity)
+                AddLevel();
+        }
+
+        public bool Contains(int key) => _root.Contains(key);
 
         /// <summary>
-        /// 若关键字不存在则创建新结点，否则根据关键字寻找该结点，并且返回
+        /// 若关键字不存在则创建新结点，返回true，否则根据关键字寻找该结点并更新数据，返回false
         /// </summary>
         /// <param name="key">新建结点的关键字</param>
         /// <returns>创建或搜索到的结点</returns>
-        public TNode CreateNode(int key) { throw new NotImplementedException(); }
-
-        public TNode DeleteNode(int key)
+        public bool InsertNode(int key, TData data)
         {
-            throw new NotImplementedException();
+            if (_root == null) _root = _new(_defaultCapacity);
+            vanEmdeBoasTreeDataInfo<TData> t;
+            return Root.Create(key, data, out t, _new);
         }
 
-        public TNode SearchNode(int key)
+        public bool DeleteNode(int key, out TData removedData)
         {
-            throw new NotImplementedException();
+            if (Contains(key))
+            {
+                removedData = _root.Remove(key).GetData();
+                return true;
+            }
+            else
+            {
+                removedData = default(TData);
+                return false;
+            }
         }
+
+        public TData SearchNode(int key) => _root.Search(key).GetData();
 
         public void Clear()
         {
-            throw new NotImplementedException();
+            _root = _new(Capacity);
         }
 
         public IEnumerator<TNode> GetEnumerator()
         {
-            throw new NotImplementedException();
+            return Root.TraverseSubtree(TraverseOrder.PreOrder).Select(res => res as TNode).GetEnumerator();
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
         public void TrimExcess()
         {
-
+            throw new NotImplementedException();
         }
+
+        public IDictionary<int, TData> ToDictionary()
+            => Root.TraverseSubtree(0, (level, node, index) => level + index * (node as vanEmdeBoasTreeNode<TData>).lsqrt, TraverseOrder.PreOrder)
+                .SelectMany(res =>
+                {
+                    var node = (res.Item1 as vanEmdeBoasTreeNode<TData>);
+                    if (node.Count == 0) return Enumerable.Empty<Tuple<int, TData>>();
+                    if (node.UniverseSize == 2 && node.Count == 2)
+                        return new[] { new Tuple<int, TData>(res.Item2, node.MinData), new Tuple<int, TData>(res.Item2 + 1, node.MaxData) };
+                    else return new[] { new Tuple<int, TData>(res.Item2 + node.Min.Value, node.MinData) };
+                })
+                .ToDictionary(res => res.Item1, res => res.Item2);
     }
 }

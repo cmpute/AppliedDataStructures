@@ -8,9 +8,10 @@ namespace System.Collections.Advanced
 {
     public class vanEmdeBoasTreeNode<TData> : IMultiwayTreeNode
     {
-        readonly int u, lsqrt, hsqrt;// lowbit/highbit divider
+        readonly int u;
+        internal readonly int lsqrt, hsqrt;// lowbit/highbit divider
         int num;
-        List<vanEmdeBoasTreeNode<TData>> _clusters;
+        vanEmdeBoasTreeNode<TData>[] _clusters;
         vanEmdeBoasTreeNode<TData> _summary;
 
         public int? Min { get; protected set; }
@@ -22,12 +23,12 @@ namespace System.Collections.Advanced
         /// 结点存储的簇的规模，也就是所谓“全集”的大小
         /// </summary>
         public int UniverseSize => u;
-        public List<vanEmdeBoasTreeNode<TData>> Clusters => _clusters;
+        public vanEmdeBoasTreeNode<TData>[] Clusters => _clusters;
         /// <summary>
-        /// count of non-null clusters
-        /// 不为空的子簇的个数
+        /// count of non-null elements
+        /// 不为空的元素的个数
         /// </summary>
-        public int ClusterCount => num;
+        public int Count => num;
         public vanEmdeBoasTreeNode<TData> SummaryNode
         {
             get
@@ -41,28 +42,16 @@ namespace System.Collections.Advanced
         /// </summary>
         public IReadOnlyList<IMultiwayTreeNode> Children => Clusters;
 
-        internal vanEmdeBoasTreeNode(int size)
+        public vanEmdeBoasTreeNode(int size)
         {
             u = size;
             num = 0;
-            if(size>2)
+            if (size > 2)
             {
-                lsqrt = Ceil2(Math.Sqrt(u));
-                hsqrt = u / hsqrt;
-                _clusters = new List<vanEmdeBoasTreeNode<TData>>(hsqrt);
+                hsqrt = Utils.Ceil2(Math.Sqrt(u));
+                lsqrt = u / hsqrt;
+                _clusters = new vanEmdeBoasTreeNode<TData>[hsqrt];
             }
-        }
-
-        //2^ceil(log2(n))
-        private static int Ceil2(double n)
-        {
-            int a = 1, c = 0;
-            while (a < n)
-            {
-                a <<= 1;
-                c++;
-            }
-            return 1 << c;
         }
 
         public bool Contains(int key)
@@ -77,11 +66,11 @@ namespace System.Collections.Advanced
         public vanEmdeBoasTreeDataInfo<TData> Search(int key)
         {
             if (Min == null || key < Min || key > Max)
-                return default(vanEmdeBoasTreeDataInfo<TData>);
+                return vanEmdeBoasTreeDataInfo<TData>.Null;
             else if (key == Min)
                 return new vanEmdeBoasTreeDataInfo<TData>() { HitNode = this, HitMin = true };
             else if (u == 2)
-                return new vanEmdeBoasTreeDataInfo<TData>() { HitNode = this, HitMin = true };
+                return new vanEmdeBoasTreeDataInfo<TData>() { HitNode = this, HitMin = false };
             else
                 return _clusters[key / lsqrt].Search(key % lsqrt);
         }
@@ -91,19 +80,28 @@ namespace System.Collections.Advanced
             Create(key, data, out res, newNode);
             return res;
         }
+        /// <summary>
+        /// Insert a new node, if node with the key exists already, then update the data
+        /// 插入新结点，若结点已存在则更新结点数据
+        /// </summary>
+        /// <param name="key">插入结点的关键字</param>
+        /// <param name="data">需要插入的数据</param>
+        /// <param name="info">返回插入的位置信息</param>
+        /// <param name="newNode">创建新结点的方法</param>
+        /// <returns>如果关键字不存在则返回<c>true</c>，关键字已存在则返回<c>false</c></returns>
         public bool Create(int key, TData data, out vanEmdeBoasTreeDataInfo<TData> info, Func<int, vanEmdeBoasTreeNode<TData>> newNode)
         {
-            bool updated = true;// update log, if node is updated, then num will be updated.
+            bool updated = true;// update log, if node is new, then num will be updated.
             info = new vanEmdeBoasTreeDataInfo<TData>() { HitNode = this, HitMin = true };
             if (Min == null)// the node is null
             {
                 Min = Max = key;
                 MinData = MaxData = data;
                 num = 1;
-                updated = true;
             }
             else
             {
+                bool replaced = false;
                 if (key < Min)// update min and insert min into sub-clusters 
                 {
                     int temp = key; // swap data
@@ -112,9 +110,9 @@ namespace System.Collections.Advanced
                     TData tempdata = data;
                     data = MinData;
                     MinData = tempdata;
-                    updated = true;
+                    replaced = true;
                 }
-                if (key == Min)
+                else if (key == Min) // update min
                 {
                     MinData = data;
                     if (Min == Max) MaxData = data;
@@ -131,25 +129,30 @@ namespace System.Collections.Advanced
                         _clusters[h].Min = _clusters[h].Max = l;
                         _clusters[h].MinData = _clusters[h].MaxData = data;
                         _clusters[h].num = 1;
-                        info.HitNode = _clusters[h];
-                        updated = true;
+                        if (!replaced) info.HitNode = _clusters[h];
                     }
                     else
-                        updated = _clusters[h].Create(l, data, out info, newNode);
+                    {
+                        if (!replaced) updated = _clusters[h].Create(l, data, out info, newNode);
+                        else _clusters[h].Create(l, data, newNode);
+                    }
                 }
                 if (key > Max)
                 {
                     Max = key;
                     MaxData = data;
-                    updated = true;
+                }
+                else if (key == Max) // update max
+                {
+                    MaxData = data;
+                    if(!replaced) return false;
                 }
                 if (updated) num++;
             }
             return updated;
         }
-
         //移除val，移除前需判断是否包含 
-        vanEmdeBoasTreeDataInfo<TData> Remove(int key)
+        public vanEmdeBoasTreeDataInfo<TData> Remove(int key)
         {
             var res = new vanEmdeBoasTreeDataInfo<TData>() { remove = true };
             if (Min == Max)// there's only one value in cluster 
@@ -182,20 +185,21 @@ namespace System.Collections.Advanced
             }
             else
             {
-                int h = key / lsqrt;
                 if (key == Min)// key is the minimum 
                 {
-                    int first = SummaryNode.Min.Value;
-                    key = first * lsqrt + _clusters[first].Min.Value;// get the first node of first cluster
                     res.HitMin = true;
                     res.HitNode = this;
                     res.rmdata = MinData;
+
+                    int first = SummaryNode.Min.Value;
+                    key = first * lsqrt + _clusters[first].Min.Value;// get the first node of first cluster
                     Min = key;// update min and key, then delete min from sub-cluster
                     MinData = _clusters[first].MinData;
-                    _clusters[h].Remove(key % lsqrt);
+                    _clusters[key / lsqrt].Remove(key % lsqrt);
                 }
                 else
-                    res = _clusters[h].Remove(key % lsqrt);
+                    res = _clusters[key / lsqrt].Remove(key % lsqrt);
+                int h = key / lsqrt;
                 if (_clusters[h].Min == null)
                 {
                     SummaryNode.Remove(h); // delete cluster from summary 
@@ -220,6 +224,64 @@ namespace System.Collections.Advanced
             num--;
             return res;
         }
+        public int? Successor(int key)
+        {
+            if (u == 2)
+                if (key == 0 && Max == 1)
+                    return 1;
+                else
+                    return null;
+            else if (Min != null && key < Min)
+                return Min;
+            else
+            {
+                int h = key / lsqrt, l = key % lsqrt;
+                var maxl = _clusters[key / lsqrt]?.Max;
+                if (maxl != null && l < maxl)
+                    return h * lsqrt + _clusters[h].Successor(l);
+                else
+                {
+                    var succ = SummaryNode?.Successor(h);//find next cluster
+                    if (succ == null)
+                        return null;
+                    else
+                        return succ * lsqrt + _clusters[succ.Value].Min;
+                }
+            }
+        }
+        public int? Predecessor(int key)
+        {
+            if (u == 2)
+                if (key == 1 && Min == 0)
+                    return 0;
+                else
+                    return null;
+            else if (Max != null && key > Max)
+                return Max;
+            else
+            {
+                int h = key / lsqrt, l = key % lsqrt;
+                var minl = _clusters[key / lsqrt]?.Min;
+                if (minl != null && l > minl)
+                    return h * lsqrt + _clusters[h].Predecessor(l);
+                else
+                {
+                    var pred = SummaryNode?.Predecessor(h);//find previous cluster
+                    if (pred == null)
+                        if (Min != null && key > Min)
+                            return Min;
+                        else return null;
+                    else
+                        return pred * lsqrt + _clusters[pred.Value].Max;
+                }
+            }
+        }
+
+        public override string ToString()
+        {
+            if (u > 2) return $"Min={MinData}";
+            else return $"Min={MinData}, Max={MaxData}";
+        }
     }
 
     /// <summary>
@@ -233,5 +295,7 @@ namespace System.Collections.Advanced
         public vanEmdeBoasTreeNode<TData> HitNode;
         public bool HitMin;
         public TData GetData() => remove ? rmdata : (HitMin ? HitNode.MinData : HitNode.MaxData);
+
+        public static vanEmdeBoasTreeDataInfo<TData> Null => default(vanEmdeBoasTreeDataInfo<TData>);
     }
 }

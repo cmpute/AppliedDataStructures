@@ -75,6 +75,7 @@
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTree.cs" />
     <Compile Include="Tree\TreeKind.cs" />
+    <Compile Include="Utilities.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 

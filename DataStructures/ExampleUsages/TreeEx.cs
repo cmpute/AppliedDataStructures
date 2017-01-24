@@ -51,76 +51,118 @@ namespace System.Collections.Advanced
             }
         }
 
+        public static IEnumerable<IBinaryTreeNode> TraverseSubtree(this IBinaryTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
+            => partialroot.TraverseSubtree<object>(null, null, null, order).Select(res => res.Item1);
         /// <summary>
-        /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with the depth of the node
-        /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点的深度
+        /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with certain information (of type <typeparamref name="TLevel"/>) of the node
+        /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点有关信息(<typeparamref name="TLevel"/>类型的)
         /// </summary>
         /// <param name="partialroot">需要遍历的子树的根</param>
+        /// <param name="leftlevelfunc">遍历到某一层结点时将附加参数传给下一层左孩子时需要进行的操作</param>
+        /// <param name="rightlevelfunc">遍历到某一层结点时将附加参数传给下一层右孩子时需要进行的操作</param>
+        /// <param name="seed">附加参数的初始值</param>
         /// <param name="order">二叉树遍历方式</param>
+        /// <typeparam name="TLevel">提供的每层结点额外信息的类型</typeparam>
         /// <return>a collection of node and depth of the node</return>
-        public static IEnumerable<Tuple<IBinaryTreeNode, int>> TraverseSubtree(this IBinaryTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder, int startDepth = 0)
+        public static IEnumerable<Tuple<IBinaryTreeNode, TLevel>> TraverseSubtree<TLevel>(
+            this IBinaryTreeNode partialroot,
+            TLevel seed,
+            Func<TLevel, IBinaryTreeNode, TLevel> leftlevelfunc,
+            Func<TLevel, IBinaryTreeNode, TLevel> rightlevelfunc,
+            TraverseOrder order = TraverseOrder.InOrder)
         {
-            var current = new Tuple<IBinaryTreeNode, int>[] { new Tuple<IBinaryTreeNode, int>(partialroot, startDepth) };
+            var current = new Tuple<IBinaryTreeNode, TLevel>[] { new Tuple<IBinaryTreeNode, TLevel>(partialroot, seed) };
+            var leftlevel = leftlevelfunc == null ? seed : leftlevelfunc(seed, partialroot);
+            var rightlevel = rightlevelfunc == null ? seed : rightlevelfunc(seed, partialroot);
             switch (order)
             {
                 case TraverseOrder.InOrder:
-                    return partialroot.LeftChild.TraverseSubtree(order, startDepth + 1)
+                    return partialroot.LeftChild.TraverseSubtree(leftlevel, leftlevelfunc, rightlevelfunc, order)
                         .Concat(current)
-                        .Concat(partialroot.RightChild.TraverseSubtree(order, startDepth + 1));
+                        .Concat(partialroot.RightChild.TraverseSubtree(rightlevel, leftlevelfunc, rightlevelfunc, order));
                 case TraverseOrder.PreOrder:
                     return current
-                        .Concat(partialroot.LeftChild.TraverseSubtree(order, startDepth + 1))
-                        .Concat(partialroot.RightChild.TraverseSubtree(order, startDepth + 1));
+                        .Concat(partialroot.LeftChild.TraverseSubtree(leftlevel, leftlevelfunc, rightlevelfunc, order))
+                        .Concat(partialroot.RightChild.TraverseSubtree(rightlevel, leftlevelfunc, rightlevelfunc, order));
                 case TraverseOrder.PostOrder:
-                    return partialroot.LeftChild.TraverseSubtree(order, startDepth + 1)
-                        .Concat(partialroot.RightChild.TraverseSubtree(order, startDepth + 1))
+                    return partialroot.LeftChild.TraverseSubtree(leftlevel, leftlevelfunc, rightlevelfunc, order)
+                        .Concat(partialroot.RightChild.TraverseSubtree(rightlevel, leftlevelfunc, rightlevelfunc, order))
                         .Concat(current);
                 case TraverseOrder.LevelOrder:
-                    return LevelOrderTraverse(partialroot, startDepth);
+                    return LevelOrderTraverse(partialroot, seed, leftlevelfunc, rightlevelfunc);
                 default:
                     return null;
             }
         }
-        private static IEnumerable<Tuple<IBinaryTreeNode, int>> LevelOrderTraverse(IBinaryTreeNode partialroot, int startDepth)
+        private static IEnumerable<Tuple<IBinaryTreeNode, TLevel>> LevelOrderTraverse<TLevel>(
+            IBinaryTreeNode partialroot,
+            TLevel seed,
+            Func<TLevel, IBinaryTreeNode, TLevel> leftlevelfunc,
+            Func<TLevel, IBinaryTreeNode, TLevel> rightlevelfunc)
         {
-            var queue = new Queue<Tuple<IBinaryTreeNode, int>>();
-            queue.Enqueue(new Tuple<IBinaryTreeNode, int>(partialroot, startDepth));
+            var queue = new Queue<Tuple<IBinaryTreeNode, TLevel>>();
+            queue.Enqueue(new Tuple<IBinaryTreeNode, TLevel>(partialroot, seed));
             while (queue.Count > 0)
             {
                 var current = queue.Dequeue();
-                if (!SentinelEx.EqualNull(current.Item1.LeftChild)) queue.Enqueue(new Tuple<IBinaryTreeNode, int>(current.Item1.LeftChild, current.Item2 + 1));
-                if (!SentinelEx.EqualNull(current.Item1.RightChild)) queue.Enqueue(new Tuple<IBinaryTreeNode, int>(current.Item1.RightChild, current.Item2 + 1));
+                if (!SentinelEx.EqualNull(current.Item1.LeftChild))
+                    queue.Enqueue(new Tuple<IBinaryTreeNode, TLevel>(current.Item1.LeftChild,
+                        leftlevelfunc == null ? current.Item2 : leftlevelfunc(current.Item2, partialroot)));
+                if (!SentinelEx.EqualNull(current.Item1.RightChild))
+                    queue.Enqueue(new Tuple<IBinaryTreeNode, TLevel>(current.Item1.RightChild,
+                        rightlevelfunc == null ? current.Item2 : rightlevelfunc(current.Item2, partialroot)));
                 yield return current;
             }
         }
 
-        public static IEnumerable<Tuple<IMultiwayTreeNode, int>> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder, int startDepth = 0)
+        public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
+            => partialroot.TraverseSubtree<object>(null, null, order).Select(res => res.Item1);
+        public static IEnumerable<Tuple<IMultiwayTreeNode, TLevel>> TraverseSubtree<TLevel>(
+            this IMultiwayTreeNode partialroot,
+            TLevel seed,
+            Func<TLevel, IMultiwayTreeNode, int, TLevel> levelfunc,
+            TraverseOrder order = TraverseOrder.LevelOrder)
         {
-            var current = new Tuple<IMultiwayTreeNode, int>[] { new Tuple<IMultiwayTreeNode, int>(partialroot, startDepth) };
+            var current = new Tuple<IMultiwayTreeNode, TLevel>[] { new Tuple<IMultiwayTreeNode, TLevel>(partialroot, seed) };
             switch (order)
             {
                 case TraverseOrder.InOrder:
                     throw new NotSupportedException("多叉树不支持中序遍历");
                 case TraverseOrder.PreOrder:
-                    return current.Concat(partialroot.Children.SelectMany(node => node.TraverseSubtree(order, startDepth + 1)));
+                    return current.Concat(partialroot.Children?
+                        .SelectMany((node, index) => node?.TraverseSubtree(
+                            levelfunc == null ? seed : levelfunc(seed, partialroot, index), levelfunc, order)
+                            ?? Enumerable.Empty<Tuple<IMultiwayTreeNode, TLevel>>())
+                        ?? Enumerable.Empty<Tuple<IMultiwayTreeNode, TLevel>>());
                 case TraverseOrder.PostOrder:
-                    return partialroot.Children.SelectMany(node => node.TraverseSubtree(order, startDepth + 1)).Reverse().Concat(current);
+                    return (partialroot.Children?
+                        .SelectMany((node, index) => node?.TraverseSubtree(
+                            levelfunc == null ? seed : levelfunc(seed, partialroot, index), levelfunc, order)
+                            ?? Enumerable.Empty<Tuple<IMultiwayTreeNode, TLevel>>())
+                        ?? Enumerable.Empty<Tuple<IMultiwayTreeNode, TLevel>>())
+                        .Reverse().Concat(current);
                 case TraverseOrder.LevelOrder:
-                    return LevelOrderTraverse(partialroot, startDepth);
+                    return LevelOrderTraverse(partialroot, seed, levelfunc);
                 default:
                     return null;
             }
         }
-        private static IEnumerable<Tuple<IMultiwayTreeNode, int>> LevelOrderTraverse(IMultiwayTreeNode partialroot, int startDepth)
+        private static IEnumerable<Tuple<IMultiwayTreeNode, TLevel>> LevelOrderTraverse<TLevel>(
+            IMultiwayTreeNode partialroot,
+            TLevel seed,
+            Func<TLevel, IMultiwayTreeNode, int, TLevel> levelfunc)
         {
-            var queue = new Queue<Tuple<IMultiwayTreeNode, int>>();
-            queue.Enqueue(new Tuple<IMultiwayTreeNode, int>(partialroot, startDepth));
+            var queue = new Queue<Tuple<IMultiwayTreeNode, TLevel>>();
+            queue.Enqueue(new Tuple<IMultiwayTreeNode, TLevel>(partialroot, seed));
+            int index;
             while (queue.Count > 0)
             {
+                index = 0;
                 var current = queue.Dequeue();
                 if (SentinelEx.NotEqualNull(current.Item1.Children))
                     foreach (var node in current.Item1.Children)
-                        queue.Enqueue(new Tuple<IMultiwayTreeNode, int>(node, startDepth + 1));
+                        queue.Enqueue(new Tuple<IMultiwayTreeNode, TLevel>(node,
+                            levelfunc == null ? current.Item2 : levelfunc(current.Item2, partialroot, index++)));
                 yield return current;
             }
         }
@@ -140,7 +182,8 @@ namespace System.Collections.Advanced
             int nstrict = 0;
             int depthlog = -1;
             bool newline = false, completeflag = true;
-            foreach (var current in LevelOrderTraverse(tree.Root, 0))
+            Func<int, IBinaryTreeNode, int> updatefunc = (int level, IBinaryTreeNode node) => level + 1;
+            foreach (var current in LevelOrderTraverse(tree.Root, 0, updatefunc, updatefunc))
             {
                 var node = current.Item1;
                 var depth = current.Item2;
