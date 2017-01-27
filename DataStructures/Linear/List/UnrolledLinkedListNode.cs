@@ -144,20 +144,9 @@ namespace System.Collections.Advanced
 
         public void PrintTo(TextWriter textOut)
         {
-            if (Count == 0) textOut.Write("[null node]");
-
-            StringBuilder sb = new StringBuilder();
-            sb.Append('[');
-            sb.Append(Items[0]);
-
-            for (int i = 1; i < Count; i++)
-            {
-                sb.Append(' ');
-                sb.Append(Items[i]);
-            }
-            sb.Append(']');
-
-            textOut.Write(sb.ToString());
+            textOut.Write('[');
+            Items.PrintTo(textOut);
+            textOut.Write(']');
         }
     }
 }

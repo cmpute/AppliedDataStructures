@@ -233,9 +233,9 @@ namespace System.Collections.Advanced
 
         public void CopyTo(TData[] array, int arrayIndex) => this.CopyTo<TData>(array, arrayIndex);
 
-        public IEnumerator<TData> GetEnumerator(bool reverse)
+        public IEnumerator<TData> GetEnumerator(bool backward)
         {
-            if (reverse)
+            if (backward)
                 return new BackEnumerator(this);
             else
                 return new Enumerator(this);
@@ -246,16 +246,16 @@ namespace System.Collections.Advanced
 
         public virtual int LastIndexOf(TData item) => EnumerateIndexOf(item, true);
 
-        public virtual int EnumerateIndexOf(TData item, bool reverse)
+        public virtual int EnumerateIndexOf(TData item, bool backward)
         {
-            var itor = GetEnumerator(reverse);
+            var itor = GetEnumerator(backward);
             int count = 0;
             if (ReferenceEquals(item, null))
             {
                 while (itor.MoveNext())
                 {
                     if (ReferenceEquals(itor.Current, null))
-                        return reverse ? Count - count - 1 : count;
+                        return backward ? Count - count - 1 : count;
                     count++;
                 }
             }
@@ -265,7 +265,7 @@ namespace System.Collections.Advanced
                 while (itor.MoveNext())
                 {
                     if (comparer.Equals(itor.Current, item))
-                        return reverse ? Count - count - 1 : count;
+                        return backward ? Count - count - 1 : count;
                     count++;
                 }
             }
