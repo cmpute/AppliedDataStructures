@@ -4,27 +4,18 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System
-{
-    /// <summary>
-    /// 封装一个方法，该方法只有一个引用参数并且不返回值
-    /// </summary>
-    /// <typeparam name="T">此委托封装的方法的类型参数</typeparam>
-    /// <param name="target">此委托封装的方法的参数</param>
-    public delegate void ActionRef<T>(ref T target);
-}
 namespace System.Collections.Generic
 {
     /// <summary>
     /// A list class that support fast bulk/range operations. e.g. reverse, range edit, cyclic offset
     /// 支持区间操作的列表
     /// </summary>
-    public class RangeList<T> : IList<T>
+    public class SplayList<T> : IList<T>
     {
         SplayRangeTree<T> tree;
 
-        public RangeList() : this(null) { }
-        public RangeList(IEnumerable<T> initData)
+        public SplayList() : this(null) { }
+        public SplayList(IEnumerable<T> initData)
         {
             tree = new SplayRangeTree<T>(initData);
         }
@@ -71,24 +62,25 @@ namespace System.Collections.Generic
             if ((Object)item == null)
             {
                 foreach (var node in tree.Skip(1).Take(tree.Count))
+                {
                     if ((Object)(node._data) == null)
                         return count;
-                    else
-                        count++;
+                    count++;
+                }
                 return -1;
             }
             else
             {
-                EqualityComparer<T> c = EqualityComparer<T>.Default;
+                var comparer = EqualityComparer<T>.Default;
 
                 foreach (var node in tree.Skip(1).Take(tree.Count))
-                    if (c.Equals(node._data, item))
+                {
+                    if (comparer.Equals(node._data, item))
                         return count;
-                    else
-                        count++;
-
-                return -1;
+                    count++;
+                }
             }
+            return -1;
         }
 
         public void Insert(int index, T item) => tree.Insert(new[] { item }, index);

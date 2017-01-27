@@ -17,7 +17,12 @@ namespace System.Collections.Advanced
         public CartesianTreeNode(TKey key)
         {
             Key = key;
-            _prior = prior_rand.Next();
+            _prior = GetRandomPriority();
+        }
+
+        protected virtual int GetRandomPriority()
+        {
+            return prior_rand.Next();
         }
     }
 }

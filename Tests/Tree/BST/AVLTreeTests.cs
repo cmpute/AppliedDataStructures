@@ -26,6 +26,7 @@ namespace System.Collections.Advanced.Tests
                 list.Add(c, c);
                 tree.InsertNode(new Node { Key = c });
                 Assert.IsTrue(tree.Select((node) => node.Key).SequenceEqual(list.Select((pair) => pair.Value)));
+                CheckBalance();
             }
         }
 
@@ -37,6 +38,7 @@ namespace System.Collections.Advanced.Tests
             for (int i = 0; i < nodenum; i++, j = 0)
             {
                 tree.InsertNode(new Node() { Key = i });
+                CheckBalance();
                 foreach (var t in tree)
                 {
                     Assert.AreEqual(j++, t.Key);
@@ -48,6 +50,7 @@ namespace System.Collections.Advanced.Tests
             for (int i = nodenum - 1; i >= 0; i--, j = 0)
             {
                 tree.DeleteNode(i);
+                CheckBalance();
                 foreach (var t in tree)
                 {
                     Assert.AreEqual(j++, t.Key);
@@ -55,6 +58,11 @@ namespace System.Collections.Advanced.Tests
                 }
                 Console.WriteLine("<.");
             }
+        }
+
+        public void CheckBalance()
+        {
+            Assert.AreEqual(0, tree.Select(node => Math.Abs(node.BalanceFactor) <= 1).Count(res => !res));
         }
     }
 }

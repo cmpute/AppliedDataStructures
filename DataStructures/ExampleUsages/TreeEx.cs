@@ -17,13 +17,13 @@ namespace System.Collections.Advanced
         /// <summary>
         /// 将二叉搜索树转换为<see cref="ICollection{T}"/>对象，以提供集合操作
         /// </summary>
-        public static ICollection<TNode> ToCollection<TSource, TNode, TKey>(this TSource tree)
+        public static ICollection<TNode> AsCollection<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
             where TNode : IKeyProvider<TKey> => new SearchTreeDictionaryAdapter<TSource, TNode, TKey>(tree);
         /// <summary>
         /// 将二叉搜索树转换为<see cref="IDictionary{TKey, TValue}"/>对象，以提供字典操作
         /// </summary>
-        public static IDictionary<TKey, TNode> ToDictionary<TSource, TNode, TKey>(this TSource tree)
+        public static IDictionary<TKey, TNode> AsDictionary<TSource, TNode, TKey>(this TSource tree)
             where TSource : ISearchTree<TNode, TKey>
             where TNode : IKeyProvider<TKey> => new SearchTreeDictionaryAdapter<TSource, TNode, TKey>(tree);
         

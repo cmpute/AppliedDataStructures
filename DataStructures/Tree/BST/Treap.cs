@@ -176,8 +176,8 @@ namespace System.Collections.Advanced
                             l.RightChild = c;
                             r.LeftChild = l;
 
-                            c.SearchUp();
-                            l.SearchUp();
+                            c.SearchUp(true);
+                            l.SearchUp(true);
                             r.SearchUp();
                         }
                         else
@@ -193,8 +193,8 @@ namespace System.Collections.Advanced
                             l.RightChild = r;
                             r.LeftChild = c;
 
-                            c.SearchUp();
-                            r.SearchUp();
+                            c.SearchUp(true);
+                            r.SearchUp(true);
                             l.SearchUp();
                         }
                     }
@@ -216,7 +216,7 @@ namespace System.Collections.Advanced
                         c.TransferParent(l);
                         l.RightChild = c;
 
-                        c.SearchUp();
+                        c.SearchUp(true);
                         l.SearchUp();
                     }
                 else if (_priorityComparer.Compare(c.Priority, r.Priority) > 0)
@@ -237,7 +237,7 @@ namespace System.Collections.Advanced
                     c.TransferParent(r);
                     r.LeftChild = c;
 
-                    c.SearchUp();
+                    c.SearchUp(true);
                     r.SearchUp();
                 }
                 else break; // already in order

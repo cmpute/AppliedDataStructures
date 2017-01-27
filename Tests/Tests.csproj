@@ -51,9 +51,10 @@
     </Otherwise>
   </Choose>
   <ItemGroup>
-    <Compile Include="ExampleUsages\RangeListTests.cs" />
+    <Compile Include="ExampleUsages\SplayListTests.cs" />
     <Compile Include="ExampleUsages\SortingExTests.cs" />
     <Compile Include="ExampleUsages\TreeExTests.cs" />
+    <Compile Include="Linear\List\UnrolledLinkedListTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\BinaryTree\BinaryTreeNodeTests.cs" />
     <Compile Include="Tree\BinaryTree\ThreadedBinaryTreeNodeTests.cs" />

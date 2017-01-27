@@ -40,12 +40,16 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="ExampleUsages\RangeList.cs" />
+    <Compile Include="ExampleUsages\SplayList.cs" />
     <Compile Include="ExampleUsages\SortingEx.cs" />
     <Compile Include="IDataProvider.cs" />
     <Compile Include="IHasSentinel.cs" />
     <Compile Include="IMergable.cs" />
     <Compile Include="IPersistent.cs" />
+    <Compile Include="IPrintable.cs" />
+    <Compile Include="Linear\List\UnrolledLinkedList.cs" />
+    <Compile Include="Linear\List\UnrolledLinkedListNode.cs" />
+    <Compile Include="ReferenceLoopException.cs" />
     <Compile Include="Tree\Binary\BinaryTreeEnumerator.cs" />
     <Compile Include="Tree\Binary\DoublyChainedTreeNode.cs" />
     <Compile Include="Tree\Binary\IBinaryTreeNode.cs" />

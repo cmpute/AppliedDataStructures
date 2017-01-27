@@ -10,7 +10,7 @@ namespace System.Collections.Generic.Tests
     [TestClass()]
     public class RangeListTests
     {
-        RangeList<int> list = new RangeList<int>();
+        SplayList<int> list = new SplayList<int>();
         List<int> compare = new List<int>();
         Random r = new Random();
         const int cycnum = 10;
@@ -48,8 +48,8 @@ namespace System.Collections.Generic.Tests
             {
                 var c = r.Next(100);
                 list.Add(c); compare.Add(c);
+                Assert.IsTrue(compare.SequenceEqual(list));
             }
-            Assert.IsTrue(compare.SequenceEqual(list));
         }
 
         [TestMethod()]
@@ -188,7 +188,7 @@ namespace System.Collections.Generic.Tests
         public void RemoveRangeTest()
         {
             int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start);
+            int count = r.Next(list.Count - 1 - start);
             list.RemoveRange(start, count);
             compare.RemoveRange(start, count);
 

@@ -66,7 +66,7 @@ namespace System.Collections.Advanced
             get { return _lchild; }
             set
             {
-                if (value == this) throw new InvalidOperationException("不能将自己设为自己的孩子");
+                if (value == this) throw new ReferenceLoopException("不能将自己设为自己的孩子");
                 _lchild = value;
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
@@ -76,7 +76,7 @@ namespace System.Collections.Advanced
             get { return _rchild; }
             set
             {
-                if (value == this) throw new InvalidOperationException("不能将自己设为自己的孩子");
+                if (value == this) throw new ReferenceLoopException("不能将自己设为自己的孩子");
                 _rchild = value;
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
@@ -133,6 +133,7 @@ namespace System.Collections.Advanced
         /// </summary>
         internal void TransferParent(BinaryTreeNode newChild)
         {
+            //TODO: If tree link need removing, do it here.
             if (Parent.LeftChild == this)
                 Parent.LeftChild = newChild;
             else
@@ -146,7 +147,7 @@ namespace System.Collections.Advanced
         {
             OnSearchDown();
         }
-        internal void SearchUp()
+        internal void SearchUp(bool hold = false)
         {
             Version++;
 
@@ -157,7 +158,7 @@ namespace System.Collections.Advanced
             OnSearchUp();
             OnSearchUpRecursive();
 
-            if (Parent != null)
+            if (Parent != null && !hold)
             {
                 BinaryTreeNode current = Parent;
                 while (current != null)
@@ -184,10 +185,7 @@ namespace System.Collections.Advanced
         /// If there are some lazy operations which need being performed on child nodes, the performation should be implemented here.
         /// 如果有延迟操作的标记需要应用到子节点上，应在此方法中实现
         /// </remarks>
-        protected virtual void OnSearchDown()
-        {
-
-        }
+        protected virtual void OnSearchDown() { }
         /// <summary>
         /// Invoke when travel back from the leaves through the tree
         /// 在搜索上行开始时调用的方法
@@ -243,7 +241,7 @@ namespace System.Collections.Advanced
             p.TransferParent(this);
             RightChild = p;
 
-            p.OnSearchUp();
+            p.SearchUp(true);
             this.OnSearchUp();
         }
         /// <summary>
@@ -270,8 +268,99 @@ namespace System.Collections.Advanced
             p.TransferParent(this);
             LeftChild = p;
 
-            p.OnSearchUp();
-            this.OnSearchUp();
+            p.SearchUp(true);
+            this.SearchUp();
+        }
+        /// <summary>
+        /// Reconstruct connected node a,b,c and their childrens.
+        /// 将相连的三个顶点和其子孙连进行重构
+        /// </summary>
+        /// <returns>新的祖先，即<paramref name="b"/></returns>
+        /// <remarks>
+        /// after reconstruction:
+        /// 重构以后的形状
+        ///      b
+        ///    /  \
+        ///   a    c
+        ///  / \  / \
+        /// t0 t1 t2 t3
+        /// </remarks>
+        protected static BinaryTreeNode Connect34(BinaryTreeNode a, BinaryTreeNode b, BinaryTreeNode c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
+        {
+            top.TransferParent(b);
+
+            a.LeftChild = t0;
+            a.RightChild = t1;
+            a.SearchUp(true);
+
+            c.LeftChild = t2;
+            c.RightChild = t3;
+            c.SearchUp(true);
+
+            b.LeftChild = a;
+            b.RightChild = c;
+            b.SearchUp();
+
+            return b;
+        }
+        /// <summary>
+        /// make v and its parent and grandparent balanced
+        /// 将v点与其两代祖先进行平衡
+        /// </summary>
+        /// <returns>新的祖先</returns>
+        protected BinaryTreeNode Connect34()
+        {
+            var v = this;
+            var p = v.Parent;
+            var g = p.Parent;
+            if (p == g.LeftChild)
+                if (v == p.LeftChild)
+                {
+                    //       g
+                    //      / \
+                    //     p   t3
+                    //    / \
+                    //   v   t2
+                    //  / \
+                    // t0 t1
+                    return Connect34(v, p, g, v.LeftChild, v.RightChild, p.RightChild, g.RightChild, g); // zig
+                }
+                else
+                {
+                    //       g
+                    //      / \
+                    //     p   t3
+                    //    / \
+                    //   t0  v
+                    //      / \
+                    //     t1 t2
+                    return Connect34(p, v, g, p.LeftChild, v.LeftChild, v.RightChild, g.RightChild, g); // zag-zig
+                }
+            else
+            {
+                if (v == p.LeftChild)
+                {
+                    //      g
+                    //     / \
+                    //    t0  p
+                    //       / \
+                    //      v   t3
+                    //     / \
+                    //    t1 t2
+                    return Connect34(g, v, p, g.LeftChild, v.LeftChild, v.RightChild, p.RightChild, g); // zig-zag
+                }
+                else
+                {
+                    //   g
+                    //  / \
+                    // t0  p
+                    //    / \
+                    //   t1  v
+                    //      / \
+                    //     t2 t3
+                    return Connect34(g, p, v, g.LeftChild, p.LeftChild, v.LeftChild, v.RightChild, g); // zig
+                }
+            }
         }
 
         #endregion

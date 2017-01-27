@@ -23,9 +23,9 @@ namespace System.Collections.Advanced
         /// </summary>
         /// <param name="node">被旋转的结点</param>
         /// <param name="target">需要成为node父亲的结点</param>
+        /// <remarks>make sure that the node is a descandent of target.</remarks>
         protected void Splay(BinaryTreeNode node, BinaryTreeNode target)
         {
-            //TODO: how to deal with it that the node is parent of target?
             if (node == null) return;
             node.SearchDown();
             var p = node.Parent;
