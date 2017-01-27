@@ -8,232 +8,68 @@ using System.Threading.Tasks;
 namespace System.Collections.Generic.Tests
 {
     [TestClass()]
-    public class RangeListTests
+    public class SplayListTests : RangeListTestBase<SplayList<int>>
     {
-        SplayList<int> list = new SplayList<int>();
-        List<int> compare = new List<int>();
-        Random r = new Random();
-        const int cycnum = 10;
+        public SplayListTests() : base(new SplayList<int>()) { }
 
         [TestInitialize]
         [TestMethod]
-        public void RandomGenerate()
-        {
-            compare.Clear();
-            list.Clear();
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                compare.Add(c);
-                Console.Write(c + "\t");
-            }
-            list.AddRange(compare);
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                list.Add(c); compare.Add(c);
-                Console.Write(c + "\t");
-            }
-            Console.WriteLine("<.");
-
-            Assert.AreEqual(cycnum * 2, list.Count);
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void RandomGenerate() => base.RandomGenerate();
 
         [TestMethod()]
-        public void AddTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                list.Add(c); compare.Add(c);
-                Assert.IsTrue(compare.SequenceEqual(list));
-            }
-        }
+        public override void AddTest() => base.AddTest();
 
         [TestMethod()]
-        public void ClearTest()
-        {
-            list.Clear();
-            Assert.AreEqual(0, list.Count);
-            Assert.AreEqual(0, list.Count());
-        }
+        public override void ClearTest() => base.ClearTest();
 
         [TestMethod()]
-        public void ContainsTest()
-        {
-            int c = list[r.Next(list.Count)];
-            Assert.AreEqual(compare.Contains(c), list.Contains(c));
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                c = r.Next(100);
-                Assert.AreEqual(compare.Contains(c), list.Contains(c));
-            }
-        }
+        public override void ContainsTest() => base.ContainsTest();
 
         [TestMethod()]
-        public void CopyToTest()
-        {
-            int[] target = new int[2 * cycnum];
-            list.CopyTo(target, 0);
-            Assert.IsTrue(compare.SequenceEqual(target));
-        }
+        public override void CopyToTest() => base.CopyToTest();
 
         [TestMethod()]
-        public void GetEnumeratorTest()
-        {
-            var iter = compare.GetEnumerator();
-            foreach(var item in list)
-            {
-                iter.MoveNext();
-                Assert.AreEqual(iter.Current, item);
-            }
-        }
+        public override void GetEnumeratorTest() => base.GetEnumeratorTest();
 
         [TestMethod()]
-        public void GetSetTest()
-        {
-            for (int i = 0; i < 2 * cycnum; i++)
-                Assert.AreEqual(compare[i], list[i]);
-
-            for (int i = 0; i < 2 * cycnum; i++)
-            {
-                var c = r.Next(100);
-                compare[i] = c; list[i] = c;
-            }
-
-            for (int i = 0; i < 2 * cycnum; i++)
-                Assert.AreEqual(compare[i], list[i]);
-        }
+        public override void AccessTest() => base.AccessTest();
 
         [TestMethod()]
-        public void IndexOfTest()
-        {
-            int c = list[r.Next(list.Count)];
-            Assert.AreEqual(compare.IndexOf(c), list.IndexOf(c));
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                c = r.Next(100);
-                Assert.AreEqual(compare.IndexOf(c), list.IndexOf(c));
-            }
-        }
+        public override void IndexOfTest() => base.IndexOfTest();
 
         [TestMethod()]
-        public void InsertTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                var index = r.Next(list.Count);
-                list.Insert(index, c); compare.Insert(index, c);
-            }
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void InsertTest() => base.InsertTest();
 
         [TestMethod()]
-        public void RemoveTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var val = compare[r.Next(list.Count)];
-                Assert.AreEqual(compare.Remove(val), list.Remove(val));
-                Assert.IsTrue(compare.SequenceEqual(list));
-            }
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void RemoveTest() => base.RemoveTest();
 
         [TestMethod()]
-        public void RemoveAtTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var index = r.Next(list.Count);
-                compare.RemoveAt(index); list.RemoveAt(index);
-                Assert.IsTrue(compare.SequenceEqual(list));
-            }
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void RemoveAtTest() => base.RemoveAtTest();
 
         [TestMethod()]
-        public void AddRangeTest()
-        {
-            List<int> temp = new List<int>();
-            for (int i = 0; i < cycnum; i++)
-                temp.Add(r.Next(100));
-
-            list.AddRange(temp);
-            compare.AddRange(temp);
-
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void AddRangeTest() => base.AddRangeTest();
 
         [TestMethod()]
-        public void InsertRangeTest()
-        {
-            List<int> temp = new List<int>();
-            for (int i = 0; i < cycnum; i++)
-                temp.Add(r.Next(100));
-
-            var index = r.Next(list.Count);
-            compare.InsertRange(index, temp);
-            list.InsertRange(index, temp);
-
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void InsertRangeTest() => base.InsertRangeTest();
 
         [TestMethod()]
-        public void RemoveRangeTest()
-        {
-            int start = r.Next(list.Count);
-            int count = r.Next(list.Count - 1 - start);
-            list.RemoveRange(start, count);
-            compare.RemoveRange(start, count);
-
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void RemoveRangeTest() => base.RemoveRangeTest();
 
         [TestMethod()]
         public void OperateRangeTest()
         {
-            int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start);
-            int add = r.Next(100);
+            int start = rand.Next(List.Count);
+            int count = rand.Next(List.Count - start);
+            int add = rand.Next(100);
 
-            list.OperateRange(start, count, (ref int target) => target += add);
+            (List as SplayList<int>).OperateRange(start, count, (ref int target) => target += add);
             for (int i = 0; i < count; i++)
-                compare[start + i] += add;
+                Compare[start + i] += add;
 
-            Assert.IsTrue(compare.SequenceEqual(list));
+            Assert.IsTrue(Compare.SequenceEqual(List));
         }
 
         [TestMethod()]
-        public void ReverseTest()
-        {
-            list.Reverse();
-            compare.Reverse();
-            
-            Assert.IsTrue(compare.SequenceEqual(list));
-
-            int start = r.Next(list.Count);
-            int count = r.Next(list.Count - start);
-            list.Reverse(start, count);
-            compare.Reverse(start, count);
-
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
-
-        public void CompareLog()
-        {
-            Console.WriteLine("[");
-            foreach (var item in list)
-                Console.Write(item + "\t");
-            Console.WriteLine("|");
-            foreach (var item in compare)
-                Console.Write(item + "\t");
-            Console.WriteLine("]");
-        }
+        public override void ReverseTest() => base.ReverseTest();
     }
 }

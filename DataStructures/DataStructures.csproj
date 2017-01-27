@@ -47,6 +47,8 @@
     <Compile Include="IMergable.cs" />
     <Compile Include="IPersistent.cs" />
     <Compile Include="IPrintable.cs" />
+    <Compile Include="Linear\List\IRangeList.cs" />
+    <Compile Include="Linear\List\ListEx.cs" />
     <Compile Include="Linear\List\UnrolledLinkedList.cs" />
     <Compile Include="Linear\List\UnrolledLinkedListNode.cs" />
     <Compile Include="ReferenceLoopException.cs" />

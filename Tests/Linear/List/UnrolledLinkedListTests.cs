@@ -9,198 +9,84 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced.Tests
 {
     [TestClass()]
-    public class UnrolledLinkedListTests
+    public class UnrolledLinkedListTests : ListTestBase<UnrolledLinkedList<UnrolledLinkedListNode<int>, int>>
     {
-        UnrolledLinkedList<UnrolledLinkedListNode<int>, int> list = new UnrolledLinkedList<UnrolledLinkedListNode<int>, int>(size => new UnrolledLinkedListNode<int>(size), 2 * cycnum);
-        List<int> compare = new List<int>();
-        Random r = new Random();
-        const int cycnum = 10;
+        const int cycles = 10;
+        protected override int Cycles => cycles;
+
+        public UnrolledLinkedListTests() : base(new UnrolledLinkedList<UnrolledLinkedListNode<int>, int>(size => new UnrolledLinkedListNode<int>(size), 2 * cycles)) { }
 
         [TestInitialize]
         [TestMethod]
-        public void RandomGenerate()
+        public override void RandomGenerate() => base.RandomGenerate();
+
+        [TestMethod]
+        public override void GetEnumeratorTest()
         {
-            compare.Clear();
-            list.Clear();
-            for (int i = 0; i < cycnum; i++)
+            base.GetEnumeratorTest();
+
+            Compare.Reverse();
+            var listiter = List.GetEnumerator(true);
+            foreach (var item in Compare)
             {
-                var c = r.Next(100);
-                compare.Add(c);
-                list.Add(c);
-
-                Assert.IsTrue(compare.SequenceEqual(list));
-                Console.Write(c + "\t");
+                Assert.AreEqual(true, listiter.MoveNext());
+                Assert.AreEqual(item, listiter.Current);
             }
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                compare.Add(c);
-                list.Add(c);
-
-                Assert.IsTrue(compare.SequenceEqual(list));
-                Console.Write(c + "\t");
-            }
-
-            Console.WriteLine("<.");
-            PrintList();
-
-            Assert.AreEqual(2 * cycnum, list.Count);
-            Assert.IsTrue(compare.SequenceEqual(list));
+            Assert.AreEqual(false, listiter.MoveNext());
         }
 
         [TestMethod]
-        public void EnumerateTest()
-        {
-            var itor = list.GetEnumerator();
-            var compareitor = compare.GetEnumerator();
-            bool flag1 = compareitor.MoveNext(), flag2 = itor.MoveNext();
-            Assert.AreEqual(flag1, flag2);
-            while (flag1 && flag2)
-            {
-                Assert.AreEqual(compareitor.Current, itor.Current);
-                flag1 = compareitor.MoveNext();
-                flag2 = itor.MoveNext();
-                Assert.AreEqual(flag1, flag2);
-            }
-
-            compare.Reverse();
-            var revitor = list.GetEnumerator(true);
-            var revcompareitor = compare.GetEnumerator();
-            flag1 = revcompareitor.MoveNext(); flag2 = revitor.MoveNext();
-            Assert.AreEqual(flag1, flag2);
-            while (flag1 && flag2)
-            {
-                Assert.AreEqual(revcompareitor.Current, revitor.Current);
-                flag1 = revcompareitor.MoveNext();
-                flag2 = revitor.MoveNext();
-                Assert.AreEqual(flag1, flag2);
-            }
-        }
-
-        [TestMethod]
-        public void AccessTest()
-        {
-            for (int i = 0; i < 2 * cycnum; i++)
-                Assert.AreEqual(compare[i], list[i]);
-        }
+        public override void AccessTest() => base.AccessTest();
 
         [TestMethod()]
         public void OperateAtTest()
         {
-            list.OperateAt(5, (ref int x) => x++);
-            list[6]++;
-            compare[5]++;
-            compare[6]++;
-            Assert.IsTrue(compare.SequenceEqual(list));
+            List.OperateAt(5, (ref int x) => x++);
+            List[6]++;
+            Compare[5]++;
+            Compare[6]++;
+            Assert.IsTrue(Compare.SequenceEqual(List));
         }
 
         [TestMethod()]
-        public void AddTest()
+        public override void AddTest() => base.AddTest();
+
+        [TestMethod()]
+        public override void ClearTest() => base.ClearTest();
+
+        [TestMethod()]
+        public override void ContainsTest() => base.ContainsTest();
+
+        [TestMethod()]
+        public override void CopyToTest() => base.CopyToTest();
+
+        [TestMethod()]
+        public override void IndexOfTest()
         {
-            for (int i = 0; i < cycnum; i++)
+            base.IndexOfTest();
+
+            int c = List[rand.Next(List.Count)];
+            Assert.AreEqual(Compare.LastIndexOf(c), List.LastIndexOf(c));
+
+            for (int i = 0; i < Cycles; i++)
             {
-                var c = r.Next(100);
-                list.Add(c); compare.Add(c);
-                Assert.IsTrue(compare.SequenceEqual(list));
+                c = rand.Next(100);
+                Assert.AreEqual(Compare.LastIndexOf(c), List.LastIndexOf(c));
             }
         }
 
         [TestMethod()]
-        public void ClearTest()
-        {
-            list.Clear();
-            Assert.AreEqual(0, list.Count);
-            Assert.AreEqual(0, list.Count());
-        }
+        public override void InsertTest() => base.InsertTest();
 
         [TestMethod()]
-        public void ContainsTest()
-        {
-            int c = list[r.Next(list.Count)];
-            Assert.AreEqual(compare.Contains(c), list.Contains(c));
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                c = r.Next(100);
-                Assert.AreEqual(compare.Contains(c), list.Contains(c));
-            }
-        }
+        public override void RemoveTest() => base.RemoveTest();
 
         [TestMethod()]
-        public void CopyToTest()
-        {
-            int[] target = new int[2 * cycnum];
-            list.CopyTo(target, 0);
-            Assert.IsTrue(compare.SequenceEqual(target));
-        }
-
-        [TestMethod()]
-        public void IndexOfTest()
-        {
-            int c = list[r.Next(list.Count)];
-            Assert.AreEqual(compare.IndexOf(c), list.IndexOf(c));
-            Assert.AreEqual(compare.LastIndexOf(c), list.LastIndexOf(c));
-
-            for (int i = 0; i < cycnum; i++)
-            {
-                c = r.Next(100);
-                Assert.AreEqual(compare.LastIndexOf(c), list.LastIndexOf(c));
-            }
-        }
-
-        [TestMethod()]
-        public void InsertTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var c = r.Next(100);
-                var index = r.Next(list.Count);
-                list.Insert(index, c); compare.Insert(index, c);
-
-                Console.Write("Insert at " + index + ": ");
-                PrintList();
-            }
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
-
-        [TestMethod()]
-        public void RemoveTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var val = compare[r.Next(list.Count)];
-                Assert.AreEqual(compare.Remove(val), list.Remove(val));
-
-                Console.Write("Delete " + val + ": ");
-                PrintList();
-
-                Assert.IsTrue(compare.SequenceEqual(list));
-            }
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
-
-        [TestMethod()]
-        public void RemoveAtTest()
-        {
-            for (int i = 0; i < cycnum; i++)
-            {
-                var index = r.Next(list.Count);
-                compare.RemoveAt(index); list.RemoveAt(index);
-
-                Console.Write("Delete at " + index + ": ");
-                PrintList();
-
-                Assert.IsTrue(compare.SequenceEqual(list));
-            }
-
-            Assert.AreEqual(compare.Count, list.Count);
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        public override void RemoveAtTest() => base.RemoveAtTest();
 
         public void PrintList()
         {
-            list.PrintTo(Console.Out);
+            List.PrintTo(Console.Out);
             Console.WriteLine();
         }
     }

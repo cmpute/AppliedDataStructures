@@ -10,7 +10,7 @@ namespace System.Collections.Generic
     /// A list class that support fast bulk/range operations. e.g. reverse, range edit, cyclic offset
     /// 支持区间操作的列表
     /// </summary>
-    public class SplayList<T> : IList<T>
+    public class SplayList<T> : IRangeList<T>
     {
         SplayRangeTree<T> tree;
 
@@ -106,10 +106,23 @@ namespace System.Collections.Generic
         #region Range Operations
         public void AddRange(IEnumerable<T> data) => InsertRange(Count, data);
         public void InsertRange(int index, IEnumerable<T> data) => tree.Insert(data, index);
-        public T[] RemoveRange(int index, int count) => tree.Delete(index, index + count - 1);
-        public void OperateRange(int index, int count, ActionRef<T> operation) => tree.Operate(operation, index, index + count - 1);
+        public IList<T> RemoveRange(int index, int count)
+        {
+            if (count > 0)
+                return tree.Delete(index, index + count - 1);
+            else return new List<T>();
+        }
+        public void OperateRange(int index, int count, ActionRef<T> operation)
+        {
+            if (count > 0)
+                tree.Operate(operation, index, index + count - 1);
+        }
         public void Reverse() => Reverse(0, Count);
-        public void Reverse(int index, int count) => tree.Reverse(index, index + count - 1);
+        public void Reverse(int index, int count)
+        {
+            if (count > 0)
+                tree.Reverse(index, index + count - 1);
+        }
         #endregion
     }
 
