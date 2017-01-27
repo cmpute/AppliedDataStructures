@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract = System.Diagnostics.Contracts.Contract;
 
 namespace System.Collections.Advanced
 {
@@ -230,13 +231,7 @@ namespace System.Collections.Advanced
 
         public bool Contains(TData item) => IndexOf(item) >= 0;
 
-        public void CopyTo(TData[] array, int arrayIndex)
-        {
-            int current = arrayIndex;
-            var iter = GetEnumerator();
-            while (iter.MoveNext())
-                array[current++] = iter.Current;
-        }
+        public void CopyTo(TData[] array, int arrayIndex) => this.CopyTo<TData>(array, arrayIndex);
 
         public IEnumerator<TData> GetEnumerator(bool reverse)
         {
@@ -255,11 +250,11 @@ namespace System.Collections.Advanced
         {
             var itor = GetEnumerator(reverse);
             int count = 0;
-            if ((Object)item == null)
+            if (ReferenceEquals(item, null))
             {
                 while (itor.MoveNext())
                 {
-                    if ((object)itor.Current == null)
+                    if (ReferenceEquals(itor.Current, null))
                         return reverse ? Count - count - 1 : count;
                     count++;
                 }

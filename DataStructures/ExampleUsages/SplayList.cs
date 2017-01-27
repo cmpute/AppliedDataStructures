@@ -3,6 +3,7 @@ using System.Collections.Advanced;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract = System.Diagnostics.Contracts.Contract;
 
 namespace System.Collections.Generic
 {
@@ -24,8 +25,16 @@ namespace System.Collections.Generic
 
         public T this[int index]
         {
-            get { return tree.IndexSearch(index + 1)._data; }
-            set { tree.IndexSearch(index + 1)._data = value; }
+            get
+            {
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+                return tree.IndexSearch(index + 1)._data;
+            }
+            set
+            {
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+                tree.IndexSearch(index + 1)._data = value;
+            }
         }
 
         public int Count => tree.Count;
@@ -38,13 +47,7 @@ namespace System.Collections.Generic
 
         public bool Contains(T item) => IndexOf(item) >= 0;
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            int current = arrayIndex;
-            var iter = GetEnumerator();
-            while (iter.MoveNext())
-                array[current++] = iter.Current;
-        }
+        public void CopyTo(T[] array, int arrayIndex) => this.CopyTo<T>(array, arrayIndex);
 
         public IEnumerator<T> GetEnumerator()
         {
@@ -56,32 +59,7 @@ namespace System.Collections.Generic
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int IndexOf(T item)
-        {
-            int count = 0;
-            if ((Object)item == null)
-            {
-                foreach (var node in tree.Skip(1).Take(tree.Count))
-                {
-                    if ((Object)(node._data) == null)
-                        return count;
-                    count++;
-                }
-                return -1;
-            }
-            else
-            {
-                var comparer = EqualityComparer<T>.Default;
-
-                foreach (var node in tree.Skip(1).Take(tree.Count))
-                {
-                    if (comparer.Equals(node._data, item))
-                        return count;
-                    count++;
-                }
-            }
-            return -1;
-        }
+        public int IndexOf(T item) => this.IndexOf<T>(item);
 
         public void Insert(int index, T item) => tree.Insert(new[] { item }, index);
 
@@ -324,4 +302,5 @@ namespace System.Collections.Generic
             return ReferenceEquals(this, nil) || base.IsSentinel();
         }
     }
+
 }

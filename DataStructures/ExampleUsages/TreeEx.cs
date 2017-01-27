@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract = System.Diagnostics.Contracts.Contract;
 
 namespace System.Collections.Advanced
 {
@@ -279,13 +280,7 @@ namespace System.Collections.Advanced
 
         public bool Contains(TNode item) => _tree.SearchNode(item.Key) != null;
 
-        public void CopyTo(TNode[] array, int arrayIndex)
-        {
-            int current = arrayIndex;
-            var iter = GetEnumerator();
-            while (iter.MoveNext())
-                array[current++] = iter.Current;
-        }
+        public void CopyTo(TNode[] array, int arrayIndex) => this.CopyTo<TNode>(array, arrayIndex);
 
         public IEnumerator<TNode> GetEnumerator() => _tree.GetEnumerator();
 
@@ -332,13 +327,7 @@ namespace System.Collections.Advanced
 
         public bool ContainsKey(TKey key) => _tree.SearchNode(key) != null;
 
-        public void CopyTo(KeyValuePair<TKey, TNode>[] array, int arrayIndex)
-        {
-            int current = arrayIndex;
-            var iter = GetEnumerator();
-            while (iter.MoveNext())
-                array[current++] = new KeyValuePair<TKey, TNode>(iter.Current.Key, iter.Current);
-        }
+        public void CopyTo(KeyValuePair<TKey, TNode>[] array, int arrayIndex) => this.CopyTo<KeyValuePair<TKey, TNode>>(array, arrayIndex);
 
         public bool Remove(TKey key) => _tree.DeleteNode(key) != null;
 

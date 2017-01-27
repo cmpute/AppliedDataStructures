@@ -9,83 +9,43 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced.Tests
 {
     [TestClass()]
-    public class LinkedListWrapperTests
+    public class LinkedListWrapperTests : ListTestBase<IList<int>>
     {
-        IList<int> list = new LinkedList<int>().AsList();
-        List<int> compare = new List<int>();
-        Random r = new Random();
-        const int cycnum = 10;
+
+        public LinkedListWrapperTests() : base(new LinkedList<int>().AsList()) { }
 
         [TestInitialize]
         [TestMethod]
-        public void RandomGenerate()
-        {
-            compare.Clear();
-            list.Clear();
-            for (int i = 0; i < 2 * cycnum; i++)
-            {
-                var c = r.Next(100);
-                compare.Add(c);
-                list.Add(c);
-                Console.Write(c + "\t");
-            }
+        public override void RandomGenerate() => base.RandomGenerate();
 
-            Assert.AreEqual(cycnum * 2, list.Count);
-            Assert.IsTrue(compare.SequenceEqual(list));
-        }
+        [TestMethod]
+        public override void AccessTest() => base.AccessTest();
 
         [TestMethod()]
-        public void AddTest()
-        {
-            Assert.Fail();
-        }
+        public override void AddTest() => base.AddTest();
 
         [TestMethod()]
-        public void ClearTest()
-        {
-            Assert.Fail();
-        }
+        public override void ClearTest() => base.ClearTest();
 
         [TestMethod()]
-        public void ContainsTest()
-        {
-            Assert.Fail();
-        }
+        public override void ContainsTest() => base.ContainsTest();
 
         [TestMethod()]
-        public void CopyToTest()
-        {
-            Assert.Fail();
-        }
+        public override void CopyToTest() => base.CopyToTest();
 
         [TestMethod()]
-        public void GetEnumeratorTest()
-        {
-            Assert.Fail();
-        }
+        public override void GetEnumeratorTest() => base.GetEnumeratorTest();
 
         [TestMethod()]
-        public void IndexOfTest()
-        {
-            Assert.Fail();
-        }
+        public override void IndexOfTest() => base.IndexOfTest();
 
         [TestMethod()]
-        public void InsertTest()
-        {
-            Assert.Fail();
-        }
+        public override void InsertTest() => base.InsertTest();
 
         [TestMethod()]
-        public void RemoveTest()
-        {
-            Assert.Fail();
-        }
+        public override void RemoveTest() => base.RemoveTest();
 
         [TestMethod()]
-        public void RemoveAtTest()
-        {
-            Assert.Fail();
-        }
+        public override void RemoveAtTest() => base.RemoveAtTest();
     }
 }

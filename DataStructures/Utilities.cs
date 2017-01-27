@@ -34,6 +34,42 @@ namespace System.Collections.Advanced
             }
             return c;
         }
+
+        public static int IndexOf<T>(this IEnumerable<T> list, T item)
+        {
+            var itor = list.GetEnumerator();
+            int count = 0;
+            if (ReferenceEquals(item, null))
+            {
+                while (itor.MoveNext())
+                {
+                    if (ReferenceEquals(itor.Current, null))
+                        return count;
+                    count++;
+                }
+            }
+            else
+            {
+                var comparer = EqualityComparer<T>.Default;
+                while (itor.MoveNext())
+                {
+                    if (comparer.Equals(itor.Current, item))
+                        return count;
+                    count++;
+                }
+            }
+            return -1;
+        }
+        public static void CopyTo<T>(this IEnumerable<T> list, T[] array, int arrayIndex)
+        {
+            Diagnostics.Contracts.Contract.Requires<ArgumentNullException>(array != null);
+            Diagnostics.Contracts.Contract.Requires<ArgumentException>(array.Rank == 1);
+
+            int current = arrayIndex;
+            var iter = list.GetEnumerator();
+            while (iter.MoveNext())
+                array[current++] = iter.Current;
+        }
     }
     
     class ComparerWrapper<T> : IComparer<T>, IEqualityComparer<T>

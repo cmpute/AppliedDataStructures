@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Contract = System.Diagnostics.Contracts.Contract;
 
 namespace System.Collections.Advanced
 {
@@ -30,8 +31,8 @@ namespace System.Collections.Advanced
             }
             else
             {
-                index = Count - index;
-                var node = _list.First;
+                index = Count - index - 1;
+                var node = _list.Last;
                 while (index-- > 0)
                     node = node.Previous;
                 return node;
@@ -42,12 +43,13 @@ namespace System.Collections.Advanced
         {
             get
             {
-                throw new NotImplementedException();
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+                return Find(index).Value;
             }
-
             set
             {
-                throw new NotImplementedException();
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+                Find(index).Value = value;
             }
         }
 
@@ -61,31 +63,32 @@ namespace System.Collections.Advanced
 
         public bool Contains(T item) => IndexOf(item) >= 0;
 
-        public void CopyTo(T[] array, int arrayIndex)
-        {
-            throw new NotImplementedException();
-        }
+        public void CopyTo(T[] array, int arrayIndex) => this.CopyTo<T>(array, arrayIndex);
 
         public IEnumerator<T> GetEnumerator() => _list.GetEnumerator();
 
-        public int IndexOf(T item)
-        {
-            throw new NotImplementedException();
-        }
+        public int IndexOf(T item) => this.IndexOf<T>(item);
 
         public void Insert(int index, T item)
         {
-            throw new NotImplementedException();
+            var loc = Find(index);
+            _list.AddBefore(loc, item);
         }
 
         public bool Remove(T item)
         {
-            throw new NotImplementedException();
+            var res = _list.Find(item);
+            if (res != null)
+            {
+                _list.Remove(_list.Find(item));
+                return true;
+            }
+            else return false;
         }
 
         public void RemoveAt(int index)
         {
-            throw new NotImplementedException();
+            _list.Remove(Find(index));
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
