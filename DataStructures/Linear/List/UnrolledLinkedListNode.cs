@@ -44,7 +44,8 @@ namespace System.Collections.Advanced
         }
 
         public int Capacity => Items.Length;
-        public virtual float MergeRatio => 0.3f;
+        const float _mergeFactor = 0.3f;
+        public virtual float MergeFactor => _mergeFactor;
         public int Count { get; protected set; } = 0;
         public int Version { get; protected set; }
 
@@ -123,7 +124,7 @@ namespace System.Collections.Advanced
         private bool FixDown()
         {
             bool fix = false;
-            if (Count < Capacity * MergeRatio)
+            if (Count < Capacity * MergeFactor)
             {
                 if (Next != this && Count + Next.Count <= Capacity)
                 {

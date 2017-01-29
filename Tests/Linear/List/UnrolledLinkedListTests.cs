@@ -39,16 +39,6 @@ namespace System.Collections.Advanced.Tests
         public override void AccessTest() => base.AccessTest();
 
         [TestMethod()]
-        public void OperateAtTest()
-        {
-            List.OperateAt(5, (ref int x) => x++);
-            List[6]++;
-            Compare[5]++;
-            Compare[6]++;
-            Assert.IsTrue(Compare.SequenceEqual(List));
-        }
-
-        [TestMethod()]
         public override void AddTest() => base.AddTest();
 
         [TestMethod()]

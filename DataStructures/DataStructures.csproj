@@ -104,7 +104,7 @@
     <Compile Include="Tree\BST\AVLTree.cs" />
     <Compile Include="Tree\BST\AVLTreeNode.cs" />
     <Compile Include="Tree\BST\BinarySearchTree.cs" />
-    <Compile Include="Tree\Binary\CompactTree.cs" />
+    <Compile Include="Tree\CompactTree.cs" />
     <Compile Include="ExampleUsages\TreeEx.cs" />
     <Compile Include="Tree\BST\CartesianTree.cs" />
     <Compile Include="Tree\BST\CartesianTreeNode.cs" />

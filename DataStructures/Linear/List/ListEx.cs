@@ -63,9 +63,16 @@ namespace System.Collections.Advanced
         }
     }
 
+    /// <remarks>
+    /// The linked list is cyclic, and the wrapper uses "Move" To Front (MTF) strategy.
+    /// 链表是循环链表，这个封装采用了MTF策略
+    /// </remarks>
     class LinkedListWrapper<T> : IList<T>
     {
         LinkedList<T> _list;
+        int _hotindex;
+        LinkedListNode<T> _hotnode;
+
         public LinkedListWrapper(LinkedList<T> list)
         {
             _list = list;
@@ -73,20 +80,50 @@ namespace System.Collections.Advanced
 
         private LinkedListNode<T> Find(int index)
         {
-            if (index <= Count - index)
+            if (index < _hotindex)
             {
-                var node = _list.First;
-                while (index-- > 0)
-                    node = node.Next;
-                return node;
+                if (index < _hotindex - index) // front -> hotindex
+                {
+                    _hotindex = index;
+                    _hotnode = _list.First;
+
+                    while (index-- > 0)
+                        _hotnode = _hotnode.Next;
+                    return _hotnode;
+                }
+                else // hotindex -> front
+                {
+                    var temp = index;
+
+                    while (index++ < _hotindex)
+                        _hotnode = _hotnode.Previous;
+
+                    _hotindex = temp;
+                    return _hotnode;
+                }
             }
             else
             {
-                index = Count - index - 1;
-                var node = _list.Last;
-                while (index-- > 0)
-                    node = node.Previous;
-                return node;
+                if (index - _hotindex < Count - index) // hotindex -> end
+                {
+                    var temp = index;
+
+                    if (_hotnode == null) _hotnode = _list.First;
+                    while (index-- > _hotindex)
+                        _hotnode = _hotnode.Next;
+
+                    _hotindex = temp;
+                    return _hotnode;
+                }
+                else // end -> hotindex
+                {
+                    _hotindex = index++;
+                    _hotnode = _list.Last;
+
+                    while (index++ < Count)
+                        _hotnode = _hotnode.Previous;
+                    return _hotnode;
+                }
             }
         }
 
@@ -110,7 +147,12 @@ namespace System.Collections.Advanced
 
         public void Add(T item) => _list.AddLast(item);
 
-        public void Clear() => _list.Clear();
+        public void Clear()
+        {
+            _list.Clear();
+            _hotindex = 0;
+            _hotnode = null;
+        }
 
         public bool Contains(T item) => IndexOf(item) >= 0;
 
@@ -122,12 +164,16 @@ namespace System.Collections.Advanced
 
         public void Insert(int index, T item)
         {
-            var loc = Find(index);
-            _list.AddBefore(loc, item);
+            _hotnode = _list.AddBefore(Find(index), item);
         }
 
         public bool Remove(T item)
         {
+            // Reset hot node, because LinkedList.Find(LinkedListNode) method is sealed,
+            // and it's inefficient to search again
+            _hotindex = 0;
+            _hotnode = null;
+
             var res = _list.Find(item);
             if (res != null)
             {
@@ -139,7 +185,10 @@ namespace System.Collections.Advanced
 
         public void RemoveAt(int index)
         {
-            _list.Remove(Find(index));
+            var loc = Find(index);
+            _hotnode = (_hotnode ?? _list.First).Next;
+            if (_hotnode == null) _hotindex = 0;
+            _list.Remove(loc);
         }
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();

@@ -26,6 +26,16 @@ namespace System.Collections
             Compare.Clear();
             List.Clear();
 
+            // clear test
+            for (int i = 0; i < Cycles; i++)
+            {
+                var c = rand.Next(100);
+                Compare.Add(c);
+                List.Add(c);
+            }
+            Compare.Clear();
+            List.Clear();
+
             for (int i = 0; i < 2 * Cycles; i++)
             {
                 var c = rand.Next(100);
@@ -144,17 +154,19 @@ namespace System.Collections
                 var index = rand.Next(List.Count);
                 Compare.RemoveAt(index); List.RemoveAt(index);
 
+                Console.WriteLine($"Remove at {index}");
+                CompareLog();
                 Assert.AreEqual(Compare.Count, List.Count);
                 Assert.IsTrue(Compare.SequenceEqual(List));
             }
         }
 
-        public void CompareLog()
+        public virtual void CompareLog()
         {
-            Console.WriteLine("[");
+            Console.Write("[");
             foreach (var item in List)
                 Console.Write(item + "\t");
-            Console.WriteLine("|");
+            Console.Write("\n|");
             foreach (var item in Compare)
                 Console.Write(item + "\t");
             Console.WriteLine("]");

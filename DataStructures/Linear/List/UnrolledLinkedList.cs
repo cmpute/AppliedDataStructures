@@ -12,11 +12,15 @@ namespace System.Collections.Advanced
         where TNode : UnrolledLinkedListNode<TData>
     {
         private const int _defaultCapacity = 4;
+        private const float _splitFactor = 1.4f;
 
         Func<int, TNode> _new;
         UnrolledLinkedListNode<TData> head;
-        int _version;
+        int _version = 0;
         int blocksize;
+
+        int _hotindex; //overall index of first element in hot node
+        UnrolledLinkedListNode<TData> _hotnode;
 
         public int Capacity => blocksize * blocksize;
 
@@ -24,40 +28,78 @@ namespace System.Collections.Advanced
         public UnrolledLinkedList(Func<int, TNode> newNode, int capacity)
         {
             _new = newNode;
-            blocksize = (int)Math.Ceiling(Math.Sqrt(capacity));
+            blocksize = (int)Math.Ceiling(_splitFactor * Math.Sqrt(capacity));
         }
 
-        private Tuple<UnrolledLinkedListNode<TData>, int> Find(int index)
+        private UnrolledLinkedListNode<TData> Find(ref int index)
         {
-            if (index <= Count - index) // Find orderly faster
+            if (index < _hotindex)
             {
-                var current = head;
-                while (index >= current.Count)
+                if (index < _hotindex - index) // front -> hotindex
                 {
-                    index -= current.Count;
-                    current = current.Next;
-                }
-                return new Tuple<UnrolledLinkedListNode<TData>, int>(current, index);
-            }
-            else // Find reversely faster
-            {
-                index = Count - index;
-                var current = head.Previous;
-                while (index > current.Count)
-                {
-                    index -= current.Count;
-                    current = current.Previous;
-                }
-                return new Tuple<UnrolledLinkedListNode<TData>, int>(current, current.Count - index);
-            }
-        }
+                    _hotindex = index;
+                    _hotnode = head;
 
-        public void OperateAt(int index, ActionRef<TData> operation)
-        {
-            var res = Find(index);
-            var data = res.Item1.Items[res.Item2];
-            operation(ref data);
-            res.Item1.Items[res.Item2] = data;
+                    while (index >= _hotnode.Count)
+                    {
+                        index -= _hotnode.Count;
+                        _hotnode = _hotnode.Next;
+                    }
+
+                    _hotindex -= index;
+                    return _hotnode;
+                }
+                else // hotindex -> front
+                {
+                    var temp = index;
+                    _hotnode = _hotnode.Previous;
+
+                    index = _hotindex - index;
+                    while (index > _hotnode.Count)
+                    {
+                        index -= _hotnode.Count;
+                        _hotnode = _hotnode.Previous;
+                    }
+
+                    index = _hotnode.Count - index;
+                    _hotindex = temp - index;
+                    return _hotnode;
+                }
+            }
+            else
+            {
+                if (index - _hotindex < Count - index) // hotindex -> end
+                {
+                    var temp = index;
+
+                    if (_hotnode == null) _hotnode = head;
+                    index -= _hotindex;
+                    while (index >= _hotnode.Count)
+                    {
+                        index -= _hotnode.Count;
+                        _hotnode = _hotnode.Next;
+                    }
+
+                    _hotindex = temp - index;
+                    return _hotnode;
+                }
+                else // end -> hotindex
+                {
+                    _hotindex = index;
+                    _hotnode = head.Previous;
+
+                    index = Count - index;
+                    while (index > _hotnode.Count)
+                    {
+                        index -= _hotnode.Count;
+                        _hotnode = _hotnode.Previous;
+                    }
+
+                    index = _hotnode.Count - index;
+                    _hotindex -= index;
+                    return _hotnode;
+                }
+            }
         }
 
         struct Enumerator : IEnumerator<TData>
@@ -196,13 +238,11 @@ namespace System.Collections.Advanced
         {
             get
             {
-                var res = Find(index);
-                return res.Item1.Items[res.Item2];
+                return Find(ref index).Items[index];
             }
             set
             {
-                var res = Find(index); // can be improved by add log of last operation
-                res.Item1.Items[res.Item2] = value;
+                Find(ref index).Items[index] = value;
             }
         }
         
@@ -219,6 +259,7 @@ namespace System.Collections.Advanced
             }
             head.Previous.Insert(head.Previous.Count, item, _new);
 
+            _version++;
             Count++;
         }
 
@@ -226,6 +267,8 @@ namespace System.Collections.Advanced
         {
             head = null;
             Count = 0;
+            _hotindex = 0;
+            _hotnode = null;
             _version++;
         }
 
@@ -274,8 +317,10 @@ namespace System.Collections.Advanced
 
         public void Insert(int index, TData item)
         {
-            var loc = Find(index);
-            loc.Item1.Insert(loc.Item2, item, _new);
+            var loc = Find(ref index);
+            loc.Insert(index, item, _new);
+
+            _version++;
             Count++;
         }
 
@@ -285,13 +330,25 @@ namespace System.Collections.Advanced
             if (index < 0) return false;
 
             RemoveAt(index);
+            _version++;
             return true;
         }
 
         public void RemoveAt(int index)
         {
-            var loc = Find(index);
-            loc.Item1.Delete(loc.Item2);
+            var loc = Find(ref index);
+            var prev = loc.Previous;
+            var prevoffset = loc.Count;
+
+            loc.Delete(index);
+
+            if (!ReferenceEquals(prev.Next, loc)) // Merged with previous node
+            {
+                _hotindex -= prevoffset;
+                _hotnode = prev;
+            }
+
+            _version++;
             Count--;
         }
 
