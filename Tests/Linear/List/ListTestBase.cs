@@ -136,7 +136,7 @@ namespace System.Collections
 
         public virtual void RemoveTest()
         {
-            for (int i = 0; i < Cycles; i++)
+            while (Compare.Count > 0)
             {
                 var val = Compare[rand.Next(List.Count)];
 
@@ -144,12 +144,11 @@ namespace System.Collections
                 Assert.AreEqual(Compare.Count, List.Count);
                 Assert.IsTrue(Compare.SequenceEqual(List));
             }
-            Assert.IsTrue(Compare.SequenceEqual(List));
         }
 
         public virtual void RemoveAtTest()
         {
-            for (int i = 0; i < Cycles; i++)
+            while (Compare.Count > 0)
             {
                 var index = rand.Next(List.Count);
                 Compare.RemoveAt(index); List.RemoveAt(index);

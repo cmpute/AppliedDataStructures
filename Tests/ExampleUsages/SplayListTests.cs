@@ -71,5 +71,8 @@ namespace System.Collections.Generic.Tests
 
         [TestMethod()]
         public override void ReverseTest() => base.ReverseTest();
+
+        [TestMethod()]
+        public override void GetRangeTest() => base.GetRangeTest();
     }
 }

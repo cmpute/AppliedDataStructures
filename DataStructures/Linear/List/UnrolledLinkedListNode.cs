@@ -4,14 +4,16 @@ using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Diagnostics.Contracts;
 
 namespace System.Collections.Advanced
 {
     public class UnrolledLinkedListNode<TData> : IPersistent, IMergable<UnrolledLinkedListNode<TData>>, IPrintable
     {
         bool _rmref; //whether to remove reference, not necessary for value type
-
-        public TData[] Items { get; protected set; }
+        
+        internal TData[] _items;
+        protected TData[] RawItems { get { return _items; } set { _items = value; } }
 
         UnrolledLinkedListNode<TData> _prev, _next;
         public UnrolledLinkedListNode<TData> Previous
@@ -35,7 +37,7 @@ namespace System.Collections.Advanced
 
         public UnrolledLinkedListNode(int capacity)
         {
-            Items = new TData[capacity];
+            _items = new TData[capacity];
 #if DEBUG
             _rmref = true;
 #else
@@ -43,23 +45,24 @@ namespace System.Collections.Advanced
 #endif
         }
 
-        public int Capacity => Items.Length;
-        const float _mergeFactor = 0.3f;
-        public virtual float MergeFactor => _mergeFactor;
-        public int Count { get; protected set; } = 0;
+        public int Capacity => _items.Length;
+        public int Count { get; protected set; }
         public int Version { get; protected set; }
 
         public void Split(Func<int, UnrolledLinkedListNode<TData>> newNode) => Split(Count >> 1, newNode);
         public void Split(int splitIndex, Func<int, UnrolledLinkedListNode<TData>> newNode)
         {
+            if (splitIndex == Count)
+                return;
+
             var newnext = newNode(Capacity);
             newnext.Next = Next;
             newnext.Previous = this;
 
             newnext.Count = Count - splitIndex;
             Count = splitIndex;
-            Array.Copy(Items, Count, newnext.Items, 0, newnext.Count);
-            if(_rmref) Array.Clear(Items, Count, newnext.Count);
+            Array.Copy(_items, Count, newnext._items, 0, newnext.Count);
+            if(_rmref) Array.Clear(_items, Count, newnext.Count);
 
             newnext.Update();
         }
@@ -73,11 +76,13 @@ namespace System.Collections.Advanced
         /// <param name="startIndex">合并的结点开始合并的数据位置</param>
         public void Merge(UnrolledLinkedListNode<TData> newNext, int startIndex)
         {
+            if (newNext == this) return;
+
             if (newNext.Count > 0)
             {
                 var copycount = newNext.Count - startIndex;
-                Array.Copy(newNext.Items, startIndex, Items, Count, copycount);
-                if (_rmref) Array.Clear(newNext.Items, 0, startIndex);
+                Array.Copy(newNext._items, startIndex, _items, Count, copycount);
+                if (_rmref) Array.Clear(newNext._items, 0, startIndex);
                 Count += copycount;
             }
 
@@ -99,46 +104,46 @@ namespace System.Collections.Advanced
             }
             
             if (index < Count)
-                Array.Copy(Items, index, Items, index + 1, Count - index);
-            Items[index] = item;
+                Array.Copy(_items, index, _items, index + 1, Count - index);
+            _items[index] = item;
             Count++;
 
             Update();
         }
 
+        ///<param name="head">链表的头节点，删除过程中将保证head不被Merge</param>
         public TData Delete(int index)
         {
-            var res = Items[index];
+            var res = _items[index];
             if (index < --Count)
             {
-                Array.Copy(Items, index + 1, Items, index, Count - index);
-                if (_rmref) Items[Count] = default(TData);
+                Array.Copy(_items, index + 1, _items, index, Count - index);
+                if (_rmref) _items[Count] = default(TData);
             }
-
-            if (!FixDown())
-                Update();
+            
+            Update();
 
             return res;
         }
 
-        private bool FixDown()
+        public void Delete(int index, int count)
         {
-            bool fix = false;
-            if (Count < Capacity * MergeFactor)
-            {
-                if (Next != this && Count + Next.Count <= Capacity)
-                {
-                    Merge(Next);
-                    fix = true;
-                }
-                if (Previous != this && Count + Previous.Count <= Previous.Capacity)
-                {
-                    Previous.Merge(this);
-                    fix = true;
-                }
-            }
+            Count -= count;
+            if (index < Count)
+                Array.Copy(_items, index + count, _items, index, Count - index);
+            if (_rmref) Array.Clear(_items, Count, count);
 
-            return fix;
+            Update();
+        }
+
+        public void Clear()
+        {
+            if (Count > 0 && _rmref)
+            {
+                Array.Clear(_items, 0, Count);
+                Count = 0;
+            }
+            Version++;
         }
 
         protected virtual void Update() { Version++; }
@@ -146,7 +151,7 @@ namespace System.Collections.Advanced
         public void PrintTo(TextWriter textOut)
         {
             textOut.Write('[');
-            Items.PrintTo(textOut);
+            _items.Take(Count).PrintTo(textOut);
             textOut.Write(']');
         }
     }

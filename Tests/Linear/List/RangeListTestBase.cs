@@ -40,12 +40,20 @@ namespace System.Collections
 
         public virtual void RemoveRangeTest()
         {
-            int start = rand.Next(Compare.Count);
-            int count = rand.Next(Compare.Count - 1 - start);
-            Assert.IsTrue(Compare.GetRange(start, count).SequenceEqual(List.RemoveRange(start, count)));
-            Compare.RemoveRange(start, count);
+            while (Compare.Count > 2)
+            {
+                int start = rand.Next(Compare.Count);
+                int count = rand.Next(Compare.Count - start);
 
-            Assert.IsTrue(Compare.SequenceEqual(List));
+                var a = Compare.GetRange(start, count);
+                var b = List.GetRange(start, count);
+                Assert.IsTrue(a.SequenceEqual(b));
+
+                List.RemoveRange(start, count);
+                Compare.RemoveRange(start, count);
+
+                Assert.IsTrue(Compare.SequenceEqual(List));
+            }
         }
 
         public virtual void ReverseTest()
@@ -61,6 +69,19 @@ namespace System.Collections
             Compare.Reverse(start, count);
 
             Assert.IsTrue(Compare.SequenceEqual(List));
+        }
+
+        public virtual void GetRangeTest()
+        {
+            for (int i = 0; i < 3 * Cycles; i++)
+            {
+                int start = rand.Next(Compare.Count);
+                int count = rand.Next(Compare.Count - start);
+
+                var a = Compare.GetRange(start, count);
+                var b = List.GetRange(start, count);
+                Assert.IsTrue(a.SequenceEqual(b));
+            }
         }
     }
 }

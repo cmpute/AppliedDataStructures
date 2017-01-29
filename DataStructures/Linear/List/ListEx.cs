@@ -45,7 +45,7 @@ namespace System.Collections.Advanced
             while (iter.MoveNext())
                 array[current++] = iter.Current;
         }
-        internal static void PrintTo<T>(this IEnumerable<T> list, System.IO.TextWriter textOut, string separator = " ")
+        public static void PrintTo<T>(this IEnumerable<T> list, System.IO.TextWriter textOut, string separator = " ")
         {
             var iter = list.GetEnumerator();
             if (!iter.MoveNext()) textOut.Write("null");

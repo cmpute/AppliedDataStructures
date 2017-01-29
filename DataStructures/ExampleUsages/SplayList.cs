@@ -84,11 +84,15 @@ namespace System.Collections.Generic
         #region Range Operations
         public void AddRange(IEnumerable<T> data) => InsertRange(Count, data);
         public void InsertRange(int index, IEnumerable<T> data) => tree.Insert(data, index);
-        public IList<T> RemoveRange(int index, int count)
+        public IList<T> GetRange(int index, int count)
+        {
+            if (count > 0) return tree.Report(index, index + count - 1);
+            else return new List<T>();
+        }
+        public void RemoveRange(int index, int count)
         {
             if (count > 0)
-                return tree.Delete(index, index + count - 1);
-            else return new List<T>();
+                tree.Delete(index, index + count - 1);
         }
         public void OperateRange(int index, int count, ActionRef<T> operation)
         {
@@ -175,7 +179,7 @@ namespace System.Collections.Generic
 
             Splay(p);
         }
-        public T[] Delete(int startindex, int endindex)
+        public void Delete(int startindex, int endindex)
         {
             if (endindex < startindex) throw new ArgumentException("操作范围不正确");
             if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
@@ -183,20 +187,12 @@ namespace System.Collections.Generic
             // Splay segment
             SelectSegment(startindex, endindex + 2);
 
-            // Remove nodes
-            var res = Root.RightChild.LeftChild.GetSubtreeEnumerator(TraverseOrder.InOrder);
+            // Remove subtree
             Root.RightChild.LeftChild = SplayRangeTreeNode<T>.nil;
 
             // Update
             Splay(Root.RightChild);
             Count -= endindex - startindex + 1;
-
-            // Report nodes
-            List<T> ret = new List<T>();
-            while (res.MoveNext())
-                ret.Add(res.Current._data);
-            return ret.ToArray();
-
         }
         public void Reverse(int startindex, int endindex)
         {
@@ -212,6 +208,19 @@ namespace System.Collections.Generic
 
             // Update
             Splay(Root.RightChild.LeftChild);
+        }
+        public List<T> Report(int startindex, int endindex)
+        {
+            // Splay segment
+            SelectSegment(startindex, endindex + 2);
+
+            // Remove nodes
+            var res = Root.RightChild.LeftChild.GetSubtreeEnumerator(TraverseOrder.InOrder);
+
+            List<T> ret = new List<T>();
+            while (res.MoveNext())
+                ret.Add(res.Current._data);
+            return ret;
         }
         public void Operate(ActionRef<T> optr, int startindex, int endindex)
         {

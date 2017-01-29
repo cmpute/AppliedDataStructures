@@ -9,9 +9,9 @@ using System.Threading.Tasks;
 namespace System.Collections.Advanced.Tests
 {
     [TestClass()]
-    public class UnrolledLinkedListTests : ListTestBase<UnrolledLinkedList<UnrolledLinkedListNode<int>, int>>
+    public class UnrolledLinkedListTests : RangeListTestBase<UnrolledLinkedList<UnrolledLinkedListNode<int>, int>>
     {
-        const int cycles = 10;
+        const int cycles = 20;
         protected override int Cycles => cycles;
 
         public UnrolledLinkedListTests() : base(new UnrolledLinkedList<UnrolledLinkedListNode<int>, int>(size => new UnrolledLinkedListNode<int>(size), 2 * cycles)) { }
@@ -36,7 +36,13 @@ namespace System.Collections.Advanced.Tests
         }
 
         [TestMethod]
-        public override void AccessTest() => base.AccessTest();
+        public override void AccessTest()
+        {
+            base.AccessTest();
+#if DEBUG
+            Assert.IsTrue(List.VerifyHotNode());
+#endif
+        }
 
         [TestMethod()]
         public override void AddTest() => base.AddTest();
@@ -74,8 +80,58 @@ namespace System.Collections.Advanced.Tests
         [TestMethod()]
         public override void RemoveAtTest() => base.RemoveAtTest();
 
+        [TestMethod()]
+        public override void AddRangeTest() => base.AddRangeTest();
+
+        [TestMethod()]
+        public override void InsertRangeTest() => base.InsertRangeTest();
+
+        [TestMethod()]
+        public override void RemoveRangeTest()
+        {
+            while (Compare.Count > 2)
+            {
+                int start = rand.Next(Compare.Count);
+                int count = rand.Next(Compare.Count - start);
+#if DEBUG
+                Assert.IsTrue(List.VerifyHotNode());
+#endif
+                Console.Write('[');
+                Compare.PrintTo(Console.Out);
+                Console.WriteLine(']');
+                List.PrintTo(Console.Out);
+                Console.WriteLine();
+                var a = Compare.GetRange(start, count);
+                var b = List.GetRange(start, count);
+
+                Console.Write('[');
+                a.PrintTo(Console.Out);
+                Console.WriteLine('|');
+                b.PrintTo(Console.Out);
+                Console.WriteLine(']');
+                Assert.IsTrue(a.SequenceEqual(b));
+                List.PrintTo(Console.Out);
+                Console.WriteLine(']');
+
+#if DEBUG
+                Assert.IsTrue(List.VerifyHotNode());
+#endif
+                Console.WriteLine($"Remove {count} starting from [{start}]");
+                List.RemoveRange(start, count);
+                Compare.RemoveRange(start, count);
+
+                Assert.IsTrue(Compare.SequenceEqual(List));
+            }
+        }
+
+        [TestMethod()]
+        public override void GetRangeTest() => base.GetRangeTest();
+
         public void PrintList()
         {
+            Console.Write('[');
+            Compare.PrintTo(Console.Out);
+            Console.WriteLine(']');
             List.PrintTo(Console.Out);
             Console.WriteLine();
         }
