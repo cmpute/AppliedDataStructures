@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Binary Search Tree (BST)
@@ -22,6 +23,8 @@ namespace System.Collections.Advanced
         public BinarySearchTree() : this(Comparer<TKey>.Default) { }
         public BinarySearchTree(IComparer<TKey> comparer)
         {
+            Contract.Requires<ArgumentNullException>(comparer != null);
+
             _comparer = comparer ?? Comparer<TKey>.Default;
         }
 
@@ -45,6 +48,8 @@ namespace System.Collections.Advanced
         /// <param name="replace">替换的结点</param>
         protected void Transplant(BinaryTreeNode target, BinaryTreeNode replace)
         {
+            Contract.Requires<ArgumentNullException>(target != null);
+
             if (target == replace) return;
 
             target.Parent.SearchDown();
@@ -61,6 +66,8 @@ namespace System.Collections.Advanced
         /// <param name="modify">是否在下行过程中调用OnSearchDown</param>
         protected virtual TNode SearchInternal(TKey key, bool modify)
         {
+            if (key == null) return null;
+
             TNode current = Root, ret = null;
             while (current != null)
             {
@@ -82,11 +89,13 @@ namespace System.Collections.Advanced
         }
 
         /// <summary>
-        /// 删除指定结点，由内部调用，确保删除的结点在内部
+        /// 删除指定结点，由内部调用，确保删除的结点在内部或为空
         /// </summary>
         /// <param name="node">需要删除的结点</param>
         protected virtual void DeleteInternal(TNode node)
         {
+            Contract.Requires(node == null || this.Contains(node));
+
             if (node == null) return;
             if (node.LeftChild == null)
                 Transplant(node, node.RightChild);
@@ -117,8 +126,10 @@ namespace System.Collections.Advanced
             Count--;
         }
 
-        public virtual TNode InsertInternal(TNode node)
+        protected virtual TNode InsertInternal(TNode node)
         {
+            if (node == null) return null;
+
             if (Root == null)
             {
                 //null tree
@@ -183,7 +194,10 @@ namespace System.Collections.Advanced
         /// <return>结点在树中并且删除成功则返回true，否则返回false</return>
         public bool DeleteNode(TNode node)
         {
+            if (node == null) return false;
             if (!SearchNodeAll(node.Key).Contains(node)) return false;
+
+            Contract.Assume(this.Contains(node));
             DeleteInternal(node);
             return true;
         }
@@ -229,7 +243,7 @@ namespace System.Collections.Advanced
                 }
             }
         }
-        //TODO: DeleteAll can be improved for better time cost
+        //TODO: DeleteAll can be improved for better time cost by transplant nodes at the same time.
         public IEnumerable<TNode> DeleteNodeAll(TKey key)
             => SearchNodeAll(key).Select(node => { DeleteInternal(node); return node; });
 

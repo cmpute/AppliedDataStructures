@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     public interface IStaticEquatableSearchTree<out TNode, in TKey> : IStaticSearchTree<TNode, TKey>
         where TNode : IKeyProvider<TKey>

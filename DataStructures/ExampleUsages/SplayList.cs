@@ -1,11 +1,12 @@
 ﻿using System;
-using System.Collections.Advanced;
+using System.Collections.Generic;
+using System.Collections.Advanced.Tree;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Contract = System.Diagnostics.Contracts.Contract;
 
-namespace System.Collections.Generic
+namespace System.Collections.Advanced.Linear
 {
     /// <summary>
     /// A list class that support fast bulk/range operations. e.g. reverse, range edit, cyclic offset
@@ -59,9 +60,19 @@ namespace System.Collections.Generic
 
         IEnumerator IEnumerable.GetEnumerator() => GetEnumerator();
 
-        public int IndexOf(T item) => this.IndexOf<T>(item);
+        public int IndexOf(T item)
+        {
+            Contract.Ensures(Contract.Result<int>() >= -1);
+            Contract.Ensures(Contract.Result<int>() < Count);
 
-        public void Insert(int index, T item) => tree.Insert(new[] { item }, index);
+            return this.IndexOf<T>(item);
+        }
+
+        public void Insert(int index, T item)
+        {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+            tree.Insert(new[] { item }, index);
+        }
 
         public bool Remove(T item)
         {
@@ -75,7 +86,11 @@ namespace System.Collections.Generic
             return false;
         }
 
-        public void RemoveAt(int index) => tree.Delete(index, index);
+        public void RemoveAt(int index)
+        {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+            tree.Delete(index, index);
+        }
 
         IEnumerator<T> IEnumerable<T>.GetEnumerator() => GetEnumerator();
 
@@ -83,25 +98,50 @@ namespace System.Collections.Generic
 
         #region Range Operations
         public void AddRange(IEnumerable<T> data) => InsertRange(Count, data);
-        public void InsertRange(int index, IEnumerable<T> data) => tree.Insert(data, index);
+        public void InsertRange(int index, IEnumerable<T> data)
+        {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+            tree.Insert(data, index);
+        }
         public IList<T> GetRange(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.Ensures(Contract.Result<IList<T>>() != null);
+            Contract.EndContractBlock();
+
             if (count > 0) return tree.Report(index, index + count - 1);
             else return new List<T>();
         }
         public void RemoveRange(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.EndContractBlock();
+
             if (count > 0)
                 tree.Delete(index, index + count - 1);
         }
         public void OperateRange(int index, int count, ActionRef<T> operation)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.EndContractBlock();
+
             if (count > 0)
                 tree.Operate(operation, index, index + count - 1);
         }
         public void Reverse() => Reverse(0, Count);
         public void Reverse(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.EndContractBlock();
+
             if (count > 0)
                 tree.Reverse(index, index + count - 1);
         }
@@ -156,7 +196,6 @@ namespace System.Collections.Generic
         public void Insert(IEnumerable<T> data, int startindex)
         {
             if (data == null) return;
-            if (startindex > Count) throw new ArgumentOutOfRangeException("插入位置不正确");
 
             SelectSegment(startindex, startindex + 1);
 
@@ -181,8 +220,6 @@ namespace System.Collections.Generic
         }
         public void Delete(int startindex, int endindex)
         {
-            if (endindex < startindex) throw new ArgumentException("操作范围不正确");
-            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
 
             // Splay segment
             SelectSegment(startindex, endindex + 2);
@@ -196,9 +233,8 @@ namespace System.Collections.Generic
         }
         public void Reverse(int startindex, int endindex)
         {
-            if (endindex < startindex) throw new InvalidOperationException("操作范围不正确");
-            else if (endindex == startindex) return;
-            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
+
+            if (endindex == startindex) return;
 
             // Splay segment
             SelectSegment(startindex, endindex + 2);
@@ -224,8 +260,6 @@ namespace System.Collections.Generic
         }
         public void Operate(ActionRef<T> optr, int startindex, int endindex)
         {
-            if (endindex < startindex) throw new InvalidOperationException("操作范围不正确");
-            if (endindex >= Count) throw new ArgumentOutOfRangeException("操作范围不正确");
 
             // Splay segment
             SelectSegment(startindex, endindex + 2);

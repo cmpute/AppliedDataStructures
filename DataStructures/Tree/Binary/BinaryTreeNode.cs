@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Class for Binary Tree Node
@@ -33,6 +34,8 @@ namespace System.Collections.Advanced
             return false;
         }
         public static bool operator !=(BinaryTreeNode a, BinaryTreeNode b) => !(a == b);
+        public override bool Equals(object obj) => base.Equals(obj);
+        public override int GetHashCode() => base.GetHashCode();
         /// <summary>
         /// Method for indicating whether it's leaf sentinel in the tree.It should be override whenever nil is re-defined.
         /// 用来判断当前结点是否为叶结点哨兵的方法。如果重新定义了nil对象，则应重载此方法。
@@ -66,7 +69,7 @@ namespace System.Collections.Advanced
             get { return _lchild; }
             set
             {
-                if (value == this) throw new ReferenceLoopException("不能将自己设为自己的孩子");
+                Contract.Requires<ReferenceLoopException>(value != this);
                 _lchild = value;
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
@@ -76,7 +79,7 @@ namespace System.Collections.Advanced
             get { return _rchild; }
             set
             {
-                if (value == this) throw new ReferenceLoopException("不能将自己设为自己的孩子");
+                Contract.Requires<ReferenceLoopException>(value != this);
                 _rchild = value;
                 if (!ReferenceEquals(value, null)) value._par = this;
             }
@@ -287,6 +290,17 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected static BinaryTreeNode Connect34(BinaryTreeNode a, BinaryTreeNode b, BinaryTreeNode c, BinaryTreeNode t0, BinaryTreeNode t1, BinaryTreeNode t2, BinaryTreeNode t3, BinaryTreeNode top)
         {
+            Contract.Requires<ArgumentNullException>(a != null);
+            Contract.Requires<ArgumentNullException>(b != null);
+            Contract.Requires<ArgumentNullException>(c != null);
+            Contract.Ensures(a.LeftChild == t0);
+            Contract.Ensures(a.RightChild == t1);
+            Contract.Ensures(c.LeftChild == t2);
+            Contract.Ensures(c.RightChild == t3);
+            Contract.Ensures(b.LeftChild == a);
+            Contract.Ensures(b.RightChild == c);
+            Contract.EndContractBlock();
+
             top.TransferParent(b);
 
             a.LeftChild = t0;

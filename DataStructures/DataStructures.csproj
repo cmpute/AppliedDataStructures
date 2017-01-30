@@ -119,7 +119,7 @@
     <Compile Include="Tree\IRootedTree.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Tree\ISearchTree.cs" />
-    <Compile Include="Tree\Binary\TraverseOrder.cs" />
+    <Compile Include="Tree\TraverseOrder.cs" />
     <Compile Include="Tree\Multiway\IMultiwayTreeNode.cs" />
     <Compile Include="Tree\Multiway\KaryTreeNode.cs" />
     <Compile Include="Tree\Multiway\vanEmdeBoasTreeNode.cs" />

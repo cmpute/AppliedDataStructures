@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -21,11 +22,15 @@ namespace System.Collections.Advanced
         public static IComparer<T> AsComparer<T>(this Comparison<T> comparison) => new ComparerWrapper<T>(comparison);
         public static IEqualityComparer<T> AsEqualityComparer<T>(this Comparison<T> comparison) => new ComparerWrapper<T>(comparison);
 
+        [Pure]
         /// <summary>
         /// Fast Implementation of Math.Ceiling(Math.Log(<paramref name="n"/>,2))
         /// </summary>
         public static int Ceil2(double n)
         {
+            Contract.Requires<ArgumentException>(n > 1);
+            Contract.Ensures(Contract.Result<int>() > 0);
+
             int a = 1, c = 0;
             while (a < n)
             {

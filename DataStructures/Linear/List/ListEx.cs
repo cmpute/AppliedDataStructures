@@ -5,13 +5,19 @@ using System.Text;
 using System.Threading.Tasks;
 using Contract = System.Diagnostics.Contracts.Contract;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Linear
 {
     public static class ListEx
     {
-        public static IList<T> AsList<T>(this LinkedList<T> list) => new LinkedListWrapper<T>(list);
+        public static IList<T> AsList<T>(this LinkedList<T> list)
+        {
+            Contract.Requires<ArgumentNullException>(list != null);
+            return new LinkedListWrapper<T>(list);
+        }
         internal static int IndexOf<T>(this IEnumerable<T> list, T item)
         {
+            Contract.Requires<ArgumentNullException>(list != null);
+
             var itor = list.GetEnumerator();
             int count = 0;
             if (ReferenceEquals(item, null))
@@ -37,8 +43,9 @@ namespace System.Collections.Advanced
         }
         internal static void CopyTo<T>(this IEnumerable<T> list, T[] array, int arrayIndex)
         {
-            Diagnostics.Contracts.Contract.Requires<ArgumentNullException>(array != null);
-            Diagnostics.Contracts.Contract.Requires<ArgumentException>(array.Rank == 1);
+            Contract.Requires<ArgumentNullException>(list != null);
+            Contract.Requires<ArgumentNullException>(array != null);
+            Contract.Requires<ArgumentException>(array.Rank == 1);
 
             int current = arrayIndex;
             var iter = list.GetEnumerator();

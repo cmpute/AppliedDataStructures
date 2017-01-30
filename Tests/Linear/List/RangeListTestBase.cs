@@ -1,7 +1,7 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
-using System.Collections.Advanced;
+using System.Collections.Advanced.Linear;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;

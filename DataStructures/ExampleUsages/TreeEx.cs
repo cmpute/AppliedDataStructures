@@ -1,11 +1,12 @@
 ﻿using System;
+using System.Collections.Advanced.Linear;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Contract = System.Diagnostics.Contracts.Contract;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Extension methods for Trees
@@ -41,6 +42,9 @@ namespace System.Collections.Advanced
         public static IEnumerator<TNode> GetSubtreeEnumerator<TNode>(this TNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
             where TNode : class, IBinaryTreeNode, IPersistent
         {
+            Contract.Requires<ArgumentNullException>(partialroot != null);
+            Contract.Ensures(Contract.Result<IEnumerator<TNode>>() != null);
+
             switch (order)
             {
                 case TraverseOrder.InOrder:
@@ -57,7 +61,12 @@ namespace System.Collections.Advanced
         }
 
         public static IEnumerable<IBinaryTreeNode> TraverseSubtree(this IBinaryTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
-            => partialroot.TraverseSubtree<object>(null, null, null, order).Select(res => res.Item1);
+        {
+            Contract.Requires<ArgumentNullException>(partialroot != null);
+            Contract.Ensures(Contract.Result<IEnumerable<IBinaryTreeNode>>() != null);
+
+            return partialroot.TraverseSubtree<object>(null, null, null, order).Select(res => res.Item1);
+        }
         /// <summary>
         /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with certain information (of type <typeparamref name="TLevel"/>) of the node
         /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点有关信息(<typeparamref name="TLevel"/>类型的)
@@ -76,6 +85,9 @@ namespace System.Collections.Advanced
             Func<TLevel, IBinaryTreeNode, TLevel> rightlevelfunc,
             TraverseOrder order = TraverseOrder.InOrder)
         {
+            Contract.Requires<ArgumentNullException>(partialroot != null);
+            Contract.Ensures(Contract.Result<IEnumerable<Tuple<IBinaryTreeNode, TLevel>>>() != null);
+
             var current = new Tuple<IBinaryTreeNode, TLevel>[] { new Tuple<IBinaryTreeNode, TLevel>(partialroot, seed) };
             var leftlevel = leftlevelfunc == null ? seed : leftlevelfunc(seed, partialroot);
             var rightlevel = rightlevelfunc == null ? seed : rightlevelfunc(seed, partialroot);
@@ -120,8 +132,14 @@ namespace System.Collections.Advanced
             }
         }
 
-        public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order = TraverseOrder.InOrder)
-            => partialroot.TraverseSubtree<object>(null, null, order).Select(res => res.Item1);
+        public static IEnumerable<IMultiwayTreeNode> TraverseSubtree(this IMultiwayTreeNode partialroot, TraverseOrder order = TraverseOrder.LevelOrder)
+        {
+            Contract.Requires<ArgumentNullException>(partialroot != null);
+            Contract.Requires<NotSupportedException>(order != TraverseOrder.InOrder, "多叉树不支持中序遍历");
+            Contract.Ensures(Contract.Result<IEnumerable<IMultiwayTreeNode>>() != null);
+
+            return partialroot.TraverseSubtree<object>(null, null, order).Select(res => res.Item1);
+        }
         /// <summary>
         /// enumerate the subtree with the root <paramref name="partialroot"/>, provided with certain information (of type <typeparamref name="TLevel"/>) of the node
         /// 遍历以<paramref name="partialroot"/>为根的子树，并且在过程中提供结点有关信息(<typeparamref name="TLevel"/>类型的)
@@ -139,11 +157,13 @@ namespace System.Collections.Advanced
             Func<TLevel, IMultiwayTreeNode, int, TLevel> levelfunc,
             TraverseOrder order = TraverseOrder.LevelOrder)
         {
+            Contract.Requires<ArgumentNullException>(partialroot != null);
+            Contract.Requires<NotSupportedException>(order != TraverseOrder.InOrder, "多叉树不支持中序遍历");
+            Contract.Ensures(Contract.Result<IEnumerable<Tuple<IMultiwayTreeNode, TLevel>>>() != null);
+
             var current = new Tuple<IMultiwayTreeNode, TLevel>[] { new Tuple<IMultiwayTreeNode, TLevel>(partialroot, seed) };
             switch (order)
             {
-                case TraverseOrder.InOrder:
-                    throw new NotSupportedException("多叉树不支持中序遍历");
                 case TraverseOrder.PreOrder:
                     return current.Concat(partialroot.Children?
                         .SelectMany((node, index) => node?.TraverseSubtree(
@@ -183,6 +203,20 @@ namespace System.Collections.Advanced
             }
         }
 
+        public static bool IsAncestorOf(this BinaryTreeNode node, BinaryTreeNode target)
+        {
+            Contract.Requires<ArgumentNullException>(node != null);
+            Contract.Requires<ArgumentNullException>(target != null);
+
+            var p = target.Parent;
+            while(SentinelEx.NotEqualNull(p))
+            {
+                if (p == node) return true;
+                p = p.Parent;
+            }
+            return false;
+        }
+
         #endregion
 
         #region Tree Type Judging
@@ -190,8 +224,10 @@ namespace System.Collections.Advanced
         public static TreeKind JudgeKind<TNode>(this IRootedTree<TNode> tree)
             where TNode : class, IBinaryTreeNode
         {
+            Contract.Requires<ArgumentNullException>(tree != null);
+            Contract.Requires<InvalidOperationException>(tree.Root != null, "树不能为空");
+
             var last = tree.Root;
-            if (SentinelEx.EqualNull(last)) throw new InvalidOperationException("树不能为空");
             TreeKind result = TreeKind.Ordinary;
 
             int degreelog = tree.Root.GetDegree();
@@ -239,6 +275,9 @@ namespace System.Collections.Advanced
         }
         public static int GetDegree(this IBinaryTreeNode node)
         {
+            Contract.Requires<ArgumentNullException>(node != null);
+            Contract.Ensures(Contract.Result<int>() >= 0 && Contract.Result<int>() <= 2);
+
             if (SentinelEx.NotEqualNull(node.LeftChild))
                 if (SentinelEx.NotEqualNull(node.RightChild))
                     return 2;
@@ -248,7 +287,12 @@ namespace System.Collections.Advanced
                 return 1;
             else return 0;
         }
-        public static int GetDegree(this IMultiwayTreeNode node) => node.Children?.Count(cnode => SentinelEx.NotEqualNull(cnode)) ?? 0;
+        public static int GetDegree(this IMultiwayTreeNode node)
+        {
+            Contract.Requires<ArgumentNullException>(node == null);
+            Contract.Ensures(Contract.Result<int>() >= 0);
+            return node.Children?.Count(cnode => SentinelEx.NotEqualNull(cnode)) ?? 0;
+        }
         private static bool AreChildrenLeftPadding(this IMultiwayTreeNode node)
         {
             if (node.Children == null) return true;
@@ -293,7 +337,8 @@ namespace System.Collections.Advanced
 
         TNode KeyValueCheck(TKey key, TNode value)
         {
-            if (_tree.KeyComparer.Compare(key, value.Key) != 0) throw new ArgumentException("结点键值与输入的参数键值不匹配");
+            if (_tree.KeyComparer.Compare(key, value.Key) != 0)
+                throw new ArgumentException("结点键值与输入的参数键值不匹配");
             return value;
         }
 

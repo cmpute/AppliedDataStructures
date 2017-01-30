@@ -6,7 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Diagnostics.Contracts;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Linear
 {
     public class UnrolledLinkedListNode<TData> : IPersistent, IMergable<UnrolledLinkedListNode<TData>>, IPrintable
     {
@@ -37,6 +37,8 @@ namespace System.Collections.Advanced
 
         public UnrolledLinkedListNode(int capacity)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(capacity > 0);
+
             _items = new TData[capacity];
 #if DEBUG
             _rmref = true;
@@ -49,9 +51,25 @@ namespace System.Collections.Advanced
         public int Count { get; protected set; }
         public int Version { get; protected set; }
 
-        public void Split(Func<int, UnrolledLinkedListNode<TData>> newNode) => Split(Count >> 1, newNode);
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Count >= 0);
+            Contract.Invariant(Version >= 0);
+            Contract.Invariant(Capacity >= 0);
+        }
+
+        public void Split(Func<int, UnrolledLinkedListNode<TData>> newNode)
+        {
+            Contract.Requires<ArgumentNullException>(newNode != null);
+            Split(Count >> 1, newNode);
+        }
         public void Split(int splitIndex, Func<int, UnrolledLinkedListNode<TData>> newNode)
         {
+            Contract.Requires<ArgumentNullException>(newNode != null);
+            Contract.Requires<ArgumentOutOfRangeException>(splitIndex >= 0 && splitIndex <= Count);
+            Contract.Ensures(Contract.OldValue(Next) == Next.Next);
+
             if (splitIndex == Count)
                 return;
 
@@ -67,7 +85,12 @@ namespace System.Collections.Advanced
             newnext.Update();
         }
 
-        public void Merge(UnrolledLinkedListNode<TData> newNext) => Merge(newNext, 0);
+        public void Merge(UnrolledLinkedListNode<TData> newNext)
+        {
+            Contract.Requires<ArgumentNullException>(newNext != null);
+            Contract.Ensures(Contract.OldValue(newNext.Next) == Next);
+            Merge(newNext, 0);
+        }
         /// <summary>
         /// Merge current node with <paramref name="newNext"/>, the nodes between this and <paramref name="newNext"/> are abandoned.
         /// 合并当前结点与<paramref name="newNext"/>， 之间的结点将会被抛弃
@@ -76,6 +99,10 @@ namespace System.Collections.Advanced
         /// <param name="startIndex">合并的结点开始合并的数据位置</param>
         public void Merge(UnrolledLinkedListNode<TData> newNext, int startIndex)
         {
+            Contract.Requires<ArgumentNullException>(newNext != null);
+            Contract.Requires<ArgumentOutOfRangeException>(startIndex >= 0 && startIndex <= Count);
+            Contract.Ensures(Contract.OldValue(newNext.Next) == Next);
+
             if (newNext == this) return;
 
             if (newNext.Count > 0)
@@ -93,6 +120,9 @@ namespace System.Collections.Advanced
 
         public void Insert(int index, TData item, Func<int, UnrolledLinkedListNode<TData>> newNext)
         {
+            Contract.Requires<ArgumentNullException>(newNext != null);
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+
             if (Count == Capacity)
             {
                 Split(newNext);
@@ -114,6 +144,8 @@ namespace System.Collections.Advanced
         ///<param name="head">链表的头节点，删除过程中将保证head不被Merge</param>
         public TData Delete(int index)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+
             var res = _items[index];
             if (index < --Count)
             {
@@ -128,6 +160,11 @@ namespace System.Collections.Advanced
 
         public void Delete(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.EndContractBlock();
+
             Count -= count;
             if (index < Count)
                 Array.Copy(_items, index + count, _items, index, Count - index);
@@ -150,6 +187,8 @@ namespace System.Collections.Advanced
 
         public void PrintTo(TextWriter textOut)
         {
+            Contract.Requires<ArgumentNullException>(textOut != null);
+
             textOut.Write('[');
             _items.Take(Count).PrintTo(textOut);
             textOut.Write(']');

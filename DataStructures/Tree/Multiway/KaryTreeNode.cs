@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Node of a k-way tree (a.k.a k-ary tree)
@@ -38,8 +39,18 @@ namespace System.Collections.Advanced
 
         public KaryTreeNode(int maxDegree)
         {
+            Contract.Requires<ArgumentException>(maxDegree > 0);
+
             MaxDegree = maxDegree;
             _children = new List<KaryTreeNode>(maxDegree);
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(MaxDegree > 0);
+            Contract.Invariant(Children.Count <= MaxDegree);
+            Contract.Invariant(Children.Capacity == MaxDegree);
         }
     }
 }

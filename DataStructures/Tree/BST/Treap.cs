@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Treap, a kind of binary search tree which is heap-ordered
@@ -84,6 +85,8 @@ namespace System.Collections.Advanced
         /// <returns>合并后的子树</returns>
         private BinaryTreeNode MergeSub(BinaryTreeNode left, BinaryTreeNode right)
         {
+            Contract.Ensures(Contract.Result<BinaryTreeNode>() == left || Contract.Result<BinaryTreeNode>() == right);
+
             if (left as TNode == null)
                 return right;
             if (right as TNode == null)
@@ -106,11 +109,13 @@ namespace System.Collections.Advanced
 
         protected override void DeleteInternal(TNode node)
         {
+            Contract.Requires<ArgumentNullException>(node != null);
             Transplant(node, MergeSub(node.LeftChild, node.RightChild));
         }
 
-        public override TNode InsertInternal(TNode node)
+        protected override TNode InsertInternal(TNode node)
         {
+            if (node == null) return null;
             var res = base.InsertInternal(node);
             if (res == node) // not already exist
                 PercolateUp(res);
@@ -119,6 +124,8 @@ namespace System.Collections.Advanced
 
         protected void PercolateUp(TNode target)
         {
+            Contract.Requires<ArgumentNullException>(target != null);
+
             TNode c = target;
             TNode p = c.Parent as TNode;
             while (p != null && _priorityComparer.Compare(p.Priority, c.Priority) > 0)
@@ -134,6 +141,8 @@ namespace System.Collections.Advanced
         /// </remarks>
         protected void PercolateDown(TNode target)
         {
+            Contract.Requires<ArgumentNullException>(target != null);
+
             TNode c = target;
             while (true)
             {
@@ -249,21 +258,26 @@ namespace System.Collections.Advanced
 
         public TNode ExtractMin()
         {
+            Contract.Requires<InvalidOperationException>(Count > 0);
+
             var res = Root;
             DeleteNode(Root);
             return res;
         }
 
-        void IPriorityQueue<TPriority, TNode>.Insert(TNode data) => InsertNode(data);
+        void IPriorityQueue<TPriority, TNode>.Insert(TNode node) => InsertNode(node);
 
         /// <remarks>
-        /// This implementation use the complicate <see cref="PercolateDown"/>, a easier way to achieve this is to delete <paramref name="data"/> and insert it back again
+        /// This implementation use the complicate <see cref="PercolateDown"/>, a easier way to achieve this is to delete <paramref name="node"/> and insert it back again
         /// 这个方法的实现使用了复杂的<see cref="PercolateDown"/>方法，一个更简单的做法是直接删除data再重新插入
         /// </remarks>
-        public void PriorityUpdate(TNode data)
+        public void PriorityUpdate(TNode node)
         {
-            PercolateUp(data);
-            PercolateDown(data);
+            Contract.Requires<ArgumentNullException>(node != null);
+            Contract.Requires<InvalidOperationException>(this.Contains(node));
+
+            PercolateUp(node);
+            PercolateDown(node);
         }
         #endregion
     }

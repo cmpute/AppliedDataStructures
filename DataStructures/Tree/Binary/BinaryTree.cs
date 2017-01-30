@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Abstraction of Binary Tree
@@ -30,6 +31,13 @@ namespace System.Collections.Advanced
         {
             Root = null;
             Count = 0;
+        }
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(Count >= 0);
+            Contract.Invariant(_rootTrailer != null);
         }
 
         public IEnumerator<TNode> GetEnumerator(TraverseOrder order) => Root.GetSubtreeEnumerator(order);

@@ -6,9 +6,15 @@ using System.Text;
 using System.Threading.Tasks;
 using Contract = System.Diagnostics.Contracts.Contract;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Linear
 {
-    //TODO: Accomplish auto size-increment in unrolled linked list ( using Array.Resize)
+    //TODO: Accomplish auto size-increment in unrolled linked list ( using Array.Resize )
+    /// <summary>
+    /// Unrolled Linked List, a kind of linked list that every node has a block of data.
+    /// 块状链表，一种每一个结点都有一块数据的链表
+    /// </summary>
+    /// <typeparam name="TNode">链表结点的类型</typeparam>
+    /// <typeparam name="TData">链表存储的数据类型</typeparam>
     public class UnrolledLinkedList<TNode, TData> : IRangeList<TData>, IPrintable, IPersistent
         where TNode : UnrolledLinkedListNode<TData>
     {
@@ -59,6 +65,9 @@ namespace System.Collections.Advanced
         public UnrolledLinkedList(Func<int, TNode> newNode) : this(newNode, _minCapacity) { }
         public UnrolledLinkedList(Func<int, TNode> newNode, int capacity)
         {
+            Contract.Requires<ArgumentNullException>(newNode != null);
+            Contract.Requires<ArgumentException>(capacity >= 0);
+
             if (capacity < _minCapacity)
                 capacity = _minCapacity;
 
@@ -300,10 +309,12 @@ namespace System.Collections.Advanced
         {
             get
             {
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
                 return Find(ref index)._items[index];
             }
             set
             {
+                Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
                 Find(ref index)._items[index] = value;
             }
         }
@@ -343,11 +354,23 @@ namespace System.Collections.Advanced
         }
         public IEnumerator<TData> GetEnumerator() => new Enumerator(this);
 
-        public virtual int IndexOf(TData item) => EnumerateIndexOf(item, false);
+        public virtual int IndexOf(TData item)
+        {
+            Contract.Ensures(Contract.Result<int>() >= -1);
+            Contract.Ensures(Contract.Result<int>() < Count);
 
-        public virtual int LastIndexOf(TData item) => EnumerateIndexOf(item, true);
+            return EnumerateIndexOf(item, false);
+        }
 
-        public virtual int EnumerateIndexOf(TData item, bool backward)
+        public virtual int LastIndexOf(TData item)
+        {
+            Contract.Ensures(Contract.Result<int>() >= -1);
+            Contract.Ensures(Contract.Result<int>() < Count);
+
+            return EnumerateIndexOf(item, true);
+        }
+
+        private int EnumerateIndexOf(TData item, bool backward)
         {
             var itor = GetEnumerator(backward);
             int count = 0;
@@ -375,6 +398,8 @@ namespace System.Collections.Advanced
 
         public void Insert(int index, TData item)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+
             var loc = Find(ref index);
             loc.Insert(index, item, _new);
 
@@ -394,6 +419,8 @@ namespace System.Collections.Advanced
 
         public void RemoveAt(int index)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index < Count);
+
             var loc = Find(ref index);
 
             loc.Delete(index); // do not merge head with head.previous
@@ -408,6 +435,8 @@ namespace System.Collections.Advanced
 
         public void PrintTo(TextWriter textOut)
         {
+            Contract.Requires<ArgumentNullException>(textOut != null);
+
             if (Count == 0) textOut.WriteLine("Null Unrolled Linked List");
 
             var node = head;
@@ -453,6 +482,8 @@ namespace System.Collections.Advanced
 
         public void InsertRange(int index, IEnumerable<TData> collection)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0 && index <= Count);
+
             var itor = collection.GetEnumerator();
             var node = Find(ref index);
 
@@ -477,6 +508,11 @@ namespace System.Collections.Advanced
 
         public void RemoveRange(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.EndContractBlock();
+
             // find end first to make hot node is located at start.
             var end = index + count;
             var endnode = Find(ref end);
@@ -513,6 +549,10 @@ namespace System.Collections.Advanced
 
         public void Reverse(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+
             throw new NotImplementedException();
         }
 
@@ -523,6 +563,12 @@ namespace System.Collections.Advanced
 
         public IList<TData> GetRange(int index, int count)
         {
+            Contract.Requires<ArgumentOutOfRangeException>(index >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(count >= 0);
+            Contract.Requires<ArgumentOutOfRangeException>(index + count <= Count);
+            Contract.Ensures(Contract.Result<IList<TData>>() != null);
+            Contract.EndContractBlock();
+
             var start = index;
             var startnode = Find(ref start);
             var end = index + count;

@@ -1,4 +1,4 @@
-﻿namespace System.Collections.Advanced
+﻿namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Indicating traversing order of the tree

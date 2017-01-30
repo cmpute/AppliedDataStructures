@@ -1,11 +1,11 @@
 ﻿using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.Collections.Advanced;
+using System.Collections.Advanced.Tree;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Node = System.Collections.Advanced.AVLTreeNode<int>;
+using Node = System.Collections.Advanced.Tree.AVLTreeNode<int>;
 
 namespace System.Collections.Advanced.Tests
 {

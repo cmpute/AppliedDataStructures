@@ -10,8 +10,8 @@ namespace System.Collections.Advanced
     /// Interface that indicates that the structure can be merged into another structure
     /// 表示该结构可以并入另一个结构的接口
     /// </summary>
-    /// <typeparam name="TIn">可以合并的结构的类型</typeparam>
-    public interface IMergable<in TIn> //<in TIn, out TOut>
+    /// <typeparam name="T">可以合并的结构的类型</typeparam>
+    public interface IMergable<in T> //<in TIn, out TOut>
     {
         /// <summary>
         /// Merge with another structure
@@ -21,7 +21,7 @@ namespace System.Collections.Advanced
         /// <remarks>
         /// The merging may be not copying original structures, it may destroy origin structure.
         /// </remarks>
-        void Merge(TIn target);
+        void Merge(T target);
         //TOut Merge(TIn target);
     }
 }

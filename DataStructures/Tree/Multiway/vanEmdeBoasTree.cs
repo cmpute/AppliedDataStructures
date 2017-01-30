@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// van Emde Boas Tree (a.k.a vEB-tree)
@@ -23,6 +24,14 @@ namespace System.Collections.Advanced
         public int Capacity => Root?.UniverseSize ?? _defaultCapacity;
 
         public TNode Root => _root;
+
+        [ContractInvariantMethod]
+        private void ObjectInvariant()
+        {
+            Contract.Invariant(_new != null);
+            Contract.Invariant(Count >= 0);
+            Contract.Invariant(Capacity >= 2);
+        }
         
         /// <summary>
         /// 创建一棵自定义结点新的vEB树
@@ -36,6 +45,9 @@ namespace System.Collections.Advanced
         /// <param name="newNode">创建新结点的方法</param>
         public vanEmdeBoasTree(int initsize, Func<int, TNode> newNode)
         {
+            Contract.Requires<ArgumentException>(initsize > 0);
+            Contract.Requires<ArgumentNullException>(newNode != null);
+            
             if (initsize < 2) initsize = _defaultCapacity;
             _new = newNode;
             _root = _new(Utils.Ceil2(initsize));
@@ -122,15 +134,19 @@ namespace System.Collections.Advanced
         }
 
         public IDictionary<int, TData> ToDictionary()
-            => Root.TraverseSubtree(0, (level, node, index) => level + index * (1 << ((node as vanEmdeBoasTreeNode<TData>).UniverseBits >> 1)), TraverseOrder.PreOrder)
-                .SelectMany(res =>
-                {
-                    var node = (res.Item1 as vanEmdeBoasTreeNode<TData>);
-                    if (node.Count == 0) return Enumerable.Empty<Tuple<int, TData>>();
-                    if (node.UniverseSize == 2 && node.Count == 2)
-                        return new[] { new Tuple<int, TData>(res.Item2, node.MinData), new Tuple<int, TData>(res.Item2 + 1, node.MaxData) };
-                    else return new[] { new Tuple<int, TData>(res.Item2 + node.Min.Value, node.MinData) };
-                })
-                .ToDictionary(res => res.Item1, res => res.Item2);
+        {
+            Contract.Requires<InvalidOperationException>(Root != null);
+
+            return Root.TraverseSubtree(0, (level, node, index) => level + index * (1 << ((node as vanEmdeBoasTreeNode<TData>).UniverseBits >> 1)), TraverseOrder.PreOrder)
+                  .SelectMany(res =>
+                  {
+                      var node = (res.Item1 as vanEmdeBoasTreeNode<TData>);
+                      if (node.Count == 0) return Enumerable.Empty<Tuple<int, TData>>();
+                      if (node.UniverseSize == 2 && node.Count == 2)
+                          return new[] { new Tuple<int, TData>(res.Item2, node.MinData), new Tuple<int, TData>(res.Item2 + 1, node.MaxData) };
+                      else return new[] { new Tuple<int, TData>(res.Item2 + node.Min.Value, node.MinData) };
+                  })
+                  .ToDictionary(res => res.Item1, res => res.Item2);
+        }
     }
 }

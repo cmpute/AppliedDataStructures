@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     public class SplayTree<TNode, TKey> : BinarySearchTree<TNode, TKey> where TNode : BinaryTreeNode, IKeyProvider<TKey>
     {
@@ -16,7 +17,11 @@ namespace System.Collections.Advanced
         /// 做一系列旋转使得<see cref="node"/>成为树根
         /// </summary>
         /// <param name="node">被旋转的结点</param>
-        protected void Splay(BinaryTreeNode node) => Splay(node, _rootTrailer);
+        protected void Splay(BinaryTreeNode node)
+        {
+            Contract.Requires<ArgumentNullException>(node != null);
+            Splay(node, _rootTrailer);
+        }
         /// <summary>
         /// Do rotations(splay) to make <see cref="node"/> children of <see cref="target"/>
         /// 做一系列旋转使得<see cref="node"/>成为<see cref="target"/>的孩子节点
@@ -26,6 +31,10 @@ namespace System.Collections.Advanced
         /// <remarks>make sure that the node is a descandent of target.</remarks>
         protected void Splay(BinaryTreeNode node, BinaryTreeNode target)
         {
+            Contract.Requires<ArgumentNullException>(node != null);
+            Contract.Requires<ArgumentNullException>(target == null || target.IsAncestorOf(node));
+            Contract.EndContractBlock();
+
             if (node == null) return;
             node.SearchDown();
             var p = node.Parent;
@@ -63,14 +72,14 @@ namespace System.Collections.Advanced
         protected override TNode SearchInternal(TKey key, bool modify)
         {
             var node = base.SearchInternal(key, modify);
-            Splay(node);
+            if (node != null) Splay(node);
             return node;
         }
 
-        public override TNode InsertInternal(TNode node)
+        protected override TNode InsertInternal(TNode node)
         {
             var res = base.InsertInternal(node);
-            Splay(res);
+            if (res != null) Splay(res);
             return res;
         }
     }

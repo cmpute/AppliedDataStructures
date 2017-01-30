@@ -1,10 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace System.Collections.Advanced
+namespace System.Collections.Advanced.Tree
 {
     /// <summary>
     /// Binary Heap, a most succinct implementation of heap
@@ -44,10 +45,16 @@ namespace System.Collections.Advanced
         /// 对数组进行移动，使之满足最小堆的性质。该方法直接对<paramref cref="target"/>进行操作，而不是拷贝副本。
         /// </summary>
         /// <param name="target">需要堆化的数组</param>
-        public static BinaryHeap<TValue> Heapify(IList<TValue> target) => Heapify(target, Comparer<TValue>.Default);
+        public static BinaryHeap<TValue> Heapify(IList<TValue> target)
+        {
+            Contract.Requires<ArgumentNullException>(target != null);
+            return Heapify(target, Comparer<TValue>.Default);
+        }
         public static BinaryHeap<TValue> Heapify(IList<TValue> target, IComparer<TValue> comparer)
         {
-            BinaryHeap<TValue> heap = new BinaryHeap<TValue>();
+            Contract.Requires<ArgumentNullException>(target != null);
+
+            BinaryHeap <TValue> heap = new BinaryHeap<TValue>();
             heap.Nodes = target;
             heap._comparer = comparer ?? Comparer<TValue>.Default;
             heap.Heapify();
@@ -65,7 +72,7 @@ namespace System.Collections.Advanced
 
         public TValue ExtractMin()
         {
-            if (Count == 0) throw new InvalidOperationException("堆为空");
+            Contract.Requires<InvalidOperationException>(Count > 0);
 
             var min = Root;
             Nodes[0] = Nodes[Count - 1];
@@ -79,6 +86,8 @@ namespace System.Collections.Advanced
 
         public void Insert(TValue data)
         {
+            Contract.Requires<ArgumentNullException>(data != null);
+
             Nodes.Add(data);
             UpdateIndex(Count - 1);
             PercolateUp(Count - 1);
@@ -86,6 +95,8 @@ namespace System.Collections.Advanced
 
         public void Merge(IPriorityQueue<TValue, TValue> another)
         {
+            if (another == null) return;
+
             foreach (var node in another)
                 Nodes.Add(node);
             Heapify();
@@ -95,6 +106,9 @@ namespace System.Collections.Advanced
          
         public void PriorityUpdate(TValue data)
         {
+            Contract.Requires<ArgumentNullException>(data != null);
+            Contract.Requires<ArgumentNullException>(this.Contains(data));
+
             int loc = (data as IIndexedHeapNode)?.IndexInHeap ?? Nodes.IndexOf(data);
             PercolateUp(loc);
             PercolateDown(loc);
